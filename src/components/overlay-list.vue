@@ -1,0 +1,196 @@
+<template>
+  <mu-v-box
+    class="overlay-list">
+    <mu-icon-button
+      button-type="normal"
+      button-style="link">
+      <mu-icon
+        :svg="listIcon"
+        :class="{active: overlayListVisible}"
+        @click="onClickOverlayWindow" />
+    </mu-icon-button>
+    <mu-v-box
+      v-show="overlayListVisible">
+      <mu-bar>
+        元件列表
+        <div size="auto" />
+        <label>
+          <input
+            v-model="showHiddenOverlay"
+            type="checkbox">
+          只显示已隐藏
+        </label>
+        <label>
+          <input
+            v-model="showUnlinkOverlay"
+            type="checkbox">
+          只显示未关联
+        </label>
+      </mu-bar>
+      <mu-h-box header>
+        <mu-flex-item
+          v-for="(h, index) in headers"
+          v-show="!h.hidden"
+          :key="index"
+          :size="h.size"
+          :text-align="h.textAlign">
+          {{ h.label }}
+        </mu-flex-item>
+      </mu-h-box>
+      <mu-v-box
+        size="auto"
+        style="overflow: auto;">
+        <mu-h-box
+          v-for="(item, i) in filterOverlays"
+          :key="item.id"
+          :class="{active: item === overlay}"
+          align-items="center"
+          @click.native="onClickOverlay(item)">
+          <mu-flex-item
+            size="60px">
+            {{ i + 1 }}
+          </mu-flex-item>
+          <mu-flex-item
+            size="auto"
+            text-align="left"
+            style="width: 0;">
+            <div
+              class="mu-text-ellipsis"
+              style="color: #fff;"
+              :title="item.name">
+              {{ item.name }}
+            </div>
+            <div
+              class="mu-text-ellipsis"
+              :title="item.structureName">
+              {{ item.structureName }}
+            </div>
+          </mu-flex-item>
+          <mu-flex-item
+            v-show="commandOrg"
+            size="80px"
+            class="mu-text-ellipsis"
+            :title="item.orgName">
+            {{ item.orgName }}
+          </mu-flex-item>
+          <mu-flex-item
+            size="60px">
+            <mu-toggle
+              v-if="item.isCurrentOrg"
+              v-model="item.isDisplay"
+              @click.stop=""
+              @change="onChange(item, 'isDisplay')" />
+            <mu-toggle
+              v-else
+              v-model="item.isCommandDisplay"
+              @click.stop=""
+              @change="onChange(item, 'isCommandDisplay')" />
+          </mu-flex-item>
+        </mu-h-box>
+      </mu-v-box>
+    </mu-v-box>
+  </mu-v-box>
+</template>
+<script>
+  import d from '../d'
+
+  export default {
+    inject: ['map'],
+    props: {
+      context: {
+        type: Object,
+        default: () => ({})
+      }
+    },
+    data () {
+      return {
+        showHiddenOverlay: false,
+        showUnlinkOverlay: false,
+        listIcon: d.list
+      }
+    },
+    computed: {
+      commandOrg () {
+        return this.map.commandOrg || false
+      },
+      overlays () {
+        return this.map.overlays
+      },
+      overlayListVisible () {
+        return this.map.overlayListVisible
+      },
+      overlay () {
+        return this.map.active.overlay || {}
+      },
+      filterOverlays () {
+        const groupIds = []
+        const result = []
+        for (const oly of this.overlays) {
+          if (!oly.isCurrentOrg && !oly.isDisplay) continue
+
+          const {
+            conditionDisplay,
+            conditionStructure
+          } = this.getDisplay(oly)
+          if (conditionDisplay &&
+            conditionStructure &&
+            !groupIds.includes(oly.parentId)) {
+            result.push(oly)
+          }
+          if (oly.parentId &&
+            oly.parentId !== -1 &&
+            !groupIds.includes(oly.parentId)) {
+            groupIds.push(oly.parentId)
+          }
+        }
+        return result
+      },
+      headers () {
+        return [
+          {
+            size: '60px',
+            label: '序号'
+          },
+          {
+            size: 'auto',
+            label: '元件名称',
+            textAlign: 'left'
+          },
+          {
+            size: '80px',
+            label: '来源',
+            hidden: !this.commandOrg
+          },
+          {
+            size: '60px',
+            label: '显示'
+          }
+        ]
+      }
+    },
+    methods: {
+      getDisplay (oly) {
+        const display = oly.isCurrentOrg ? oly.isDisplay : oly.isCommandDisplay
+        const conditionDisplay = this.showHiddenOverlay ? !display : true
+        const conditionStructure =
+          this.showUnlinkOverlay
+            ? !oly.projectStructureId
+            : true
+        return { conditionDisplay, conditionStructure }
+      },
+      onClickOverlayWindow () {
+        this.map.switchOverlayWindow('overlayListVisible')
+      },
+      onClickOverlay (oly) {
+        const display =
+          oly.isCurrentOrg
+            ? oly.isDisplay
+            : oly.isCommandDisplay
+        if (display) this.$emit('click', oly, true)
+      },
+      onChange (item, key) {
+        this.$emit('change', item, { key, value: item[key] })
+      }
+    }
+  }
+</script>

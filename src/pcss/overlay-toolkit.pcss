@@ -1,0 +1,49 @@
+.overlay-bar {
+  position: absolute !important;
+  top: 40px;
+  width: 40px;
+  margin: 16px;
+  text-align: center;
+  z-index: 100;
+  & > div {
+    background: $bgColorLight;
+    &::-webkit-scrollbar {
+     width: 0;
+    }
+    &:last-child {
+      position: absolute;
+      width: 152px;
+      max-height: 120px;
+      height: auto;
+      padding: 8px 0 0;
+      left: 40px;
+      overflow: auto;
+      box-shadow: 0 3px 12px rgba(0,0,0,.23),0 3px 12px rgba(0,0,0,.16);
+      & a {
+        width: 28px;
+        height: 28px;
+        padding: 4px;
+        margin: 0 0 8px 8px;
+        background: $fontColorWhite;
+        & img {
+          width: 100%;
+          height: 100%;
+        }
+      }
+    }
+    & .mu-list-item{
+      padding: 0 6px;
+      width: 40px;
+      line-height: 40px;
+      font-size: $fontSize;
+      color: $fontColorWhite !important;
+      &:hover{
+        background: $bgColorHover;
+        cursor: pointer;
+      }
+      &.active{
+        background: $bgColorActive;
+      }
+    }
+  }
+}
