@@ -1,0 +1,45 @@
+.overlay-form {
+  width: 262px;
+  top: 72px;
+  right: 32px;
+  bottom: 108px;
+  overflow: auto;
+  z-index: 10;
+  & *, button {
+    color: $fontColorGrey;
+    font-size: $fontSize !important;
+  }
+  button:hover {
+    color: $fontColorWhite !important;
+  }
+  & .mu-editor[disabled] > .mu-input,
+  & .mu-toggle[disabled] > .mu-toggle-slide-bar {
+    background: $bgColorDisabled;
+  }
+  & > * {
+    background: $bgColorLight;
+    &.mu-bar,
+    & > .mu-bar {
+      padding: 0 0 0 8px;
+      background: $bgColorDark;
+    }
+    & img, & [combo-icon] {
+      position: absolute;
+      top: 8px;
+      left: 16px;
+      z-index: 10;
+    }
+    & .mu-color-picker {
+      position:absolute;
+      max-width: 60px;
+      opacity: 0;
+      z-index: 10;
+      & > input {
+        cursor: pointer;
+      }
+      & > .mu-color-picker-indicator {
+        z-index: -1 !important;
+      }
+    }
+  }
+}

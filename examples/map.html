@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Bar Example</title>
+  <script type="text/javascript" src="../node_modules/vue/dist/vue.js"></script>
+  <script type="text/javascript" src="../node_modules/mussel/dist/mussel.js"></script>
+  <script type="text/javascript" src="../node_modules/a-color-picker/dist/acolorpicker.js"></script>
+  <script type="text/javascript" src="https://api.map.baidu.com/api?v=3.0&amp;ak=471Ih7dPPTucwZXZxlq5ax52Hb71FhZ8"></script>
+  <script type="text/javascript" src="https://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager.js"></script>
+  <script type="text/javascript" src="../dist/mobula.js"></script>
+  <style>
+    .client-area {
+      background: rgba(0, 0, 0, .05);
+    }
+  </style>
+</head>
+
+<body class="mu-background-normal">
+  <div id="app">
+    <h2>Map Example</h2>
+    <hr>
+    <map-bidu
+      :command-org="false"
+      :events="events"
+      :legends="legends"
+      :overlays="overlays"
+      :structures="structures">
+      <map-mode></map-mode>
+      <map-toolkit></map-toolkit>
+      <map-overlay-toolkit></map-overlay-toolkit>
+      <map-overlay-list></map-overlay-list>
+      <map-overlay-form></map-overlay-form>
+    </map-bidu>
+  </div>
+
+  <script type="text/javascript">
+    var app = new Vue({
+      el: '#app',
+      data: {
+        context: {
+          currentOrg: {
+            id: 10
+          }
+        },
+        events: {},
+        legends: [
+          {
+            id: 1008,
+            type: 'marker',
+            value: 'marker',
+            disabled: true,
+            imgUrl: "http://dev.mctech.vip/fss/iwop-dev/intelli-quantity/map-legend/23273869197912261851758722365306.svg?FSSAccessKeyId=LTAIMMsdxTwnzzof&Expires=1585281784&Signature=n9TlWEZAMMi7fwk86G2eaaZ0lvY%3D"
+          },
+          {
+            type: 'marker',
+            disabled: true,
+            value: 'create'
+          },
+          {
+            id: 1013,
+            type: 'polyline',
+            value: 'solid',
+            disabled: true,
+            isRemoved: false
+          },
+          {
+            id: 1016,
+            type: 'polygon',
+            value: 'circle',
+            disabled: true,
+            isRemoved: false
+          },
+          {
+            id: 1017,
+            type: 'special',
+            value: 'specialDoubleLine',
+            imgUrl: 'http://dev.mctech.vip/fss/iwop-dev/intelli-quantity/map-legend/15368183468982430837415124692641.png?FSSAccessKeyId=LTAIMMsdxTwnzzof&Expires=1585281784&Signature=HW9EOFM%2BiuPXjZ7EkbznoE11imM%3D',
+            disabled: true,
+            isRemoved: false
+          }
+        ],
+        overlays: [],
+        structures: [
+          {
+            id: 10001,
+            name: '性能',
+            projectStructureCategoryId: null,
+            categoryName: null
+          },
+          {
+            id: 10002,
+            name: '猫胖胖',
+            projectStructureCategoryId: 1001,
+            categoryName: '猫'
+          },
+          {
+            id: 10003,
+            name: '猫臭臭',
+            projectStructureCategoryId: 1001,
+            categoryName: '猫'
+          }
+        ],
+        listVisible: true
+      },
+      mounted () {
+        this.events = {
+          mouseover: (e, overlay) => {
+            console.log('mouseover')
+          }
+        }
+        this.overlays.push(
+          {
+            id: 102,
+            name: '线',
+            points: [
+              {
+                longitude: 111.08588591379404,
+                latitude: 29.119196829827867
+              },
+              {
+                longitude: 111.15588591379404,
+                latitude: 29.129196829827867
+              }
+            ],
+            projectMapLegendId: 1013,
+            visible: true,
+            disabled: false
+          },
+          {
+            id: 101,
+            name: '圆形',
+            width: 280,
+            points: [
+              {
+                longitude: 111.05588591379404,
+                latitude: 29.119196829827867
+              }
+            ],
+            projectMapLegendId: 1016,
+            visible: true,
+            disabled: false
+          }
+        )
+      }
+    });
+  </script>
+</body>
+
+</html>
