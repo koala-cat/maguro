@@ -131,7 +131,7 @@
             :style="{maxWidth: maxWidth}">
             <mu-icon
               combo-icon
-              :icon="strokeStyle" />
+              :svg="getPath(strokeStyle)" />
             <mu-combo-box
               :clearable="false"
               :disabled="disabled"
@@ -142,8 +142,7 @@
                 style="padding: 5px 0; text-align: center;"
                 @click="onComboBoxSelect('strokeStyle', stroke.value)">
                 <mu-icon
-                  :svg="getPath(stroke.value)"
-                  style="fill: #ffffff;" />
+                  :svg="getPath(stroke.value)" />
               </mu-option>
             </mu-combo-box>
           </mu-h-box>
@@ -283,7 +282,8 @@
           return this.overlay.name
         },
         set (val) {
-          this.$emit('change', { name: val })
+          console.log(this.map)
+          this.map.updateOverlay('name', val)
         }
       },
       specialFile () {
@@ -294,7 +294,7 @@
           return this.overlay.width
         },
         set (val) {
-          this.$emit('change', { width: parseFloat(val) })
+          this.map.updateOverlay('width', parseFloat(val))
         }
       },
       height: {
@@ -302,7 +302,7 @@
           return this.overlay.height || null
         },
         set (val) {
-          this.$emit('change', { height: parseFloat(val) })
+          this.map.updateOverlay('height', parseFloat(val))
         }
       },
       fillColor: {
@@ -311,7 +311,7 @@
         },
         set (val) {
           if (this.fillFieldVisible) {
-            this.$emit('change', { fillColor: val })
+            this.map.updateOverlay('fillColor', val)
           }
         }
       },
@@ -321,7 +321,7 @@
         },
         set (val) {
           if (val === 0) val = 0.00001
-          this.$emit('change', { fillOpacity: fixedNumber(val / 100, 4) })
+          this.map.updateOverlay('fillOpacity', fixedNumber(val / 100, 4))
         }
       },
       strokeColor: {
@@ -329,7 +329,7 @@
           return this.overlay.strokeColor
         },
         set (val) {
-          this.$emit('change', { strokeColor: val })
+          this.map.updateOverlay('strokeColor', val)
         }
       },
       strokeWeight: {
@@ -337,7 +337,7 @@
           return this.overlay.strokeWeight
         },
         set (val) {
-          this.$emit('change', { strokeWeight: val })
+          this.map.updateOverlay('strokeWeight', val)
         }
       },
       strokeStyle () {
@@ -348,7 +348,7 @@
           return this.overlay.isLocked
         },
         set (val) {
-          this.$emit('change', { isLocked: val })
+          this.map.updateOverlay('isLocked', val)
         }
       },
       isDisplay: {
@@ -357,7 +357,7 @@
         },
         set (val) {
           const key = this.overlay.isCommand ? 'isDisplay' : 'isCommandDisplay'
-          this.$emit('change', { [key]: val })
+          this.map.updateOverlay(key, val)
         }
       },
       structureName () {
@@ -387,10 +387,10 @@
         this.visible = false
       },
       onComboBoxSelect (key, val) {
-        this.$emit('change', { [key]: val })
+        this.map.updateOverlay(key, val)
       },
       onChangeLevel (val) {
-        this.$emit('change', { level: val })
+        this.map.updateOverlay('level', val)
       }
     }
   }

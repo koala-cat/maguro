@@ -186,7 +186,9 @@
           oly.isCurrentOrg
             ? oly.isDisplay
             : oly.isCommandDisplay
-        if (display) this.$emit('click', oly, true)
+        if (display) {
+          this.map.selectOverlay(oly)
+        }
       },
       onChange (item, key) {
         this.$emit('change', item, { key, value: item[key] })

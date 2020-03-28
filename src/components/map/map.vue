@@ -8,7 +8,9 @@
 </template>
 <script>
   import BMap from 'BMap'
+  import debounce from 'lodash.debounce'
   import { Initial } from './initial'
+  import Update from './update'
 
   let map = null
 
@@ -62,16 +64,6 @@
         }
       }
     },
-    watch: {
-      // events: {
-      //   handler (val) {
-      //     this.suspend = true
-      //     this.initial.bindEvents(val)
-      //     this.initial.overlays(true)
-      //   },
-      //   deep: true
-      // }
-    },
     mounted () {
       map = new BMap.Map('map', { enableMapClick: false })
       map.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
@@ -89,6 +81,19 @@
         this.updateOverlays,
         this.removedOverlays,
         this.polylineCenters,
+        this.polylinePointIds,
+        this.active,
+        this.marker
+      )
+
+      this.update = new Update(
+        map,
+        this.events,
+        this.overlays,
+        this.selectedOverlays,
+        this.specialOverlays,
+        this.updateOverlays,
+        this.removedOverlays,
         this.polylinePointIds,
         this.active,
         this.marker
@@ -113,22 +118,29 @@
         this.suspend = true
         this.active.tool = val
         this.initial._select.tool()
+      },
+      updateOverlay: debounce(function (key, value) {
+        this.update.setSetting(key, value, (oly) => {
+          this.initial._select.overlay(oly)
+        })
+      }, 500),
+      selectOverlay (overlay) {
+        let points = null
+        const type = overlay.type
+
+        try {
+          points = overlay.getPath()
+        } catch {
+          points = [overlay.getPosition()]
+        }
+
+        const viewPort = this.map.getViewport(points)
+        this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+        if (type.includes('special')) {
+          overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
+        }
+        this.initial._select.overlay(overlay)
       }
-    //   if (zoom) {
-    //   let points = null
-    //   try {
-    //     points = overlay.getPath()
-    //   } catch {
-    //     points = [overlay.getPosition()]
-    //   }
-    //   const viewPort = this._map.getViewport(points)
-    //   this._map.centerAndZoom(viewPort.center, viewPort.zoom)
-    //   if (type.includes('special')) {
-    //     overlay = this._overlays.find(
-    //       item => item.invented && item.parentId === overlay.parentId
-    //     )
-    //   }
-    // }
     }
   }
 </script>

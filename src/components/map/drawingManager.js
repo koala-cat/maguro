@@ -5,12 +5,9 @@ import Draw from './draw'
 import Remove from './remove'
 import { setOverlaySettings } from './setting'
 
-let me = null
-
 class DrawingManager extends Draw {
   constructor (map, overlays, id) {
     super()
-    me = this
     this._map = map
     this._overlays = overlays
 
@@ -67,7 +64,7 @@ class DrawingManager extends Draw {
       this._drawingManager._mask.addEventListener('click', click)
       return
     } else {
-      this.listenerEvent(`${type}complete`, this[`${type}Complete`])
+      this.listenerEvent(`${type}complete`, this[`${type}Complete`].bind(this))
     }
 
     const modes = {
@@ -90,44 +87,44 @@ class DrawingManager extends Draw {
   }
 
   drawNewOverlay (overlay, newOverlay) {
-    setOverlaySettings(newOverlay, me._options)
-    me._map.removeOverlay(overlay)
-    me._drawingManager.close()
-    super.bindEvents(me._events, newOverlay)
-    if (me._callback) me._callback(newOverlay)
+    setOverlaySettings(newOverlay, this._options)
+    this._map.removeOverlay(overlay)
+    this._drawingManager.close()
+    super.bindEvents(this._events, newOverlay)
+    if (this._callback) this._callback(newOverlay)
   }
 
   markerComplete (marker) {
     const options = {
-      ...me._options,
+      ...this._options,
       width: 16
     }
-    me._map.removeOverlay(marker)
-    me._drawingManager.close()
-    super.marker(marker.point, false, options, me._events, me._callback)
+    this._map.removeOverlay(marker)
+    this._drawingManager.close()
+    super.marker(marker.point, false, options, this._events, this._callback)
   }
 
   polylineComplete (line) {
     const points = line.getPath()
-    const newLine = new BMap.Polyline(points, me._options)
-    me.drawNewOverlay(line, newLine)
+    const newLine = new BMap.Polyline(points, this._options)
+    this.drawNewOverlay(line, newLine)
   }
 
   circleComplete (circle) {
     const center = circle.getCenter()
     const radius = circle.getRadius()
-    const newCircle = new BMap.Circle(center, radius, me._options)
-    me.drawNewOverlay(circle, newCircle)
+    const newCircle = new BMap.Circle(center, radius, this._options)
+    this.drawNewOverlay(circle, newCircle)
   }
 
   rectangleComplete (ply) {
-    me.polygonComplete(ply)
+    this.polygonComplete(ply)
   }
 
   polygonComplete (ply) {
-    const newPly = new BMap.Polygon(ply.getPath(), me._options)
-    newPly.type = me._type
-    me.drawNewOverlay(ply, newPly)
+    const newPly = new BMap.Polygon(ply.getPath(), this._options)
+    newPly.type = this._type
+    this.drawNewOverlay(ply, newPly)
   }
 }
 

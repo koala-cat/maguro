@@ -7,11 +7,8 @@ import { defaultStyle, getOverlaySettings, setOverlaySettings } from './setting'
 
 // 绘制点（icon、symbol、svg）、线、面（圆、多边形）、文本、特殊类型
 
-let me = null
-
 class Draw {
   constructor (map, marker) {
-    me = this
     this._map = map
     this._marker = marker
   }
@@ -87,16 +84,16 @@ class Draw {
     }
     if (svg) {
       options.fillColor = '#333'
-      marker = me.svg(point, svg, options)
+      marker = this.svg(point, svg, options)
     } else {
-      const icon = isSymbol ? me.symbolIcon(options) : me.icon(options)
+      const icon = isSymbol ? this.symbolIcon(options) : this.icon(options)
       marker = new BMap.Marker(point, {
         icon: icon
       })
     }
 
     setOverlaySettings(marker, options)
-    me.bindEvents(events, marker)
+    this.bindEvents(events, marker)
     if (callback) callback(marker)
 
     return marker

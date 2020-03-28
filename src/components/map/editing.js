@@ -1,5 +1,4 @@
 import BMap from 'BMap'
-import cloneDeep from 'lodash.clonedeep'
 import { notify } from 'mussel'
 
 import { calcRectAllPoints } from './calc/point'
@@ -14,15 +13,16 @@ class SetEditing {
     this._marker = marker
   }
 
-  enableEditing (overlay, editable, style = {}) {
+  enableEditing (overlay, editable) {
     const type = overlay.type
     if (!type) return
+
     if (type === 'marker') {
       overlay = this.marker(overlay, editable)
     } else if (type === 'label') {
-      overlay = this.label(overlay, editable, style)
+      overlay = this.label(overlay, editable)
     } else if (type === 'rectangle') {
-      overlay = this.rectangle(overlay, editable, style)
+      overlay = this.rectangle(overlay, editable)
     } else if (type.includes('special')) {
       overlay = this.special(overlay, editable)
     } else {
@@ -62,31 +62,50 @@ class SetEditing {
     }
   }
 
-  rectangle (overlay, editable, style, options = {}) {
+  rectangle (overlay, editable, options = {}) {
+    if (!editable) {
+      this.clearMarkers()
+      return
+    }
+
     const mPoints = overlay.getPath()
     const points = calcRectAllPoints(mPoints[0], mPoints[2], 6)
 
     if (editable) {
-      const markers = this.getMarkers(points, options, 6, (path) => {
-        overlay.setPath(path)
+      const sizeWidth = options.width || 10
+      const sizeHeight = options.height || 10
+      const markers = []
+      const moveIcon = new BMap.Icon('assets/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
+        imageSize: new BMap.Size(sizeWidth, sizeHeight)
       })
-      overlay.markers = markers
-    } else {
-      overlay.markers.map(marker => {
-        this._map.removeOverlay(marker)
-      })
-      delete overlay.markers
+      const shadow = new BMap.Icon('assets/shadow.png', new BMap.Size(sizeWidth * 2, sizeHeight * 2))
+
+      for (let i = 0; i < points.length; i++) {
+        const marker = new BMap.Marker(points[i])
+        marker.point = points[i]
+        marker.parentId = overlay.id
+        marker.enableDragging()
+        marker.setIcon(moveIcon)
+        marker.setShadow(shadow)
+        markers.push(marker)
+        this._map.addOverlay(marker)
+
+        // this._drag.polygonMarker(marker, markers, points, 6, (path) => {
+        //   overlay.setPath(path)
+        // })
+      }
+      this._marker.overlays.push(...markers)
     }
     return overlay
   }
 
-  label (overlay, editable, style) {
+  label (overlay, editable) {
     const borderColor = editable ? '#5E87DB' : 'rgba(0, 0, 0, 0)'
     overlay.setStyle({ borderColor })
     return overlay
   }
 
-  special (overlay, editable, options = {}, callback) {
+  special (overlay, editable, options = {}) {
     if (!editable) {
       this.clearMarkers()
       return
@@ -112,6 +131,7 @@ class SetEditing {
       const mPoint = points[i]
       const marker = new BMap.Marker(mPoint)
       marker.point = mPoint
+      marker.parentId = overlay.id
       marker.enableDragging()
       marker.setIcon(moveIcon)
       marker.setShadow(shadow)
@@ -123,53 +143,6 @@ class SetEditing {
     }
     this._marker.overlays.push(...markers)
     return polyline
-  }
-
-  getMarkers (points, options, count, callback) {
-    const sizeWidth = options.width || 10
-    const sizeHeight = options.height || 10
-    const markers = []
-    let endPoint = null
-    let pointsTmp = cloneDeep(points)
-    const moveIcon = new BMap.Icon('assets/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
-      imageSize: new BMap.Size(sizeWidth, sizeHeight)
-    })
-    const shadow = new BMap.Icon('assets/shadow.png', new BMap.Size(sizeWidth * 2, sizeHeight * 2))
-
-    for (let i = 0; i < points.length; i++) {
-      const marker = new BMap.Marker(points[i])
-      marker.point = points[i]
-      marker.enableDragging()
-      marker.setIcon(moveIcon)
-      marker.setShadow(shadow)
-      markers.push(marker)
-      marker.addEventListener('mousedown', (e) => {
-        endPoint = e.target.point
-      })
-      marker.addEventListener('dragging', (e) => {
-        const point = e.point
-        for (let j = 0; j < pointsTmp.length; j++) {
-          if (endPoint.lng === pointsTmp[j].lng) {
-            points[j].lng = point.lng
-          }
-
-          if (endPoint.lat === pointsTmp[j].lat) {
-            points[j].lat = point.lat
-          }
-        }
-        points = calcRectAllPoints(points[0], points[4], count)
-        for (let j = 0; j < markers.length; j++) {
-          markers[j].setPosition(points[j])
-        }
-
-        const rectPoints = [points[0], points[2], points[4], points[6]]
-        if (callback) callback(rectPoints)
-      })
-      marker.addEventListener('dragend', (e) => {
-        pointsTmp = cloneDeep(points)
-      })
-    }
-    this._marker.overlays.push(...markers)
   }
 
   clearMarkers () {

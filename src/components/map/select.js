@@ -1,5 +1,6 @@
 import { tools } from '../../constants'
 import { isOverlayInFrame } from './calc/geo'
+import { getPolylineIncludeSpecials } from './calc/overlay'
 
 import Add from './add'
 import Drag from './drag'
@@ -7,6 +8,7 @@ import DrawingManager from './drawingManager'
 import Remove from './remove'
 import SetEditing from './editing'
 import { defaultStyle } from './setting'
+import Update from './update'
 
 class Select {
   constructor (
@@ -33,6 +35,24 @@ class Select {
     this._active = active
     this._marker = marker
 
+    this._add = new Add(
+      this._map,
+      this._overlays,
+      this._specialOverlays,
+      this._marker
+    )
+    this._drag = new Drag(
+      map,
+      events,
+      overlays,
+      selectedOverlays,
+      specialOverlays,
+      updateOverlays,
+      removedOverlays,
+      polylinePointIds,
+      active,
+      marker
+    )
     this._drawingManager = new DrawingManager(
       this._map,
       this._overlays
@@ -44,25 +64,17 @@ class Select {
       this._marker
     )
     this._remove = new Remove(this._map)
-
-    this._add = new Add(
-      this._map,
-      this._overlays,
-      this._specialOverlays,
-      this._marker
-    )
-
-    this._drag = new Drag(
-      this._map,
-      this._events,
-      this._overlays,
-      this._selectedOverlays,
-      this._specialOverlays,
-      this._updateOverlays,
-      this._removedOverlays,
-      this._polylinePointIds,
-      this._active,
-      this._marker
+    this._update = new Update(
+      map,
+      events,
+      overlays,
+      selectedOverlays,
+      specialOverlays,
+      updateOverlays,
+      removedOverlays,
+      polylinePointIds,
+      active,
+      marker
     )
   }
 
@@ -74,7 +86,7 @@ class Select {
       return
     }
 
-    if (this._activeToolType === 'special' && type === 'polyline' && e) {
+    if (this._active.tool?.type === 'special' && type === 'polyline' && e) {
       const options = {
         ...defaultStyle(),
         type: this._active.tool?.value || '',
@@ -125,11 +137,14 @@ class Select {
       this._selectedOverlays.splice(0)
       this._active.overlay = overlays[0]
     }
-    this._editing.enableEditing(overlay, !overlay.disabled)
+
+    if (getPolylineIncludeSpecials(overlay, this._overlays).length === 0) {
+      this._editing.enableEditing(overlay, !overlay.disabled)
+    }
     this._selectedOverlays.push(...overlays)
 
     if (!overlay.disabled) {
-      this._drag.init(overlay)
+      this._drag.init(overlay, this._editing, this._update)
     }
   }
 
@@ -140,23 +155,24 @@ class Select {
       for (const oly of this._overlays) {
         const parentIds = []
         const type = oly.type
-
         if (parentIds.includes(oly.parentId) || !oly.visible) continue
         const { result, parentId } = isOverlayInFrame(oly, overlay)
         if (result) {
           if (type.includes('special')) {
             const specials = this._overlays.reduce((arr, item) => {
               if (item.parentId === oly.parentId) {
-                arr.push(item.id)
+                arr.push(item)
               }
               return arr
             }, [])
             this._selectedOverlays.push(...specials)
           } else {
             this._selectedOverlays.push(oly)
+            if (getPolylineIncludeSpecials(oly, this._overlays).length === 0) {
+              this._editing.enableEditing(oly, true)
+            }
           }
-          this._editing.enableEditing(oly, true)
-          this._drag.init(oly)
+          this._drag.init(oly, this._editing)
         }
         if (parentId) parentIds.push(parentId)
       }
@@ -194,10 +210,10 @@ class Select {
     }
 
     if (['polyline', 'special'].includes(tool.type)) {
-      this._activeToolType = type = tool.type
+      type = tool.type
       options.strokeStyle = type === 'polyline' ? tool.value : 'solid'
     } else {
-      this._activeToolType = type = tool.value || tool.type
+      type = tool.value || tool.type
       options.strokeStyle = 'solid'
     }
     options.type = type

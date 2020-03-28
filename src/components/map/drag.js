@@ -1,13 +1,12 @@
 import BMap from 'BMap'
+import cloneDeep from 'lodash.clonedeep'
 import { notify } from 'mussel'
 
+import { calcRectAllPoints } from './calc/point'
 import { calcMarkerOnLinePosition } from './calc/position'
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/overlay'
 
-import SetEditing from './editing'
 import Update from './update'
-
-let me = null
 
 class Drag {
   constructor (
@@ -22,21 +21,10 @@ class Drag {
     active,
     marker
   ) {
-    me = this
     this._map = map
     this._overlays = overlays
     this._selectedOverlays = selectedOverlays
-    this._updateOverlays = updateOverlays
-    this._removedOverlays = removedOverlays
-    this._polylinePointIds = polylinePointIds
     this._marker = marker
-
-    this._editing = new SetEditing(
-      this._map,
-      this._overlays,
-      this._selectedOverlays,
-      this._marker
-    )
 
     this._update = new Update(
       map,
@@ -52,19 +40,26 @@ class Drag {
     )
   }
 
-  init (overlay) {
-    const type = overlay.type
+  init (overlay, _editing) {
+    this._editing = _editing
 
     this._startPoint = null
     this._startPixel = null
 
-    if (type.includes('special')) {
-      const polyline = getSpecialAttachPolyline(overlay, this._overlays)
+    if (overlay.type.includes('special')) {
       this._marker.overlays.map(marker => {
-        this.specialMarker(marker, overlay, polyline)
+        if (marker.parentId === overlay.id) {
+          const polyline = getSpecialAttachPolyline(overlay, this._overlays)
+          this.specialMarker(marker, overlay, polyline)
+        }
       })
     } else {
-      overlay.addEventListener('mousedown', this.start)
+      if (overlay.type.includes('rectangle')) {
+        this.rectMarker(overlay, 6)
+      }
+      if (overlay.bindEvent) return
+      overlay.bindEvent = true
+      overlay.addEventListener('mousedown', this.start.bind(this))
     }
   }
 
@@ -74,23 +69,26 @@ class Drag {
     } catch {
       e.stopPropagation()
     }
-    me._startPixel = { x: e.clientX, y: e.clientY }
-    me._startPoint = me._map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
-    window.addEventListener('mousemove', me.move)
-    window.addEventListener('mouseup', me.end)
+    this._startPixel = { x: e.clientX, y: e.clientY }
+    this._startPoint = this._map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
+    this.moveHandler = this.move.bind(this)
+    this.endHandler = this.end.bind(this)
+    window.addEventListener('mousemove', this.moveHandler)
+    window.addEventListener('mouseup', this.endHandler)
   }
 
   move (e) {
     e.stopPropagation()
     const movePixel = { x: e.clientX, y: e.clientY }
-    const movePoint = me._map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
-    const dx = movePixel.x - me._startPixel.x
-    const dy = movePixel.y - me._startPixel.y
-    const dlng = movePoint.lng - me._startPoint.lng
-    const dlat = movePoint.lat - me._startPoint.lat
+    const movePoint = this._map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
+    const dx = movePixel.x - this._startPixel.x
+    const dy = movePixel.y - this._startPixel.y
+    const dlng = movePoint.lng - this._startPoint.lng
+    const dlat = movePoint.lat - this._startPoint.lat
+
     if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return
-    for (let i = 0; i < me._selectedOverlays.length; i++) {
-      const oly = me._selectedOverlays[i]
+    for (let i = 0; i < this._selectedOverlays.length; i++) {
+      const oly = this._selectedOverlays[i]
       const type = oly.type
 
       if (type.includes('special') || oly.disabled || oly.isLocked) {
@@ -99,29 +97,30 @@ class Drag {
 
       if (['marker', 'label'].includes(type)) {
         const point = oly.getPosition()
-        const mPoint = me.getPoint(point, dlng, dlat)
+        const mPoint = this.getPoint(point, dlng, dlat)
 
         oly.setPosition(mPoint)
       } else if (['circle'].includes(type)) {
         const point = oly.getCenter()
-        const mPoint = me.getPoint(point, dlng, dlat)
+        const mPoint = this.getPoint(point, dlng, dlat)
 
         oly.setCenter(new BMap.Point(mPoint.lng, mPoint.lat))
       } else {
-        me.setPath(oly, dlng, dlat)
-        const specialOlys = getPolylineIncludeSpecials(oly, me._overlays)
-        specialOlys.map(item => me.setPath(item, dlng, dlat))
+        this.setPath(oly, dlng, dlat)
+        const specialOlys = getPolylineIncludeSpecials(oly, this._overlays)
+        specialOlys.map(item => this.setPath(item, dlng, dlat))
       }
-      me._editing.enableEditing(oly, false)
+
+      if (this._editing) this._editing.enableEditing(oly, false)
     }
-    me._startPixel = movePixel
-    me._startPoint = movePoint
+    this._startPixel = movePixel
+    this._startPoint = movePoint
   }
 
   end (e) {
     e.stopPropagation()
 
-    me._selectedOverlays.map(oly => {
+    this._selectedOverlays.map(oly => {
       const type = oly.type
       let points = null
       try {
@@ -134,25 +133,23 @@ class Drag {
         }
       }
 
-      if (!type.includes('special')) {
-        me._editing.enableEditing(oly, true)
+      if (this._editing && !type.includes('special') &&
+        getPolylineIncludeSpecials(oly, this._overlays).length === 0) {
+        this._editing.enableEditing(oly, true)
+        if (type === 'rectangle') {
+          this.rectMarker(oly)
+        }
       }
 
-      me._update.overlay(
-        oly,
-        { key: 'points', value: points }
-      )
-      const specialOlys = getPolylineIncludeSpecials(oly, me._overlays)
-      specialOlys.map(item => {
-        me._update.overlay(
-          item,
-          { key: 'points', value: item.getPath() }
-        )
+      const overlays = getPolylineIncludeSpecials(oly, this._overlays)
+      overlays.push(oly)
+      overlays.map(item => {
+        this._update.overlay(item, { key: 'points', value: points })
       })
     })
 
-    window.removeEventListener('mousemove', me.move)
-    window.removeEventListener('mouseup', me.end)
+    window.removeEventListener('mousemove', this.moveHandler)
+    window.removeEventListener('mouseup', this.endHandler)
   }
 
   specialMarker (marker, overlay, polyline) {
@@ -175,6 +172,41 @@ class Drag {
         marker.setPosition(this._marker.points[movePointIdx])
         notify('info', '拖动后点的不在线上，请放大地图重新拖动。')
       }
+    })
+  }
+
+  rectMarker (overlay, count = 6) {
+    const markers = this._marker.overlays.filter(item => item.parentId === overlay.id)
+    let endPoint = null
+    const mPoints = overlay.getPath()
+    let points = calcRectAllPoints(mPoints[0], mPoints[2], count)
+    let pointsTmp = cloneDeep(points)
+    markers.map(marker => {
+      marker.addEventListener('mousedown', (e) => {
+        endPoint = e.target.point
+      })
+      marker.addEventListener('dragging', (e) => {
+        const point = e.point
+        for (let j = 0; j < pointsTmp.length; j++) {
+          if (endPoint.lng === pointsTmp[j].lng) {
+            points[j].lng = point.lng
+          }
+
+          if (endPoint.lat === pointsTmp[j].lat) {
+            points[j].lat = point.lat
+          }
+        }
+        points = calcRectAllPoints(points[0], points[4], count)
+        for (let j = 0; j < markers.length; j++) {
+          markers[j].setPosition(points[j])
+        }
+
+        const rectPoints = [points[0], points[2], points[4], points[6]]
+        overlay.setPath(rectPoints)
+      })
+      marker.addEventListener('dragend', (e) => {
+        pointsTmp = cloneDeep(points)
+      })
     })
   }
 

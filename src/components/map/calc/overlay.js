@@ -9,10 +9,10 @@ function getSpecialAttachPolyline (special, overlays) {
 
 function getPolylineIncludeSpecials (polyline, overlays) {
   const specials = []
-  if (polyline instanceof BMap.Polyline) return specials
+  if (!(polyline instanceof BMap.Polyline)) return specials
   for (const oly of overlays) {
     const type = oly.type
-    if (type !== 'special') {
+    if (!type.includes('special')) {
       continue
     }
     if (oly.parentLineId === polyline.id) specials.push(oly)

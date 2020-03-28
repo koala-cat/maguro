@@ -1,4 +1,3 @@
-import debounce from 'lodash.debounce'
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/overlay'
 
 import Add from './add'
@@ -52,41 +51,39 @@ class Update {
     this._remove = new Remove(this._map)
   }
 
-  setSetting (key, value) {
-    debounce(function () {
-      this._lineupdate = key
+  setSetting (key, value, callback) {
+    this._lineupdate = key
 
-      for (const oly of this._selectedOverlays) {
-        const type = oly.type
+    for (const oly of this._selectedOverlays) {
+      const type = oly.type
 
-        oly[key] = value
-        if (oly.invented) continue
+      oly[key] = value
+      if (oly.invented) continue
 
-        this.overlay(oly, { key, value })
-        if (key === 'name' && type === 'label') {
-          oly.setContent(value, { key, value })
-          continue
-        }
-        if (['name', 'level', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
-          this.swicthDisplay(oly, { key, value })
-          continue
-        }
-
-        if (type === 'label') {
-          const style = settingsToStyle({ key: value }, type)
-          oly.setStyle(style)
-        } else if (type === 'marker') {
-          this.markerSetting(oly, { key, value })
-        } else {
-          if (key === 'projectMapLegendId' || key === 'width') {
-            this.specialSetting(oly, null, key)
-            return
-          }
-          oly[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
-        }
+      this.overlay(oly, { key, value })
+      if (key === 'name' && type === 'label') {
+        oly.setContent(value, { key, value })
+        continue
       }
-      this._lineupdate = null
-    }, 500)
+      if (['name', 'level', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
+        this.swicthDisplay(oly, { key, value })
+        continue
+      }
+
+      if (type === 'label') {
+        const style = settingsToStyle({ [key]: value }, type)
+        oly.setStyle(style)
+      } else if (type === 'marker') {
+        this.markerSetting(oly, { key, value }, callback)
+      } else {
+        if (key === 'projectMapLegendId' || key === 'width') {
+          this.specialSetting(oly, null, key)
+          return
+        }
+        oly[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
+      }
+    }
+    this._lineupdate = null
   }
 
   specialSetting (overlay, points, setting) {
@@ -103,7 +100,6 @@ class Update {
       type
     }
 
-    this._editing.special(overlay, false)
     this._add.special(points, options, this._events, (olys) => {
       if (setting !== 'projectMapLegendId') {
         for (let i = 0; i < olys.length; i++) {
@@ -130,12 +126,10 @@ class Update {
       this._remove.selectedOverlays(this._overlays, this._selectedOverlays)
       this._selectedOverlays.push(...olys)
       this._active.overlay = olys[0]
-
-      this._editing.special(olys[olys.length - 1], true)
     })
   }
 
-  markerSetting (overlay, { key, value }, events) {
+  markerSetting (overlay, { key, value }, callback) {
     if (key !== 'projectMapLegendId' && overlay.svgDoc) {
       const style = settingsToStyle({ [key]: value })
       for (const s in style) {
@@ -148,11 +142,10 @@ class Update {
     }
 
     const point = overlay.getPosition()
-    const mPoint = [point.lng, point.lat]
-    const idx = window._overlays.findIndex(item => item.id === overlay.id)
+    const idx = this._overlays.findIndex(item => item.id === overlay.id)
     const options = {
       ...getOverlaySettings(overlay),
-      iconUrl: overlay.imgUrl,
+      iconUrl: overlay.imgUrl || overlay.iconUrl,
       svg: overlay.svgDoc
     }
 
@@ -160,15 +153,12 @@ class Update {
       overlay.remove()
     }
     this._editing.marker(overlay, false)
-    const newOverlay = this._draw.marker(mPoint, false, options, events)
     this._map.removeOverlay(overlay)
-    this.overlay(newOverlay, { key, value })
-    // moveOverlays(newOverlay)
-    this._editing.marker(newOverlay, true)
-
-    this._active.overlay = newOverlay
-    this._selectedOverlays.splice(0, 1, newOverlay)
+    const newOverlay = this._draw.marker(point, false, options, this._events)
+    this._map.addOverlay(newOverlay)
     this._overlays.splice(idx, 1, newOverlay)
+    this.overlay(newOverlay, { key, value })
+    if (callback) callback(newOverlay)
   }
 
   lineupdate (editable, overlay) {
