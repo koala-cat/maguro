@@ -1,5 +1,8 @@
 import BMap from 'BMap'
-import { getPolylineIncludeSpecials } from './calc/overlay'
+import { notify } from 'mussel'
+
+import { calcMarkerOnLinePosition } from './calc/position'
+import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/overlay'
 
 import SetEditing from './editing'
 import Update from './update'
@@ -9,9 +12,12 @@ let me = null
 class Drag {
   constructor (
     map,
+    events,
     overlays,
     selectedOverlays,
+    specialOverlays,
     updateOverlays,
+    removedOverlays,
     polylinePointIds,
     active,
     marker
@@ -20,19 +26,27 @@ class Drag {
     this._map = map
     this._overlays = overlays
     this._selectedOverlays = selectedOverlays
-    this._polylinePointIds = polylinePointIds
     this._updateOverlays = updateOverlays
+    this._removedOverlays = removedOverlays
+    this._polylinePointIds = polylinePointIds
+    this._marker = marker
 
     this._editing = new SetEditing(
-      map,
-      overlays,
-      selectedOverlays,
-      marker
+      this._map,
+      this._overlays,
+      this._selectedOverlays,
+      this._marker
     )
+
     this._update = new Update(
       map,
+      events,
       overlays,
       selectedOverlays,
+      specialOverlays,
+      updateOverlays,
+      removedOverlays,
+      polylinePointIds,
       active,
       marker
     )
@@ -41,11 +55,17 @@ class Drag {
   init (overlay) {
     const type = overlay.type
 
-    if (type.includes('special')) return
-
     this._startPoint = null
     this._startPixel = null
-    overlay.addEventListener('mousedown', this.start)
+
+    if (type.includes('special')) {
+      const polyline = getSpecialAttachPolyline(overlay, this._overlays)
+      this._marker.overlays.map(marker => {
+        this.specialMarker(marker, overlay, polyline)
+      })
+    } else {
+      overlay.addEventListener('mousedown', this.start)
+    }
   }
 
   start (e) {
@@ -120,23 +140,42 @@ class Drag {
 
       me._update.overlay(
         oly,
-        { key: 'points', value: points },
-        me._polylinePointIds,
-        me._updateOverlays
+        { key: 'points', value: points }
       )
       const specialOlys = getPolylineIncludeSpecials(oly, me._overlays)
       specialOlys.map(item => {
         me._update.overlay(
           item,
-          { key: 'points', value: item.getPath() },
-          me._polylinePointIds,
-          me._updateOverlays
+          { key: 'points', value: item.getPath() }
         )
       })
     })
 
     window.removeEventListener('mousemove', me.move)
     window.removeEventListener('mouseup', me.end)
+  }
+
+  specialMarker (marker, overlay, polyline) {
+    let endPoint = null
+    let movePointIdx = null
+
+    marker.addEventListener('mousedown', (e) => {
+      endPoint = e.point
+      const distanceA = this._map.getDistance(endPoint, this._marker.points[0])
+      const distanceB = this._map.getDistance(endPoint, this._marker.points[1])
+      movePointIdx = distanceA < distanceB ? 0 : 1
+    })
+    marker.addEventListener('dragend', (e) => {
+      const dragIdx = calcMarkerOnLinePosition(e.point, polyline, true)
+      if (dragIdx > -1) {
+        this._marker.points.splice(movePointIdx, 1, e.point)
+        this._marker.positions.splice(movePointIdx, 1, dragIdx)
+        this._update.specialSetting(overlay, polyline, 'points')
+      } else {
+        marker.setPosition(this._marker.points[movePointIdx])
+        notify('info', '拖动后点的不在线上，请放大地图重新拖动。')
+      }
+    })
   }
 
   getPoint (point, dlng, dlat) {

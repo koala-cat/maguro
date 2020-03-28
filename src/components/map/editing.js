@@ -96,8 +96,6 @@ class SetEditing {
     const sizeWidth = options.width || 10
     const sizeHeight = options.height || 10
     const markers = []
-    let endPoint = null
-    let movePointIdx = null
     const moveIcon = new BMap.Icon('assets/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
       imageSize: new BMap.Size(sizeWidth, sizeHeight)
     })
@@ -122,26 +120,9 @@ class SetEditing {
 
       const idx = calcMarkerOnLinePosition(points[i], polyline)
       this._marker.positions.push(idx)
-      marker.addEventListener('mousedown', (e) => {
-        endPoint = e.point
-        const distanceA = this._map.getDistance(endPoint, this._marker.points[0])
-        const distanceB = this._map.getDistance(endPoint, this._marker.points[1])
-        movePointIdx = distanceA < distanceB ? 0 : 1
-      })
-      marker.addEventListener('dragend', (e) => {
-        const dragIdx = calcMarkerOnLinePosition(e.point, polyline, true)
-        if (dragIdx > -1) {
-          this._marker.points.splice(movePointIdx, 1, e.point)
-          this._marker.positions.splice(movePointIdx, 1, dragIdx)
-          // setSpecialSettings(overlay, polyline.getPath(), 'points', false)
-          if (callback) callback(overlay, polyline, 'points')
-        } else {
-          marker.setPosition(this._marker.points[movePointIdx])
-          notify('info', '拖动后点的不在线上，请放大地图重新拖动。')
-        }
-      })
     }
     this._marker.overlays.push(...markers)
+    return polyline
   }
 
   getMarkers (points, options, count, callback) {

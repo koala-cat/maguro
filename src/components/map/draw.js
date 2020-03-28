@@ -48,8 +48,6 @@ class Draw {
   }
 
   symbolIcon (options) {
-    // options = defaultStyle(options)
-
     const rotation = options.rotation || 0
     const scale = options.scale || 4
     const symbol = options.symbol || BMap_Symbol_SHAPE_CIRCLE
@@ -85,10 +83,10 @@ class Draw {
 
     options = {
       ...options,
-      fillOpacity: 1,
-      fillColor: '#333'
+      fillOpacity: 1
     }
     if (svg) {
+      options.fillColor = '#333'
       marker = me.svg(point, svg, options)
     } else {
       const icon = isSymbol ? me.symbolIcon(options) : me.icon(options)
@@ -185,11 +183,8 @@ class Draw {
       newPoints = data
     }
 
-    options = { width: 32, ...options }
     const { type, width } = options
-
     const { wPoint, wPixel } = distanceToPointAndPixel(this._map, width)
-
     let overlays = []
     options.wPoint = wPoint
     options.wPixel = wPixel

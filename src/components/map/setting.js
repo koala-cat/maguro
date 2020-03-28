@@ -12,6 +12,7 @@ function defaultSettings () {
     projectStructureId: null,
     parentLineId: null,
     projectGeoKey: null,
+    iconUrl: null,
     fillColor: '#457bd8',
     fillOpacity: 0.5,
     strokeStyle: 'solid',

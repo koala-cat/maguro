@@ -8,7 +8,7 @@
 </template>
 <script>
   import BMap from 'BMap'
-  import Initial from './initial'
+  import { Initial } from './initial'
 
   let map = null
 
@@ -63,22 +63,14 @@
       }
     },
     watch: {
-      events: {
-        handler (val) {
-          this.suspend = true
-          this.initial.bindEvents(val)
-          this.initial.overlays(true)
-        },
-        deep: true
-      },
-      overlays (val) {
-        if (this.suspend) {
-          this.suspend = false
-          return
-        }
-        this.suspend = true
-        this.initial.overlays(true)
-      }
+      // events: {
+      //   handler (val) {
+      //     this.suspend = true
+      //     this.initial.bindEvents(val)
+      //     this.initial.overlays(true)
+      //   },
+      //   deep: true
+      // }
     },
     mounted () {
       map = new BMap.Map('map', { enableMapClick: false })

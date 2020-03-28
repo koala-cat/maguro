@@ -7,6 +7,8 @@ import OverlayForm from './overlay-form.vue'
 import OverlayList from './overlay-list.vue'
 import OverlayToolkit from './overlay-toolkit.vue'
 
+import { refresh } from './map/initial'
+
 function install ($Vue = Vue) {
   $Vue.component('map-bidu', MapBidu)
   $Vue.component('map-mode', Mode)
@@ -24,5 +26,7 @@ export {
   Toolkit,
   OverlayToolkit,
   OverlayForm,
-  OverlayList
+  OverlayList,
+
+  refresh
 }

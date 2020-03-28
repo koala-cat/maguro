@@ -106,10 +106,8 @@
         listVisible: true
       },
       mounted () {
-        this.events = {
-          mouseover: (e, overlay) => {
-            console.log('mouseover')
-          }
+        this.events.mouseover = (e, overlay) => {
+          console.log('mouseover')
         }
         this.overlays.push(
           {
@@ -144,6 +142,8 @@
             disabled: false
           }
         )
+        
+        mobula.refresh()
       }
     });
   </script>

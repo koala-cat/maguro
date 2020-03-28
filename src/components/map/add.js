@@ -61,7 +61,7 @@ class Add {
 
     const idx = calcMarkerOnLinePosition(point, polyline)
     if (idx > -1) {
-      const overlay = this._draw.marker(point, true, { fillOpacity: 1 })
+      const overlay = this._draw.marker(point, true, options)
       overlay.parentLineId = polyline.id
       this._map.addOverlay(overlay)
 
@@ -77,19 +77,20 @@ class Add {
     this._parentId--
     options = {
       ...options,
+      width: 32,
       parentLineId: polyline.id,
       parentId: this._parentId
     }
-    this._draw.special(polyline, options, events, (overlays) => {
-      this.special(overlays)
-      if (callback) callback()
-    })
+    this.special(polyline, options, events, callback)
   }
 
-  special (overlays) {
-    const parentId = overlays[0].parentId
-    this._specialOverlays[parentId] = overlays
-    this.overlay(overlays)
+  special (polyline, options, events, callback) {
+    this._draw.special(polyline, options, events, (overlays) => {
+      const parentId = overlays[0].parentId
+      this._specialOverlays[parentId] = overlays
+      this.overlay(overlays)
+      if (callback) callback(overlays)
+    })
   }
 }
 

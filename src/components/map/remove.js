@@ -43,6 +43,7 @@ class Remove {
         this._map.removeOverlay(oly)
       }
     }
+    selectedOverlays.splice(0)
   }
 
   markers (marker) {

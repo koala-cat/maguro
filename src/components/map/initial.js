@@ -9,6 +9,7 @@ import Legend from './legend'
 import Remove from './remove'
 import Select from './select'
 
+let me = null
 class Initial {
   constructor (
     map,
@@ -24,6 +25,7 @@ class Initial {
     active,
     marker
   ) {
+    me = this
     this._map = map
     this._events = events
     this._legends = legends
@@ -56,6 +58,7 @@ class Initial {
       this._selectedOverlays,
       this._specialOverlays,
       this._updateOverlays,
+      this._removedOverlays,
       this._polylineCenters,
       this._polylinePointIds,
       this._active,
@@ -87,9 +90,6 @@ class Initial {
     }
 
     this._events.click = click
-    for (const key in events) {
-      this._events[key] = events[key]
-    }
   }
 
   keyboard () {
@@ -185,4 +185,11 @@ class Initial {
   }
 }
 
-export default Initial
+function refresh () {
+  me.bindEvents()
+  me.overlays(true)
+}
+export {
+  Initial,
+  refresh
+}

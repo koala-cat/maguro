@@ -16,6 +16,7 @@ class Select {
     selectedOverlays,
     specialOverlays,
     updateOverlays,
+    removedOverlays,
     polylineCenters,
     polylinePointIds,
     active,
@@ -53,9 +54,12 @@ class Select {
 
     this._drag = new Drag(
       this._map,
+      this._events,
       this._overlays,
       this._selectedOverlays,
+      this._specialOverlays,
       this._updateOverlays,
+      this._removedOverlays,
       this._polylinePointIds,
       this._active,
       this._marker
@@ -72,6 +76,7 @@ class Select {
 
     if (this._activeToolType === 'special' && type === 'polyline' && e) {
       const options = {
+        ...defaultStyle(),
         type: this._active.tool?.value || '',
         iconUrl: this._active.tool.imgUrl,
         projectMapLegendId: this._active.tool.id

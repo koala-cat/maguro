@@ -1,6 +1,7 @@
 import debounce from 'lodash.debounce'
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/overlay'
 
+import Add from './add'
 import Draw from './draw'
 import SetEditing from './editing'
 import Remove from './remove'
@@ -9,19 +10,39 @@ import { getOverlaySettings, settingsToStyle } from './setting'
 class Update {
   constructor (
     map,
+    events,
     overlays,
     selectedOverlays,
+    specialOverlays,
+    updateOverlays,
+    removedOverlays,
+    polylinePointIds,
     active,
     marker
   ) {
     this._map = map
-    this._lineupdate = null
+    this._events = events
     this._overlays = overlays
     this._selectedOverlays = selectedOverlays
+    this._specialOverlays = specialOverlays
+    this._updateOverlays = updateOverlays
+    this._removedOverlays = removedOverlays
+    this._polylinePointIds = polylinePointIds
     this._active = active
     this._marker = marker
 
-    this._draw = new Draw(this._map)
+    this._lineupdate = null
+
+    this._add = new Add(
+      this._map,
+      this._overlays,
+      this._specialOverlays,
+      this._marker
+    )
+    this._draw = new Draw(
+      this._map,
+      this._marker
+    )
     this._editing = new SetEditing(
       this._map,
       this._overlays,
@@ -31,7 +52,7 @@ class Update {
     this._remove = new Remove(this._map)
   }
 
-  setSetting (key, value, polylinePointIds, updateOverlays, removedOverlays) {
+  setSetting (key, value) {
     debounce(function () {
       this._lineupdate = key
 
@@ -58,7 +79,7 @@ class Update {
           this.markerSetting(oly, { key, value })
         } else {
           if (key === 'projectMapLegendId' || key === 'width') {
-            this.specialSetting(oly, null, key, removedOverlays)
+            this.specialSetting(oly, null, key)
             return
           }
           oly[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
@@ -68,7 +89,7 @@ class Update {
     }, 500)
   }
 
-  specialSetting (overlay, points, setting, removedOverlays) {
+  specialSetting (overlay, points, setting) {
     const specials = this._selectedOverlays
     const type = overlay.type
 
@@ -83,17 +104,16 @@ class Update {
     }
 
     this._editing.special(overlay, false)
-
-    this._draw.special(points, options, (olys) => {
+    this._add.special(points, options, this._events, (olys) => {
       if (setting !== 'projectMapLegendId') {
         for (let i = 0; i < olys.length; i++) {
           olys[i].id = specials[i].id
           if (setting === 'width') {
-            this.update(olys[i], { key: setting, value: width })
+            this.overlay(olys[i], { key: setting, value: width })
             continue
           }
           if (setting === 'points') {
-            this.update(olys[i], { key: setting, value: olys[i].getPath() })
+            this.overlay(olys[i], { key: setting, value: olys[i].getPath() })
             continue
           }
         }
@@ -104,13 +124,13 @@ class Update {
           }
           return arr
         }, [])
-        removedOverlays.push(...ids)
+        this._removedOverlays.push(...ids)
       }
 
+      this._remove.selectedOverlays(this._overlays, this._selectedOverlays)
       this._selectedOverlays.push(...olys)
       this._active.overlay = olys[0]
 
-      this._remove.selectedOverlays(this._overlays, this._selectedOverlays)
       this._editing.special(olys[olys.length - 1], true)
     })
   }
@@ -142,7 +162,7 @@ class Update {
     this._editing.marker(overlay, false)
     const newOverlay = this._draw.marker(mPoint, false, options, events)
     this._map.removeOverlay(overlay)
-    this.update(newOverlay, { key, value })
+    this.overlay(newOverlay, { key, value })
     // moveOverlays(newOverlay)
     this._editing.marker(newOverlay, true)
 
@@ -157,11 +177,11 @@ class Update {
         let points = null
         try {
           points = [overlay.getCenter()]
-          this.update(overlay, { key: 'width', value: overlay.getRadius() })
+          this.overlay(overlay, { key: 'width', value: overlay.getRadius() })
         } catch {
           points = overlay.getPath()
         }
-        this.update(overlay, { key: 'points', value: points })
+        this.overlay(overlay, { key: 'points', value: points })
       }
     }
     if (editable) {
@@ -171,12 +191,12 @@ class Update {
     }
   }
 
-  overlay (oly, { key, value }, polylinePointIds, updateOverlays) {
+  overlay (oly, { key, value }) {
     if (oly.id < 0) return
     if (oly.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
 
     const id = oly.id
-    if (!updateOverlays[id]) updateOverlays[id] = {}
+    if (!this._updateOverlays[id]) this._updateOverlays[id] = {}
 
     if (key === 'points') {
       value = value.reduce((arr, item, index) => {
@@ -184,8 +204,8 @@ class Update {
           longitude: item.lng,
           latitude: item.lat
         }
-        if (polylinePointIds[id]) {
-          point.id = polylinePointIds[id][index]
+        if (this._polylinePointIds[id]) {
+          point.id = this._polylinePointIds[id][index]
         }
         arr.push(point)
         return arr
@@ -194,8 +214,8 @@ class Update {
       oly[key] = value
     }
 
-    updateOverlays[id] = {
-      ...updateOverlays[id],
+    this._updateOverlays[id] = {
+      ...this._updateOverlays[id],
       id: oly.id,
       name: oly.name,
       projectGeoKey: oly.projectGeoKey,
@@ -234,7 +254,7 @@ class Update {
         //   this._editing.disableEditing()
         // }
       }
-      this.update(oly, { key, value })
+      this.overlay(oly, { key, value })
     })
   }
 }
