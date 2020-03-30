@@ -1,13 +1,6 @@
 <template>
   <mu-h-box class="toolbar">
-    <mu-button
-      v-show="uploadVisible"
-      button-style="text"
-      :disabled="disabled"
-      @click="onUploadPolyline">
-      <span style="font-size: 14px;">+</span>
-      导入线路
-    </mu-button>
+    <slot />
     <mu-button
       button-style="text"
       @click="save">
@@ -36,14 +29,6 @@
         fullScreen: false
       }
     },
-    computed: {
-      disabled () {
-        return this.map.disabled
-      },
-      uploadVisible () {
-        return this.map.uploadVisible || true
-      }
-    },
     mounted () {
       const exitHandler = () => {
         if (!this.setFullScreen()) {
@@ -61,11 +46,8 @@
       getScreen () {
         return this.fullScreen ? d['zoom-down'] : d['zoom-up']
       },
-      onUploadPolyline () {
-        this.$emit('uploadPolyline')
-      },
       save () {
-        this.$emit('save')
+        this.map.saveOverlays()
       },
       setFullScreen () {
         return document.fullscreenElement || document.webkitFullscreenElement ||

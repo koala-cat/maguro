@@ -3,25 +3,22 @@ import { notify } from 'mussel'
 import { calcMarkerOnLinePosition } from './calc/position'
 
 import Draw from './draw'
-import Remove from './remove'
+import { removeMarkers } from './remove'
 
 class Add {
   constructor (
     map,
     overlays,
-    specialOverlays,
-    marker
+    options
   ) {
     this._map = map
     this._overlays = overlays
-    this._specialOverlays = specialOverlays
-    this._marker = marker
+    this._options = options
 
     this._draw = new Draw(
-      this._map,
-      this._marker
+      map,
+      options.marker
     )
-    this._remove = new Remove(this._map)
 
     this._id = -1
     this._parentId = -1
@@ -52,10 +49,10 @@ class Add {
   }
 
   marker (point, polyline, options, events, callback) {
-    if (this._marker.overlays.length > 0) {
-      const overlay = this._marker.overlays[0]
+    if (this._options.marker.overlays.length > 0) {
+      const overlay = this._options.marker.overlays[0]
       if (overlay.parentLineId !== polyline.id) {
-        this._remove.markers(this._marker)
+        removeMarkers(this._map, this._options)
       }
     }
 
@@ -65,14 +62,14 @@ class Add {
       overlay.parentLineId = polyline.id
       this._map.addOverlay(overlay)
 
-      this._marker.overlays.push(overlay)
-      this._marker.points.push(point)
-      this._marker.positions.push(idx)
+      this._options.marker.overlays.push(overlay)
+      this._options.marker.points.push(point)
+      this._options.marker.positions.push(idx)
     } else {
       notify('info', '请放大地图，重新打点。')
     }
 
-    if (this._marker.points.length < 2) return
+    if (this._options.marker.points.length < 2) return
 
     this._parentId--
     options = {
@@ -87,7 +84,7 @@ class Add {
   special (polyline, options, events, callback) {
     this._draw.special(polyline, options, events, (overlays) => {
       const parentId = overlays[0].parentId
-      this._specialOverlays[parentId] = overlays
+      this.__options.specialOverlays[parentId] = overlays
       this.overlay(overlays)
       if (callback) callback(overlays)
     })

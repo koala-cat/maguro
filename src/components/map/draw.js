@@ -119,7 +119,6 @@ class Draw {
   }
 
   polygon (points, options = {}, events) {
-    // options = defaultStyle(options)
     const polygon = new BMap.Polygon(points, options)
 
     setOverlaySettings(polygon, options)

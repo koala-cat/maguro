@@ -11,7 +11,7 @@
         <mu-icon
           :svg="getPath(triangle)"
           style="fill: #ffffff;" />
-        属性
+        {{ title || '属性' }}
       </mu-button>
       <mu-flex-item size="auto" />
       <mu-icon-button
@@ -24,6 +24,7 @@
     <mu-v-box
       v-show="expanded">
       <mu-form
+        v-if="basicVisible"
         layout="flow"
         label-width="48px"
         label-align="left"
@@ -189,6 +190,7 @@
           <label>{{ structureName }}</label>
         </mu-form-field>
       </mu-form>
+      <slot name="basic" />
     </mu-v-box>
     <structure-tree
       v-if="structures"
@@ -214,6 +216,11 @@
       StructureTree
     },
     props: {
+      title: String,
+      basicVisible: {
+        type: Boolean,
+        default: true
+      },
       maxWidth: {
         type: String,
         default: '60px'

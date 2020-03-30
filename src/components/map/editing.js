@@ -5,7 +5,7 @@ import { calcRectAllPoints } from './calc/point'
 import { calcMarkerOnLinePosition } from './calc/position'
 import { getSpecialAttachPolyline } from './calc/overlay'
 
-class SetEditing {
+class Editing {
   constructor (map, overlays, selectedOverlays, marker) {
     this._map = map
     this._overlays = overlays
@@ -89,10 +89,6 @@ class SetEditing {
         marker.setShadow(shadow)
         markers.push(marker)
         this._map.addOverlay(marker)
-
-        // this._drag.polygonMarker(marker, markers, points, 6, (path) => {
-        //   overlay.setPath(path)
-        // })
       }
       this._marker.overlays.push(...markers)
     }
@@ -153,4 +149,4 @@ class SetEditing {
   }
 }
 
-export default SetEditing
+export default Editing

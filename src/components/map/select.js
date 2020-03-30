@@ -5,93 +5,59 @@ import { getPolylineIncludeSpecials } from './calc/overlay'
 import Add from './add'
 import Drag from './drag'
 import DrawingManager from './drawingManager'
-import Remove from './remove'
-import SetEditing from './editing'
+import Editing from './editing'
+import { removeMarkers } from './remove'
 import { defaultStyle } from './setting'
-import Update from './update'
 
 class Select {
   constructor (
     map,
     events,
     overlays,
-    selectedOverlays,
-    specialOverlays,
-    updateOverlays,
-    removedOverlays,
-    polylineCenters,
-    polylinePointIds,
-    active,
-    marker
+    options
   ) {
     this._map = map
     this._events = events
     this._overlays = overlays
-    this._selectedOverlays = selectedOverlays
-    this._specialOverlays = specialOverlays
-    this._updateOverlays = updateOverlays
-    this._polylineCenters = polylineCenters
-    this._polylinePointIds = polylinePointIds
-    this._active = active
-    this._marker = marker
+    this._options = options
 
     this._add = new Add(
-      this._map,
-      this._overlays,
-      this._specialOverlays,
-      this._marker
+      map,
+      overlays,
+      options
     )
     this._drag = new Drag(
       map,
       events,
       overlays,
-      selectedOverlays,
-      specialOverlays,
-      updateOverlays,
-      removedOverlays,
-      polylinePointIds,
-      active,
-      marker
+      options
     )
     this._drawingManager = new DrawingManager(
-      this._map,
-      this._overlays
-    )
-    this._editing = new SetEditing(
-      this._map,
-      this._overlays,
-      this._selectedOverlays,
-      this._marker
-    )
-    this._remove = new Remove(this._map)
-    this._update = new Update(
       map,
-      events,
+      overlays
+    )
+    this._editing = new Editing(
+      map,
       overlays,
-      selectedOverlays,
-      specialOverlays,
-      updateOverlays,
-      removedOverlays,
-      polylinePointIds,
-      active,
-      marker
+      options.selectedOverlays,
+      options.marker
     )
   }
 
   overlay (overlay, e) {
     const type = overlay.type
 
-    if ((!overlay.isLocked && this._selectedOverlays.includes(overlay)) ||
-      this._active.overlay === overlay) {
+    if ((!overlay.isLocked && this._options.selectedOverlays.includes(overlay)) ||
+      this._options.active.overlay === overlay) {
       return
     }
 
-    if (this._active.tool?.type === 'special' && type === 'polyline' && e) {
+    if (this._options.active.tool?.type === 'special' && type === 'polyline' && e) {
       const options = {
         ...defaultStyle(),
-        type: this._active.tool?.value || '',
-        iconUrl: this._active.tool.imgUrl,
-        projectMapLegendId: this._active.tool.id
+        type: this._options.active.tool?.value || '',
+        iconUrl: this._options.active.tool.imgUrl,
+        projectMapLegendId: this._options.active.tool.id
       }
       this._add.marker(
         e.point,
@@ -100,7 +66,7 @@ class Select {
         this._events,
         () => {
           this.unSelectTool()
-          this._remove.markers(this._marker)
+          removeMarkers(this._map, this._options)
         }
       )
     } else {
@@ -109,15 +75,15 @@ class Select {
   }
 
   unSelectOverlays () {
-    this._selectedOverlays.map(oly => {
+    this._options.selectedOverlays.map(oly => {
       this._editing.enableEditing(oly, false)
     })
-    this._selectedOverlays.splice(0)
-    this._active.overlay = null
+    this._options.selectedOverlays.splice(0)
+    this._options.active.overlay = null
   }
 
   multipleOverlays (e, overlay) {
-    this._remove.markers(this._marker)
+    removeMarkers(this._map, this._options)
 
     // const mac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
     const modKey = e?.ctrlKey || false
@@ -125,32 +91,32 @@ class Select {
 
     const overlays = []
     if (type.includes('special')) {
-      overlays.push(...this._specialOverlays[overlay.parentId])
+      overlays.push(...this._options.specialOverlays[overlay.parentId])
     } else {
       overlays.push(overlay)
     }
 
     if (modKey) {
-      this._active.overlay = this._active.overlay || overlays[0]
+      this._options.active.overlay = this._options.active.overlay || overlays[0]
     } else {
       this.unSelectOverlays()
-      this._selectedOverlays.splice(0)
-      this._active.overlay = overlays[0]
+      this._options.selectedOverlays.splice(0)
+      this._options.active.overlay = overlays[0]
     }
 
     if (getPolylineIncludeSpecials(overlay, this._overlays).length === 0) {
       this._editing.enableEditing(overlay, !overlay.disabled)
     }
-    this._selectedOverlays.push(...overlays)
+    this._options.selectedOverlays.push(...overlays)
 
     if (!overlay.disabled) {
-      this._drag.init(overlay, this._editing, this._update)
+      this._drag.init(overlay, this._editing)
     }
   }
 
   frameOverlays () {
     const complete = (overlay) => {
-      this._selectedOverlays.splice(0)
+      this._options.selectedOverlays.splice(0)
 
       for (const oly of this._overlays) {
         const parentIds = []
@@ -165,9 +131,9 @@ class Select {
               }
               return arr
             }, [])
-            this._selectedOverlays.push(...specials)
+            this._options.selectedOverlays.push(...specials)
           } else {
-            this._selectedOverlays.push(oly)
+            this._options.selectedOverlays.push(oly)
             if (getPolylineIncludeSpecials(oly, this._overlays).length === 0) {
               this._editing.enableEditing(oly, true)
             }
@@ -179,7 +145,7 @@ class Select {
 
       this._map.removeOverlay(overlay)
       this._drawingManager.close()
-      this._active.tool = null
+      this._options.active.tool = null
     }
 
     const options = {
@@ -196,14 +162,14 @@ class Select {
 
   tool () {
     let type = null
-    const tool = this._active.tool
+    const tool = this.options._active.tool
     const options = {
       ...defaultStyle(),
       iconUrl: tool.imgUrl,
       svgDoc: tool.svgDoc
     }
 
-    this._remove.markers(this._marker)
+    removeMarkers(this._map, this._options)
     if (!tool.type && ['marker', 'polyline', 'polygon', 'special'].includes(tool.value)) {
       this._drawingManager.break()
       return
@@ -229,14 +195,14 @@ class Select {
         this._add.overlay(
           overlay,
           this._overlays,
-          this._polylineCenters
+          this._options.polylineCenters
         )
         setTimeout(() => {
           this.unSelectTool()
         }, 10)
       }
       this._drawingManager.close()
-      this._remove.markers(this._marker)
+      removeMarkers(this._map, this._options)
 
       this.unSelectOverlays()
       this._drawingManager.draw(options, this._events, complete)
@@ -244,13 +210,13 @@ class Select {
   }
 
   unSelectTool () {
-    const activeType = this._active.tool?.type
+    const activeType = this._options.active.tool?.type
     let tool = null
 
     if (activeType) {
       tool = tools.find(item => item.value === activeType)
     }
-    this._active.tool = tool
+    this._options.active.tool = tool
     this._map.setDefaultCursor('pointer')
   }
 }

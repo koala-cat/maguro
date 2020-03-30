@@ -13,30 +13,17 @@ class Drag {
     map,
     events,
     overlays,
-    selectedOverlays,
-    specialOverlays,
-    updateOverlays,
-    removedOverlays,
-    polylinePointIds,
-    active,
-    marker
+    options
   ) {
     this._map = map
     this._overlays = overlays
-    this._selectedOverlays = selectedOverlays
-    this._marker = marker
+    this._options = options
 
     this._update = new Update(
       map,
       events,
       overlays,
-      selectedOverlays,
-      specialOverlays,
-      updateOverlays,
-      removedOverlays,
-      polylinePointIds,
-      active,
-      marker
+      options
     )
   }
 
@@ -47,7 +34,7 @@ class Drag {
     this._startPixel = null
 
     if (overlay.type.includes('special')) {
-      this._marker.overlays.map(marker => {
+      this._options.marker.overlays.map(marker => {
         if (marker.parentId === overlay.id) {
           const polyline = getSpecialAttachPolyline(overlay, this._overlays)
           this.specialMarker(marker, overlay, polyline)
@@ -87,8 +74,8 @@ class Drag {
     const dlat = movePoint.lat - this._startPoint.lat
 
     if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return
-    for (let i = 0; i < this._selectedOverlays.length; i++) {
-      const oly = this._selectedOverlays[i]
+    for (let i = 0; i < this._options.selectedOverlays.length; i++) {
+      const oly = this._options.selectedOverlays[i]
       const type = oly.type
 
       if (type.includes('special') || oly.disabled || oly.isLocked) {
@@ -120,7 +107,7 @@ class Drag {
   end (e) {
     e.stopPropagation()
 
-    this._selectedOverlays.map(oly => {
+    this._options.selectedOverlays.map(oly => {
       const type = oly.type
       let points = null
       try {
@@ -158,25 +145,25 @@ class Drag {
 
     marker.addEventListener('mousedown', (e) => {
       endPoint = e.point
-      const distanceA = this._map.getDistance(endPoint, this._marker.points[0])
-      const distanceB = this._map.getDistance(endPoint, this._marker.points[1])
+      const distanceA = this._map.getDistance(endPoint, this._options.marker.points[0])
+      const distanceB = this._map.getDistance(endPoint, this._options.marker.points[1])
       movePointIdx = distanceA < distanceB ? 0 : 1
     })
     marker.addEventListener('dragend', (e) => {
       const dragIdx = calcMarkerOnLinePosition(e.point, polyline, true)
       if (dragIdx > -1) {
-        this._marker.points.splice(movePointIdx, 1, e.point)
-        this._marker.positions.splice(movePointIdx, 1, dragIdx)
+        this._options.marker.points.splice(movePointIdx, 1, e.point)
+        this._options.marker.positions.splice(movePointIdx, 1, dragIdx)
         this._update.specialSetting(overlay, polyline, 'points')
       } else {
-        marker.setPosition(this._marker.points[movePointIdx])
+        marker.setPosition(this._options.marker.points[movePointIdx])
         notify('info', '拖动后点的不在线上，请放大地图重新拖动。')
       }
     })
   }
 
   rectMarker (overlay, count = 6) {
-    const markers = this._marker.overlays.filter(item => item.parentId === overlay.id)
+    const markers = this._options.marker.overlays.filter(item => item.parentId === overlay.id)
     let endPoint = null
     const mPoints = overlay.getPath()
     let points = calcRectAllPoints(mPoints[0], mPoints[2], count)

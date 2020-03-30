@@ -22,11 +22,21 @@
       :events="events"
       :legends="legends"
       :overlays="overlays"
-      :structures="structures">
+      :structures="structures"
+      @save="saveOverlays">
       <map-mode></map-mode>
-      <map-toolkit></map-toolkit>
+      <map-toolkit>
+        <mu-button
+          button-style="text"
+          @click="onUploadPolyline">
+          <span style="font-size: 14px;">+</span>
+          导入线路
+        </mu-button>
+      </map-toolkit>
       <map-overlay-toolkit></map-overlay-toolkit>
-      <map-overlay-list></map-overlay-list>
+      <map-overlay-list
+        :source-column-visible="false">
+      </map-overlay-list>
       <map-overlay-form></map-overlay-form>
     </map-bidu>
   </div>
@@ -153,6 +163,15 @@
         )
         
         mobula.refresh()
+      },
+      methods: {
+        onUploadPolyline () {
+          // 要提供drawuploadline
+          console.log('upload')
+        },
+        saveOverlays (result) {
+          console.log(result)
+        }
       }
     });
   </script>

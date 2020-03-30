@@ -4,9 +4,8 @@ import { getOverlaySettings } from './setting'
 
 import Draw from './draw'
 import DrawingManager from './drawingManager'
-import SetEditing from './editing'
-import Legend from './legend'
-import Remove from './remove'
+import { getLegend, getLegendType } from './legend'
+import { removeOverlays } from './remove'
 import Select from './select'
 
 let me = null
@@ -16,53 +15,28 @@ class Initial {
     events,
     legends,
     overlays,
-    selectedOverlays,
-    specialOverlays,
-    updateOverlays,
-    removedOverlays,
-    polylineCenters,
-    polylinePointIds,
-    active,
-    marker
+    options
   ) {
     me = this
     this._map = map
     this._events = events
     this._legends = legends
     this._overlays = overlays
-    this._selectedOverlays = selectedOverlays
-    this._specialOverlays = specialOverlays
-    this._updateOverlays = updateOverlays
-    this._removedOverlays = removedOverlays
-    this._polylineCenters = polylineCenters
-    this._polylinePointIds = polylinePointIds
-    this._active = active
-    this._marker = marker
+    this._options = options
 
     this._draw = new Draw(
-      this._map,
-      this._marker
+      map,
+      options.marker
     )
-    this._drawingManager = new DrawingManager(map, overlays)
-    this._editing = new SetEditing(
-      this._map,
-      this._selectedOverlays,
-      this._marker
+    this._drawingManager = new DrawingManager(
+      map,
+      overlays
     )
-    this._legend = new Legend(legends)
-    this._remove = new Remove(map)
     this._select = new Select(
-      this._map,
-      this._events,
-      this._overlays,
-      this._selectedOverlays,
-      this._specialOverlays,
-      this._updateOverlays,
-      this._removedOverlays,
-      this._polylineCenters,
-      this._polylinePointIds,
-      this._active,
-      this._marker
+      map,
+      events,
+      overlays,
+      options
     )
 
     this.map()
@@ -71,12 +45,12 @@ class Initial {
 
   map () {
     this._map.addEventListener('zoomend', () => {
-      showOverlays(this._map, this._overlays, this._specialOverlays)
+      showOverlays(this._map, this._overlays, this._options.specialOverlays)
     })
 
     this._map.addEventListener('click', (e) => {
-      if ((this._active.tool && !this._active.tool.type) || !this._active.tool) {
-        this._active.tool = null
+      if ((this._options.active.tool && !this._options.active.tool.type) || !this._active.tool) {
+        this._options.active.tool = null
         if (!e.overlay) {
           this._select.unSelectOverlays()
         }
@@ -97,7 +71,7 @@ class Initial {
       e = e || window.event
       const keyCode = e.keyCode || e.which || e.charCode
       if (keyCode === 46) { // Delete
-        this._remove.overlays(this._selectedOverlays, this._removedOverlays)
+        removeOverlays(this._map, this._overlays, this._options)
       }
 
       if (keyCode === 27) { // Escape
@@ -114,16 +88,16 @@ class Initial {
     const overlays = []
 
     this._map.clearOverlays()
-    this._specialOverlays = {}
+    this._options.specialOverlays = {}
 
     for (const oly of this._overlays) {
-      this._legend.getLegend(oly)
-      const type = oly.type = this._legend.getType()
+      const legend = getLegend(this._legends, oly)
+      const type = oly.type = getLegendType(legend)
       const { id, projectGeoKey, points } = oly
       const mPoints = []
 
       if (projectGeoKey) {
-        this._polylinePointIds[id] = points.map(point => { return point.id })
+        this._options.polylinePointIds[id] = points.map(point => { return point.id })
       }
 
       try {
@@ -135,9 +109,9 @@ class Initial {
 
         if (type.includes('special')) {
           const key = oly.parentId > 0 ? oly.parentId : oly.id
-          if (!this._specialOverlays[key]) this._specialOverlays[key] = []
+          if (!this._options.specialOverlays[key]) this._options.specialOverlays[key] = []
           oly.points = mPoints
-          this._specialOverlays[key].push(oly)
+          this._options.specialOverlays[key].push(oly)
           continue
         }
 
@@ -159,13 +133,13 @@ class Initial {
       const zoom = this._map.getZoom()
       const center = this._map.getCenter()
       this._map.centerAndZoom(center, zoom)
-      showOverlays(this._map, this._overlays, this._specialOverlays)
+      showOverlays(this._map, this._overlays, this._options.specialOverlays)
     }
   }
 
   specialOverlays () {
-    for (const key in this._specialOverlays) {
-      const specials = this._specialOverlays[key]
+    for (const key in this._options.specialOverlays) {
+      const specials = this._options.specialOverlays[key]
       specials.sort((a, b) => a.invented * 1 - b.invented * 1)
 
       const overlay = specials[specials.length - 1]

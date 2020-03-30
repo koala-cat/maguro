@@ -12,15 +12,17 @@
     <mu-v-box
       v-show="overlayListVisible">
       <mu-bar>
-        元件列表
+        {{ title || '元件列表' }}
         <div size="auto" />
-        <label>
+        <label
+          v-show="hiddenFilterVisible">
           <input
             v-model="showHiddenOverlay"
             type="checkbox">
           只显示已隐藏
         </label>
-        <label>
+        <label
+          v-show="unlinkFilterVisible">
           <input
             v-model="showUnlinkOverlay"
             type="checkbox">
@@ -67,13 +69,14 @@
             </div>
           </mu-flex-item>
           <mu-flex-item
-            v-show="commandOrg"
+            v-show="sourceColumnVisible"
             size="80px"
             class="mu-text-ellipsis"
             :title="item.orgName">
             {{ item.orgName }}
           </mu-flex-item>
           <mu-flex-item
+            v-show="displayColumnVisible"
             size="60px">
             <mu-toggle
               v-if="item.isCurrentOrg"
@@ -97,9 +100,22 @@
   export default {
     inject: ['map'],
     props: {
-      context: {
-        type: Object,
-        default: () => ({})
+      title: String,
+      hiddenFilterVisible: {
+        type: Boolean,
+        default: true
+      },
+      unlinkFilterVisible: {
+        type: Boolean,
+        default: true
+      },
+      sourceColumnVisible: {
+        type: Boolean,
+        default: true
+      },
+      displayColumnVisible: {
+        type: Boolean,
+        default: true
       }
     },
     data () {
@@ -110,9 +126,6 @@
       }
     },
     computed: {
-      commandOrg () {
-        return this.map.commandOrg || false
-      },
       overlays () {
         return this.map.overlays
       },
@@ -159,11 +172,12 @@
           {
             size: '80px',
             label: '来源',
-            hidden: !this.commandOrg
+            hidden: !this.sourceColumnVisible
           },
           {
             size: '60px',
-            label: '显示'
+            label: '显示',
+            hiddel: !this.displayColumnVisible
           }
         ]
       }
@@ -191,7 +205,7 @@
         }
       },
       onChange (item, key) {
-        this.$emit('change', item, { key, value: item[key] })
+        this.map.updateOverlay(key, item[key])
       }
     }
   }

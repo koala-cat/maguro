@@ -9,6 +9,8 @@
 <script>
   import BMap from 'BMap'
   import debounce from 'lodash.debounce'
+  import { notify } from 'mussel'
+  import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
   import { Initial } from './initial'
   import Update from './update'
 
@@ -70,52 +72,42 @@
       map.setCurrentCity('北京')
       map.enableScrollWheelZoom(true)
       this.map = map
-
       this.initial = new Initial(
         map,
         this.events,
         this.legends,
         this.overlays,
-        this.selectedOverlays,
-        this.specialOverlays,
-        this.updateOverlays,
-        this.removedOverlays,
-        this.polylineCenters,
-        this.polylinePointIds,
-        this.active,
-        this.marker
+        this.$data
       )
 
       this.update = new Update(
         map,
         this.events,
         this.overlays,
-        this.selectedOverlays,
-        this.specialOverlays,
-        this.updateOverlays,
-        this.removedOverlays,
-        this.polylinePointIds,
-        this.active,
-        this.marker
+        this.$data
       )
     },
     methods: {
-      switchOverlayWindow (key) {
-        this[key] = !this[key]
-      },
       setMapType (val, mode) {
         this.active.mode = val
         map.setMapType(mode)
         this.$emit('setMapType', val)
       },
+      switchOverlayWindow (key) {
+        this.active.tool = null
+        this[key] = !this[key]
+      },
       addLegend (legend) {
-        console.log('addLegend')
+        this.$emit('addLegend', legend)
       },
       removeLegend (legend) {
-        console.log('removeLegend')
+        this.$emit('removeLegend', legend)
       },
-      onSelectTool (val, style = {}) {
-        this.suspend = true
+      selectTool (val, style = {}) {
+        if (this.overlayListVisible) {
+          this.overlayListVisible = false
+        }
+
         this.active.tool = val
         this.initial._select.tool()
       },
@@ -140,6 +132,23 @@
           overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
         }
         this.initial._select.overlay(overlay)
+      },
+      saveOverlays () {
+        const result = {}
+
+        result.creates = getCreateOverlays(this.overlays, this.polylineCenters)
+        if (Object.keys(this.updateOverlays).length === 0 &&
+          this.removeOverlays.length === 0 && !result.creates) {
+          notify('info', '没有需要修改的信息。')
+          return
+        }
+        if (this.removeOverlays.length > 0) {
+          result.removes = this.removeOverlays
+        }
+        if (Object.keys(this.updateOverlays).length > 0) {
+          result.updates = getUpdateOverlays(this.updateOverlays)
+        }
+        this.$emit('save', result)
       }
     }
   }

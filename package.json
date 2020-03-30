@@ -14,7 +14,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.7.5",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-optional-chaining": "^7.7.5",
+    "@babel/plugin-proposal-private-methods": "^7.8.3",
     "@babel/preset-env": "^7.7.6",
     "@vue/babel-plugin-transform-vue-jsx": "^1.1.2",
     "a-color-picker": "^1.2.1",
@@ -55,9 +57,5 @@
     "serve": "^11.2.0",
     "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10"
-  },
-  "dependencies": {
-    "@rollup/plugin-image": "^2.0.4",
-    "rollup-plugin-img": "^1.1.0"
   }
 }

@@ -52,6 +52,7 @@
   import TreeNode from './tree-node.vue'
 
   export default {
+    inject: ['map'],
     components: {
       TreeNode
     },
@@ -118,7 +119,7 @@
       }, 500),
       onChecked (value, structure) {
         const projectStructureId = value ? structure?.id || null : null
-        this.$emit('change', { projectStructureId })
+        this.map.updateOverlay('projectStructureId', projectStructureId)
       }
     }
   }

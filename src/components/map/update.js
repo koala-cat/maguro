@@ -2,8 +2,8 @@ import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/ove
 
 import Add from './add'
 import Draw from './draw'
-import SetEditing from './editing'
-import Remove from './remove'
+import Editing from './editing'
+import { removeSelectedOverlays } from './remove'
 import { getOverlaySettings, settingsToStyle } from './setting'
 
 class Update {
@@ -11,50 +11,36 @@ class Update {
     map,
     events,
     overlays,
-    selectedOverlays,
-    specialOverlays,
-    updateOverlays,
-    removedOverlays,
-    polylinePointIds,
-    active,
-    marker
+    options
   ) {
     this._map = map
     this._events = events
     this._overlays = overlays
-    this._selectedOverlays = selectedOverlays
-    this._specialOverlays = specialOverlays
-    this._updateOverlays = updateOverlays
-    this._removedOverlays = removedOverlays
-    this._polylinePointIds = polylinePointIds
-    this._active = active
-    this._marker = marker
+    this._options = options
 
     this._lineupdate = null
 
     this._add = new Add(
-      this._map,
-      this._overlays,
-      this._specialOverlays,
-      this._marker
+      map,
+      overlays,
+      options
     )
     this._draw = new Draw(
-      this._map,
-      this._marker
+      map,
+      options.marker
     )
-    this._editing = new SetEditing(
-      this._map,
-      this._overlays,
-      this._selectedOverlays,
-      this._marker
+    this._editing = new Editing(
+      map,
+      overlays,
+      options.selectedOverlays,
+      options.marker
     )
-    this._remove = new Remove(this._map)
   }
 
   setSetting (key, value, callback) {
     this._lineupdate = key
 
-    for (const oly of this._selectedOverlays) {
+    for (const oly of this._options.selectedOverlays) {
       const type = oly.type
 
       oly[key] = value
@@ -66,7 +52,7 @@ class Update {
         continue
       }
       if (['name', 'level', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
-        this.swicthDisplay(oly, { key, value })
+        this.switchDisplay(oly, { key, value })
         continue
       }
 
@@ -87,7 +73,7 @@ class Update {
   }
 
   specialSetting (overlay, points, setting) {
-    const specials = this._selectedOverlays
+    const specials = this._options.selectedOverlays
     const type = overlay.type
 
     specials.sort((a, b) => a.invented * 1 - b.invented * 1)
@@ -120,12 +106,12 @@ class Update {
           }
           return arr
         }, [])
-        this._removedOverlays.push(...ids)
+        this._options.removedOverlays.push(...ids)
       }
 
-      this._remove.selectedOverlays(this._overlays, this._selectedOverlays)
-      this._selectedOverlays.push(...olys)
-      this._active.overlay = olys[0]
+      removeSelectedOverlays(this._map, this._overlays, this._options)
+      this._options.selectedOverlays.push(...olys)
+      this._options.active.overlay = olys[0]
     })
   }
 
@@ -186,7 +172,7 @@ class Update {
     if (oly.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
 
     const id = oly.id
-    if (!this._updateOverlays[id]) this._updateOverlays[id] = {}
+    if (!this._options.updateOverlays[id]) this._options.updateOverlays[id] = {}
 
     if (key === 'points') {
       value = value.reduce((arr, item, index) => {
@@ -194,8 +180,8 @@ class Update {
           longitude: item.lng,
           latitude: item.lat
         }
-        if (this._polylinePointIds[id]) {
-          point.id = this._polylinePointIds[id][index]
+        if (this._options.polylinePointIds[id]) {
+          point.id = this._options.polylinePointIds[id][index]
         }
         arr.push(point)
         return arr
@@ -204,8 +190,8 @@ class Update {
       oly[key] = value
     }
 
-    this._updateOverlays[id] = {
-      ...this._updateOverlays[id],
+    this._options.updateOverlays[id] = {
+      ...this._options.updateOverlays[id],
       id: oly.id,
       name: oly.name,
       projectGeoKey: oly.projectGeoKey,
@@ -213,7 +199,7 @@ class Update {
     }
   }
 
-  swicthDisplay (overlay, { key, value }) {
+  switchDisplay (overlay, { key, value }) {
     if (key !== 'isDisplay' && key !== 'isCommandDisplay') return
 
     let polylineVisible = true

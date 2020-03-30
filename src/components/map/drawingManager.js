@@ -2,11 +2,10 @@ import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
 import Draw from './draw'
-import Remove from './remove'
 import { setOverlaySettings } from './setting'
 
 class DrawingManager extends Draw {
-  constructor (map, overlays, id) {
+  constructor (map, overlays) {
     super()
     this._map = map
     this._overlays = overlays
@@ -19,8 +18,6 @@ class DrawingManager extends Draw {
     } else {
       this._drawingManager.open()
     }
-
-    this._remove = new Remove(this._map)
   }
 
   break () {

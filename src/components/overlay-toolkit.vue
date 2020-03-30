@@ -23,18 +23,25 @@
       <a
         v-for="(tool, index) in subTools"
         :key="index"
-        :style="getLegendStyle(tool)"
-        @click="onSelect(tool)">
+        :style="getLegendStyle(tool)">
         <span
           v-if="tool.value === 'create'"
           @click="uploadLegend">+</span>
-        <img v-else :src="tool.imgUrl">
+        <img
+          v-else
+          :src="tool.imgUrl"
+          @click="onSelect(tool)">
         <span
           v-if="!tool.disabled"
           class="icon ipm-icon-error-circle"
           style="position: absolute; top: 0; right: -6px; color: #f5222d; line-height: 0;"
           @click.stop="removeLegend(tool)" />
       </a>
+      <input
+        ref="fileSelector"
+        type="file"
+        accept=".png,.jpeg,.jpg,.svg"
+        style="display: none;">
     </mu-h-box>
   </mu-v-box>
 </template>
@@ -96,13 +103,17 @@
         this.onSelect(tool)
       },
       onSelect (tool) {
-        this.map.onSelectTool(tool)
+        this.map.selectTool(tool)
       },
       removeLegend (legend) {
         this.map.removeLegend(legend)
       },
       uploadLegend (legend) {
-        this.map.addLegend(legend)
+        this.$refs.fileSelector.click()
+        this.$refs.fileSelector.onchange = (e) => {
+          console.log(e)
+          this.map.addLegend(e)
+        }
       }
     }
   }

@@ -154,9 +154,26 @@ function calcOnePixelToPoint (map) {
   return { lng: Math.abs(pointA.lng - pointB.lng), lat: Math.abs(pointA.lat - pointB.lat) }
 }
 
+function getOverlayPoints (oly) {
+  let points = []
+  try {
+    points = [oly.getCenter()]
+    oly.width = oly.getRadius()
+  } catch {
+    try {
+      points = oly.getPath()
+    } catch {
+      points = [oly.getPosition()]
+    }
+  }
+  return points
+}
+
 export {
   calcCenterPoint,
   calcSpecialPoints,
   calcOnePixelToPoint,
-  calcRectAllPoints
+  calcRectAllPoints,
+
+  getOverlayPoints
 }

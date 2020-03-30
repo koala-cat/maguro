@@ -1,25 +1,22 @@
-class Legend {
-  constructor (legends) {
-    this._legends = legends
-  }
-
-  getLegend (overlay) {
-    const legendId = overlay?.projectMapLegendId || null
-    const legend = this._legends.find(item => item.id === legendId)
-    this._legend = legend
-    return legend || {}
-  }
-
-  getType () {
-    this._type = this._legend.type === 'polyline'
-      ? this._legend.type
-      : this._legend.value || this._legend.type
-    return this._type
-  }
-
-  getId () {
-    return this._legend?.id || null
-  }
+function getLegend (legends, overlay) {
+  const legendId = overlay?.projectMapLegendId || null
+  const legend = legends.find(item => item.id === legendId)
+  return legend || {}
 }
 
-export default Legend
+function getLegendType (legend) {
+  const type = legend.type === 'polyline'
+    ? legend.type
+    : legend.value || legend.type
+  return type
+}
+
+function getLegendId (legend) {
+  return legend?.id || null
+}
+
+export {
+  getLegend,
+  getLegendType,
+  getLegendId
+}
