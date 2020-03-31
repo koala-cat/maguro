@@ -78,9 +78,9 @@ export default {
   },
   output: [
     {
-      file: 'dist/bobcat.js',
+      file: 'dist/maguro.js',
       format: 'umd',
-      name: 'bobcat',
+      name: 'maguro',
       globals: {
         vue: 'Vue',
         BMap: 'BMap',

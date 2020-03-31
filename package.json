@@ -1,8 +1,8 @@
 {
-  "name": "bobcat",
-  "version": "0.1.0",
+  "name": "maguro",
+  "version": "0.1.1",
   "description": "draw on map",
-  "main": "dist/bobcat.esm.js",
+  "main": "dist/maguro.esm.js",
   "files": [
     "dist",
     "src"
