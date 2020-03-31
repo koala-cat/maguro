@@ -78,9 +78,9 @@ export default {
   },
   output: [
     {
-      file: 'dist/redbud.js',
+      file: 'dist/bobcat.js',
       format: 'umd',
-      name: 'redbud',
+      name: 'bobcat',
       globals: {
         vue: 'Vue',
         BMap: 'BMap',

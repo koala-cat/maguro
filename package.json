@@ -1,8 +1,8 @@
 {
-  "name": "redbud",
+  "name": "bobcat",
   "version": "0.1.0",
   "description": "draw on map",
-  "main": "dist/redbud.esm.js",
+  "main": "dist/bobcat.esm.js",
   "files": [
     "dist",
     "src"
