@@ -62,7 +62,7 @@
                 :key="legend.id"
                 style="padding: 5px 0; text-align: center;"
                 @click="onComboBoxSelect('projectMapLegendId', legend.id)">
-                <img :src="legend.imgUrl" width="28" height="16">
+                <img :src="legend.iconUrl" width="28" height="16">
               </mu-option>
             </mu-combo-box>
           </mu-h-box>

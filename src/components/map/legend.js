@@ -1,5 +1,5 @@
-function getLegend (legends, overlay) {
-  const legendId = overlay?.projectMapLegendId || null
+function getLegend (legends, data) {
+  const legendId = data ? data?.projectMapLegendId || data : null
   const legend = legends.find(item => item.id === legendId)
   return legend || {}
 }
@@ -11,12 +11,7 @@ function getLegendType (legend) {
   return type
 }
 
-function getLegendId (legend) {
-  return legend?.id || null
-}
-
 export {
   getLegend,
-  getLegendType,
-  getLegendId
+  getLegendType
 }

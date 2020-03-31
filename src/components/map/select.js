@@ -56,7 +56,7 @@ class Select {
       const options = {
         ...defaultStyle(),
         type: this._options.active.tool?.value || '',
-        iconUrl: this._options.active.tool.imgUrl,
+        iconUrl: this._options.active.tool.iconUrl,
         projectMapLegendId: this._options.active.tool.id
       }
       this._add.marker(
@@ -162,11 +162,11 @@ class Select {
 
   tool () {
     let type = null
-    const tool = this.options._active.tool
+    const tool = this._options.active.tool
     const options = {
       ...defaultStyle(),
-      iconUrl: tool.imgUrl,
-      svgDoc: tool.svgDoc
+      iconUrl: tool.iconUrl,
+      svg: tool.svg
     }
 
     removeMarkers(this._map, this._options)

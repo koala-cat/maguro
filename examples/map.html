@@ -57,7 +57,14 @@
             type: 'marker',
             value: 'marker',
             disabled: true,
-            imgUrl: "http://dev.mctech.vip/fss/iwop-dev/intelli-quantity/map-legend/23273869197912261851758722365306.svg?FSSAccessKeyId=LTAIMMsdxTwnzzof&Expires=1585281784&Signature=n9TlWEZAMMi7fwk86G2eaaZ0lvY%3D"
+            iconUrl: "./assets/s1.svg"
+          },
+          {
+            id: 1009,
+            type: 'marker',
+            value: 'marker',
+            disabled: true,
+            iconUrl: "./assets/s2.svg"
           },
           {
             type: 'marker',
@@ -96,7 +103,7 @@
             id: 1019,
             type: 'special',
             value: 'specialDoubleLine',
-            imgUrl: 'http://dev.mctech.vip/fss/iwop-dev/intelli-quantity/map-legend/15368183468982430837415124692641.png?FSSAccessKeyId=LTAIMMsdxTwnzzof&Expires=1585281784&Signature=HW9EOFM%2BiuPXjZ7EkbznoE11imM%3D',
+            iconUrl: 'http://dev.mctech.vip/fss/iwop-dev/intelli-quantity/map-legend/15368183468982430837415124692641.png?FSSAccessKeyId=LTAIMMsdxTwnzzof&Expires=1585281784&Signature=HW9EOFM%2BiuPXjZ7EkbznoE11imM%3D',
             disabled: true,
             isRemoved: false
           }
@@ -125,6 +132,24 @@
         listVisible: true
       },
       mounted () {
+        for (const item of this.legends) {
+          if (!item.iconUrl) continue
+          try {
+            let xmlhttp = null
+            if (window.XMLHttpRequest) {
+              xmlhttp = new XMLHttpRequest()
+            } else {
+              xmlhttp = new window.ActiveXObject('Microsoft.XMLHTTP')
+            }
+            xmlhttp.open('GET', item.iconUrl, false)
+            xmlhttp.send(null)
+            const xmlDoc = xmlhttp.responseXML.documentElement
+            item.svg = xmlDoc
+          } catch (err) {
+            console.log(err)
+          }
+        }
+
         this.events.mouseover = (e, overlay) => {
           console.log('mouseover')
         }

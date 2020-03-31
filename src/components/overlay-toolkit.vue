@@ -29,7 +29,7 @@
           @click="uploadLegend">+</span>
         <img
           v-else
-          :src="tool.imgUrl"
+          :src="tool.iconUrl"
           @click="onSelect(tool)">
         <span
           v-if="!tool.disabled"

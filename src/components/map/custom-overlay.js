@@ -1,16 +1,14 @@
 import BMap from 'BMap'
 
 class ComplexCustomOverlay extends BMap.Overlay {
-  constructor (mpoint, mpixel, options) {
+  constructor (options) {
     super()
     this._badgeNum = options.badge || 0
     this._fill = options.fillColor
-    this._imageUrl = options.imageUrl || ''
+    this._imageUrl = options.iconUrl || ''
     this._offsetX = options.offsetX || 0
     this._offsetY = options.offsetY || 0
     this._opacity = options.fillOpacity
-    this._point = mpoint
-    this._pixel = mpixel
     this._position = 'absolute'
     this._size = `${options.width}px`
     this._width = options.width || 0
@@ -46,9 +44,8 @@ class ComplexCustomOverlay extends BMap.Overlay {
     return this._point
   }
 
-  setPosition (mpoint, mpixel) {
+  setPosition (mpoint) {
     this._point = mpoint
-    this._pixel = mpixel
     this.setTransform()
   }
 
@@ -57,28 +54,31 @@ class ComplexCustomOverlay extends BMap.Overlay {
     this.setTransform()
   }
 
-  setTransform (_div, _pixel, _size) {
+  setTransform () {
     const offset = {
       x: this._offsetX - parseFloat(this._size) / 2,
       y: this._offsetY - parseFloat(this._size) / 2
     }
-    const x = this._pixel.x - offset.x + 'px'
-    const y = this._pixel.y - offset.y + 'px'
+    const pixel = this._map.pointToOverlayPixel(this._point)
+    const x = pixel.x + offset.x + 'px'
+    const y = pixel.y + offset.y + 'px'
     this._div.style.transform = `translate3d(${x}, ${y}, 0)`
   }
 }
 
 class CustomSvg extends ComplexCustomOverlay {
-  constructor (_div) {
-    super(_div)
-    this._div = _div
+  constructor (map, point, options) {
+    super(options)
+    this._map = map
+    this._point = point
+    this._options = options
   }
 
-  initialize (svgDoc) {
-    const viewBox = svgDoc.getAttribute('viewBox')
+  initialize () {
+    const viewBox = this._options.svg.getAttribute('viewBox')
     this._div.innerHTML = `
       <svg class="icon" viewBox="${viewBox}">
-        ${svgDoc.innerHTML}
+        ${this._options.svg.innerHTML}
       </svg>
     `
     const svg = this._div.firstElementChild
@@ -90,10 +90,11 @@ class CustomSvg extends ComplexCustomOverlay {
     this._div.style.position = this._position
     this._div.style.border = '1px solid transparent'
     this._div.style.transition = 'all 0'
+    this._map.getPanes().labelPane.appendChild(this._div)
+    return this._div
   }
 
-  draw (svgDoc) {
-    this.initialize(svgDoc)
+  draw () {
     super.setTransform()
   }
 

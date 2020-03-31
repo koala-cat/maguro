@@ -49,7 +49,7 @@ class Initial {
     })
 
     this._map.addEventListener('click', (e) => {
-      if ((this._options.active.tool && !this._options.active.tool.type) || !this._active.tool) {
+      if ((this._options.active.tool && !this._options.active.tool.type) || !this._options.active.tool) {
         this._options.active.tool = null
         if (!e.overlay) {
           this._select.unSelectOverlays()

@@ -12,7 +12,7 @@ class DrawingManager extends Draw {
 
     if (!this._drawingManager) {
       this._drawingManager = new BMapLib.DrawingManager(map, {
-        isOpen: true,
+        isOpen: false,
         enableDrawingTool: false
       })
     } else {
@@ -94,7 +94,9 @@ class DrawingManager extends Draw {
   markerComplete (marker) {
     const options = {
       ...this._options,
-      width: 16
+      width: 16,
+      fillColor: '#333',
+      fillOpacity: 1
     }
     this._map.removeOverlay(marker)
     this._drawingManager.close()

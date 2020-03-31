@@ -37,7 +37,7 @@ class Update {
     )
   }
 
-  setSetting (key, value, callback) {
+  setSetting (key, value, legend, callback) {
     this._lineupdate = key
 
     for (const oly of this._options.selectedOverlays) {
@@ -60,10 +60,10 @@ class Update {
         const style = settingsToStyle({ [key]: value }, type)
         oly.setStyle(style)
       } else if (type === 'marker') {
-        this.markerSetting(oly, { key, value }, callback)
+        this.markerSetting(oly, { key, value }, legend, callback)
       } else {
         if (key === 'projectMapLegendId' || key === 'width') {
-          this.specialSetting(oly, null, key)
+          this.specialSetting(oly, null, key, legend)
           return
         }
         oly[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
@@ -72,7 +72,7 @@ class Update {
     this._lineupdate = null
   }
 
-  specialSetting (overlay, points, setting) {
+  specialSetting (overlay, points, setting, legend) {
     const specials = this._options.selectedOverlays
     const type = overlay.type
 
@@ -115,8 +115,8 @@ class Update {
     })
   }
 
-  markerSetting (overlay, { key, value }, callback) {
-    if (key !== 'projectMapLegendId' && overlay.svgDoc) {
+  markerSetting (overlay, { key, value }, legend, callback) {
+    if (key !== 'projectMapLegendId' && overlay.svg) {
       const style = settingsToStyle({ [key]: value })
       for (const s in style) {
         overlay.setStyle(s, style[s])
@@ -131,8 +131,8 @@ class Update {
     const idx = this._overlays.findIndex(item => item.id === overlay.id)
     const options = {
       ...getOverlaySettings(overlay),
-      iconUrl: overlay.imgUrl || overlay.iconUrl,
-      svg: overlay.svgDoc
+      iconUrl: legend?.iconUrl || overlay.iconUrl,
+      svg: legend?.svg || overlay.svg
     }
 
     if (overlay.toString().includes('Overlay')) {

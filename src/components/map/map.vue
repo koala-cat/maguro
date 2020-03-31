@@ -11,6 +11,8 @@
   import debounce from 'lodash.debounce'
   import { notify } from 'mussel'
   import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
+
+  import { getLegend } from './legend'
   import { Initial } from './initial'
   import Update from './update'
 
@@ -112,7 +114,11 @@
         this.initial._select.tool()
       },
       updateOverlay: debounce(function (key, value) {
-        this.update.setSetting(key, value, (oly) => {
+        let legend = null
+        if (key === 'projectMapLegendId') {
+          legend = getLegend(this.legends, value)
+        }
+        this.update.setSetting(key, value, legend, (oly) => {
           this.initial._select.overlay(oly)
         })
       }, 500),

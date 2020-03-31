@@ -65,26 +65,21 @@ class Draw {
     })
   }
 
-  svg (point, svgDoc, options = {}, events) {
-    const svg = new CustomSvg(point, svgDoc)
+  svg (point, options = {}, events) {
+    const svg = new CustomSvg(this._map, point, options)
 
     setOverlaySettings(svg, options)
     this.bindEvents(events, svg)
-
+    this._map.addOverlay(svg)
     return svg
   }
 
   marker (point, isSymbol, options = {}, events, callback) {
     let marker = null
-    const svg = options.svgDoc
+    const svg = options.svg
 
-    options = {
-      ...options,
-      fillOpacity: 1
-    }
     if (svg) {
-      options.fillColor = '#333'
-      marker = this.svg(point, svg, options)
+      marker = this.svg(point, options)
     } else {
       const icon = isSymbol ? this.symbolIcon(options) : this.icon(options)
       marker = new BMap.Marker(point, {
@@ -276,7 +271,6 @@ class Draw {
 
     if (type === 'marker') {
       const mPoint = [mPoints[0].lng, mPoints[0].lat]
-      options.iconUrl = options.imgUrl
       newOly = this.marker(mPoint, false, options, events)
     } else if (type === 'polyline') {
       newOly = this.polyline(mPoints, options, events)

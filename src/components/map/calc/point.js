@@ -15,11 +15,13 @@ function calcCrossPoint (line1pointA, line1pointB, line2pointB, line2pointC) {
     if (line2pointB.lat === line2pointC.lat) {
       lng = line2pointB.lng
     } else {
-      lng = line2pointB.lng - (line2pointB.lng - line2pointC.lng) * (line2pointB.lat - lat) / (line2pointB.lat - line2pointC.lat)
+      lng = line2pointB.lng - (line2pointB.lng - line2pointC.lng) *
+        (line2pointB.lat - lat) / (line2pointB.lat - line2pointC.lat)
     }
   } else if (line2pointB.lat === line2pointC.lat) {
     lat = line2pointB.lat
-    lng = line1pointA.lng - (line1pointA.lng - line1pointB.lng) * (line1pointA.lat - lat) / (line1pointA.lat - line1pointB.lat)
+    lng = line1pointA.lng - (line1pointA.lng - line1pointB.lng) *
+      (line1pointA.lat - lat) / (line1pointA.lat - line1pointB.lat)
   } else {
     const m = (line1pointA.lng - line1pointB.lng) / (line1pointA.lat - line1pointB.lat)
     const n = (line2pointB.lng - line2pointC.lng) / (line2pointB.lat - line2pointC.lat)
