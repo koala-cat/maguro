@@ -1,5 +1,5 @@
 <template>
-  <div class="map-wrapper">
+  <div class="map-wrapper mu-absolute-fit">
     <div
       id="map"
       class="mu-absolute-fit" />

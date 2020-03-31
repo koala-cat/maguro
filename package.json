@@ -1,8 +1,8 @@
 {
-  "name": "mobula",
-  "version": "0.0.65",
+  "name": "redbud",
+  "version": "0.1.0",
   "description": "draw on map",
-  "main": "dist/mobula.esm.js",
+  "main": "dist/redbud.esm.js",
   "files": [
     "dist",
     "src"

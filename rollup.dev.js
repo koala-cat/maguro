@@ -78,9 +78,9 @@ export default {
   },
   output: [
     {
-      file: 'dist/mobula.js',
+      file: 'dist/redbud.js',
       format: 'umd',
-      name: 'mobula',
+      name: 'redbud',
       globals: {
         vue: 'Vue',
         BMap: 'BMap',
