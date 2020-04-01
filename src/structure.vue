@@ -6,7 +6,7 @@
         style="color: #fff"
         @click="expanded = !expanded">
         <mu-icon
-          :svg="getPath(triangle)"
+          :svg="getPath()"
           style="fill: #ffffff" />
         关联构筑物
       </mu-button>
@@ -47,7 +47,8 @@
 </template>
 <script>
   import debounce from 'lodash.debounce'
-  import d from '../d'
+
+  import { triangleDownSvg, triangleRightSvg } from './assets/svg-icons'
 
   import TreeNode from './tree-node.vue'
 
@@ -73,11 +74,6 @@
         searchKey: ''
       }
     },
-    computed: {
-      triangle () {
-        return this.expanded ? 'triangle-down' : 'triangle-right'
-      }
-    },
     watch: {
       overlay (val) {
         this.getFilterStructures()
@@ -87,8 +83,8 @@
       this.getFilterStructures()
     },
     methods: {
-      getPath (icon) {
-        return d[icon]
+      getPath () {
+        return this.expanded ? triangleDownSvg : triangleRightSvg
       },
       getFilterStructures () {
         const map = {}

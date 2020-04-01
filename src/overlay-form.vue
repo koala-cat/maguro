@@ -202,9 +202,10 @@
 <script>
   import BMap from 'BMap'
   import isEmpty from 'lodash.isempty'
-  import { legendSpecs, fontSpecs, strokeSpecs } from '../constants'
-  import d from '../d'
+  import { legendSpecs, fontSpecs, strokeSpecs } from './constants'
   import { fixedNumber } from './map/calc/data'
+
+  import { dashedSvg, solidSvg } from './assets/svg-icons'
 
   import ColorPicker from './color-picker.vue'
   import StructureTree from './structure.vue'
@@ -381,7 +382,11 @@
     },
     methods: {
       getPath (icon) {
-        return d[icon]
+        const svg = {
+          dashed: dashedSvg,
+          solid: solidSvg
+        }
+        return svg[icon]
       },
       getComboOptions (data) {
         const map = []
@@ -402,3 +407,55 @@
     }
   }
 </script>
+
+<style scoped>
+  * {
+    color: $fontColorGrey;
+    font-size: $fontSize !important;
+  }
+
+  button:hover {
+    color: $fontColorWhite !important;
+  }
+
+  .mu-editor[disabled] > .mu-input,
+  .mu-toggle[disabled] > .mu-toggle-slide-bar {
+    background: $bgColorDisabled;
+  }
+
+  .mu-color-picker {
+    position:absolute;
+    max-width: 60px;
+    opacity: 0;
+    z-index: 10;
+    & > input {
+      cursor: pointer;
+    }
+    & > .mu-color-picker-indicator {
+      z-index: -1 !important;
+    }
+  }
+
+  .overlay-form {
+    width: 262px;
+    top: 72px;
+    right: 32px;
+    bottom: 108px;
+    overflow: auto;
+    z-index: 10;
+    & > * {
+      background: $bgColorLight;
+      &.mu-bar,
+      & > .mu-bar {
+        padding: 0 0 0 8px;
+        background: $bgColorDark;
+      }
+      & img, & [combo-icon] {
+        position: absolute;
+        top: 8px;
+        left: 16px;
+        z-index: 10;
+      }
+    }
+  }
+</style>

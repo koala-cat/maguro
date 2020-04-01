@@ -1,8 +1,8 @@
 import BMap from 'BMap'
 import { CustomSvg } from './custom-overlay'
 
-import { calcSpecialPoints } from '../components/map/calc/point'
-import { distanceToPointAndPixel } from '../components/map/calc/distance'
+import { calcSpecialPoints } from '../map/calc/point'
+import { distanceToPointAndPixel } from '../map/calc/distance'
 import { defaultStyle, getOverlaySettings, setOverlaySettings } from './setting'
 
 // 绘制点（icon、symbol、svg）、线、面（圆、多边形）、文本、特殊类型

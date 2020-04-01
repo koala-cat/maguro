@@ -1,7 +1,8 @@
 <template>
-  <div
-    id="map"
-    class="mu-absolute-fit">
+  <div class="mu-absolute-fit">
+    <div
+      id="map"
+      class="mu-absolute-fit" />
     <slot />
   </div>
 </template>
@@ -15,7 +16,6 @@
   // import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
 
   // import { getLegend } from './legend'
-  // import Update from './update'
 
   export default {
     provide () {

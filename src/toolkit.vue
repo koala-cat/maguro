@@ -1,5 +1,5 @@
 <template>
-  <mu-h-box class="toolbar">
+  <mu-h-box class="toolkit">
     <slot />
     <mu-button
       button-style="text"
@@ -13,20 +13,25 @@
       style="font-size: 18px;"
       @click="switchScreen">
       <mu-icon
-        :svg="getScreen()"
+        :svg="screenIcon"
         style="fill: #fff;" />
     </mu-icon-button>
   </mu-h-box>
 </template>
 <script>
-  import d from '../d'
+  import { zoomUpSvg, zoomDownSvg } from './assets/svg-icons'
 
   export default {
-    inject: ['map'],
+    inject: ['baiduMap'],
     data () {
       return {
         busy: false,
         fullScreen: false
+      }
+    },
+    computed: {
+      screenIcon () {
+        return this.fullScreen ? zoomDownSvg : zoomUpSvg
       }
     },
     mounted () {
@@ -43,11 +48,8 @@
       }
     },
     methods: {
-      getScreen () {
-        return this.fullScreen ? d['zoom-down'] : d['zoom-up']
-      },
       save () {
-        this.map.saveOverlays()
+        this.baiduMap.saveOverlays()
       },
       setFullScreen () {
         return document.fullscreenElement || document.webkitFullscreenElement ||
@@ -82,3 +84,28 @@
     }
   }
 </script>
+
+<style scoped>
+  .toolkit {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 4px 8px;
+    background: $bgColorLight;
+    z-index: 100;
+    & > button {
+      color: $fontColorWhite !important;
+      font-size: $fontSize !important;
+      &[icon-only] {
+        font-size: 18px !important;
+      }
+      &:hover {
+        background: $bgColorDark !important;
+      }
+      &[disabled] {
+        color: $fontColorGrey !important;
+      }
+    }
+  }
+</style>

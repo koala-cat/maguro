@@ -1,6 +1,6 @@
 import BMap from 'BMap'
 import { notify } from 'mussel'
-import { getPolylineIncludeSpecials } from '../components/map/calc/overlay'
+import { getPolylineIncludeSpecials } from '../map/calc/overlay'
 
 function removeOverlays (map, overlays, options) {
   const { selectedOverlays, removedOverlays } = options

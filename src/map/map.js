@@ -39,7 +39,7 @@ export default {
         }
 
         if (keyCode === 27) { // Escape
-          // 终端绘制
+          // 终止绘制
           // 取消选中覆盖物
         }
       }

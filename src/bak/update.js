@@ -1,4 +1,4 @@
-import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../components/map/calc/overlay'
+import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../map/calc/overlay'
 
 import Add from './add'
 import Draw from './draw'
@@ -147,9 +147,11 @@ class Update {
     if (callback) callback(newOverlay)
   }
 
-  lineupdate (editable, overlay) {
-    const lineupdate = (e) => {
-      if (!this._lineupdate) {
+  lineupdate (overlay, options) {
+    const { editable, lineupdate } = options
+
+    const update = (e) => {
+      if (!lineupdate) {
         let points = null
         try {
           points = [overlay.getCenter()]
@@ -161,9 +163,9 @@ class Update {
       }
     }
     if (editable) {
-      overlay.addEventListener('lineupdate', lineupdate)
+      overlay.addEventListener('lineupdate', update)
     } else {
-      overlay.removeEventListener('lineupdate', lineupdate)
+      overlay.removeEventListener('lineupdate', update)
     }
   }
 

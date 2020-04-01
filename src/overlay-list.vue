@@ -31,12 +31,12 @@
       </mu-bar>
       <mu-h-box header>
         <mu-flex-item
-          v-for="(h, index) in headers"
-          v-show="!h.hidden"
+          v-for="(item, index) in headers"
+          v-show="!item.hidden"
           :key="index"
-          :size="h.size"
-          :text-align="h.textAlign">
-          {{ h.label }}
+          :size="item.size"
+          :text-align="item.textAlign">
+          {{ item.label }}
         </mu-flex-item>
       </mu-h-box>
       <mu-v-box
@@ -46,6 +46,7 @@
           v-for="(item, i) in filterOverlays"
           :key="item.id"
           :class="{active: item === overlay}"
+          class="list-item"
           align-items="center"
           @click.native="onClickOverlay(item)">
           <mu-flex-item
@@ -95,7 +96,7 @@
   </mu-v-box>
 </template>
 <script>
-  import d from '../d'
+  import { listSvg } from './assets/svg-icons'
 
   export default {
     inject: ['map'],
@@ -122,7 +123,7 @@
       return {
         showHiddenOverlay: false,
         showUnlinkOverlay: false,
-        listIcon: d.list
+        listIcon: listSvg
       }
     },
     computed: {
@@ -210,3 +211,75 @@
     }
   }
 </script>
+
+<style scoped>
+  .overlay-list > :first-child {
+    position: absolute;
+    top: -16px;
+    left: 16px;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    background: $bgColorLight !important;
+    z-index: 5;
+    & > .mu-icon {
+      width: 100%;
+      height: 100%;
+      font-size: 18px;
+      fill: #fff;
+    }
+    & >.active{
+      background: $bgColorActive;
+    }
+  }
+
+  .overlay-list > :last-child {
+    position: absolute !important;
+    width: 320px;
+    height: 292px;
+    top: -16px;
+    left: 64px;
+    background: $bgColorLight;
+    & * {
+      color: $fontColorGrey;
+      font-size: $fontSize;
+    }
+    & [text-align="left"] {
+      text-align: left;
+    }
+    & > .mu-bar {
+      padding: 4px 12px;
+      color: $fontColorWhite;
+    }
+    & > [header] {
+      text-align: center;
+      background: $bgColorDark;
+      & > * {
+        padding: 8px 0;
+      }
+    }
+    .list-item {
+      & > *{
+        padding: 8px 0;
+        text-align: center;
+      }
+      &:after {
+        content: '';
+        position: absolute;
+        height: 1px;
+        right: 10px;
+        bottom: 0;
+        left: 10px;
+        background: $bgColorDark;
+      }
+      &:hover {
+        cursor: pointer;
+        background: $bgColorHover;
+      }
+      &.active {
+        background: $bgColorActive;
+      }
+    }
+  }
+</style>

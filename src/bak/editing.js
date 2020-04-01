@@ -1,9 +1,9 @@
 import BMap from 'BMap'
 import { notify } from 'mussel'
 
-import { calcRectAllPoints } from '../components/map/calc/point'
-import { calcMarkerOnLinePosition } from '../components/map/calc/position'
-import { getSpecialAttachPolyline } from '../components/map/calc/overlay'
+import { calcRectAllPoints } from '../map/calc/point'
+import { calcMarkerOnLinePosition } from '../map/calc/position'
+import { getSpecialAttachPolyline } from '../map/calc/overlay'
 
 class Editing {
   constructor (map, overlays, selectedOverlays, marker) {
@@ -45,7 +45,7 @@ class Editing {
         const imageOffset = markerIcon.imageOffset
         const size = markerIcon.size
         const iconSize = new BMap.Size(size.width + space, size.height + space)
-        const shadow = new BMap.Icon('assets/bullet.png', iconSize, {
+        const shadow = new BMap.Icon('assets/images/bullet.png', iconSize, {
           imageOffset: new BMap.Size(imageOffset.width, imageOffset.height),
           anchor: new BMap.Size(anchor.width + space / 2, anchor.height + space / 2),
           imageSize: iconSize
@@ -75,10 +75,10 @@ class Editing {
       const sizeWidth = options.width || 10
       const sizeHeight = options.height || 10
       const markers = []
-      const moveIcon = new BMap.Icon('assets/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
+      const moveIcon = new BMap.Icon('assets/images/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
         imageSize: new BMap.Size(sizeWidth, sizeHeight)
       })
-      const shadow = new BMap.Icon('assets/shadow.png', new BMap.Size(sizeWidth * 2, sizeHeight * 2))
+      const shadow = new BMap.Icon('assets/images/shadow.png', new BMap.Size(sizeWidth * 2, sizeHeight * 2))
 
       for (let i = 0; i < points.length; i++) {
         const marker = new BMap.Marker(points[i])
@@ -111,10 +111,10 @@ class Editing {
     const sizeWidth = options.width || 10
     const sizeHeight = options.height || 10
     const markers = []
-    const moveIcon = new BMap.Icon('assets/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
+    const moveIcon = new BMap.Icon('assets/images/bullet.jpg', new BMap.Size(sizeWidth, sizeHeight), {
       imageSize: new BMap.Size(sizeWidth, sizeHeight)
     })
-    const shadow = new BMap.Icon('assets/shadow.png', new BMap.Size(sizeWidth * 2, sizeHeight * 2))
+    const shadow = new BMap.Icon('assets/images/shadow.png', new BMap.Size(sizeWidth * 2, sizeHeight * 2))
 
     const polyline = getSpecialAttachPolyline(overlay, this._overlays)
     if (!polyline) {
