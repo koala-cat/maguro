@@ -1,54 +1,54 @@
 <template>
-  <div class="map-wrapper mu-absolute-fit">
-    <div
-      id="map"
-      class="mu-absolute-fit" />
+  <div
+    id="map"
+    class="mu-absolute-fit">
     <slot />
   </div>
 </template>
 <script>
   import BMap from 'BMap'
-  import debounce from 'lodash.debounce'
-  import { notify } from 'mussel'
-  import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
+  import cloneDeep from 'lodash.clonedeep'
 
-  import { getLegend } from './legend'
-  import { Initial } from './initial'
-  import Update from './update'
+  import MapMixin from './map'
+  // import debounce from 'lodash.debounce'
+  // import { notify } from 'mussel'
+  // import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
 
-  let map = null
+  // import { getLegend } from './legend'
+  // import Update from './update'
 
   export default {
     provide () {
       return {
-        map: this
+        baiduMap: this
       }
     },
+    mixins: [MapMixin],
     props: {
-      commandOrg: {
-        type: Boolean,
-        default: false
-      },
-      legends: {
-        type: Array,
-        default: () => ([])
-      },
-      events: {
+      mapEvents: {
         type: Object,
         default: () => ({})
       },
-      overlays: {
+      mapLegends: {
         type: Array,
         default: () => ([])
       },
-      structures: {
+      mapOverlays: {
+        type: Array,
+        default: () => ([])
+      },
+      mapStructures: {
         type: Array,
         default: () => ([])
       }
     },
     data () {
       return {
-        map: null,
+        baiduMap: null,
+        events: this.mapEvents,
+        legends: this.mapLegends,
+        overlays: [],
+        structures: this.mapStructures,
         overlayListVisible: false,
         selectedOverlays: [],
         updateOverlays: {},
@@ -65,97 +65,93 @@
           overlays: [],
           points: [],
           positions: []
-        }
+        },
+        view: true
+      }
+    },
+    watch: {
+      mapOverlays () {
+        this.overlays = cloneDeep(this.mapOverlays)
+        // 比较一下events
+        this.initEvents()
+        this.initOverlays()
       }
     },
     mounted () {
-      map = new BMap.Map('map', { enableMapClick: false })
-      map.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
-      map.setCurrentCity('北京')
-      map.enableScrollWheelZoom(true)
-      this.map = map
-      this.initial = new Initial(
-        map,
-        this.events,
-        this.legends,
-        this.overlays,
-        this.$data
-      )
+      this.baiduMap = new BMap.Map('map', { enableMapClick: false })
+      this.baiduMap.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
+      this.baiduMap.setCurrentCity('北京')
+      this.baiduMap.enableScrollWheelZoom(true)
 
-      this.update = new Update(
-        map,
-        this.events,
-        this.overlays,
-        this.$data
-      )
+      this.init()
     },
     methods: {
-      setMapType (val, mode) {
-        this.active.mode = val
-        map.setMapType(mode)
-        this.$emit('setMapType', val)
-      },
-      switchOverlayWindow (key) {
-        this.active.tool = null
-        this[key] = !this[key]
-      },
-      addLegend (legend) {
-        this.$emit('addLegend', legend)
-      },
-      removeLegend (legend) {
-        this.$emit('removeLegend', legend)
-      },
-      selectTool (val, style = {}) {
-        if (this.overlayListVisible) {
-          this.overlayListVisible = false
-        }
+      // setMapType (val, mode) {
+      //   this.active.mode = val
+      //   this.baiduMap.setMapType(mode)
+      //   this.$emit('setMapType', val)
+      // }
+      // switchOverlayWindow (key) {
+      //   this.active.tool = null
+      //   this[key] = !this[key]
+      // },
+      // addLegend (legend) {
+      //   this.$emit('addLegend', legend)
+      // },
+      // removeLegend (legend) {
+      //   this.$emit('removeLegend', legend)
+      // },
+      // selectTool (val, style = {}) {
+      //   if (this.overlayListVisible) {
+      //     this.overlayListVisible = false
+      //   }
 
-        this.active.tool = val
-        this.initial._select.tool()
-      },
-      updateOverlay: debounce(function (key, value) {
-        let legend = null
-        if (key === 'projectMapLegendId') {
-          legend = getLegend(this.legends, value)
-        }
-        this.update.setSetting(key, value, legend, (oly) => {
-          this.initial._select.overlay(oly)
-        })
-      }, 500),
-      selectOverlay (overlay) {
-        let points = null
-        const type = overlay.type
+      //   this.active.tool = val
+      //   this.initial._select.tool()
+      // },
+      // updateOverlay: debounce(function (key, value) {
+      //   let legend = null
+      //   if (key === 'projectMapLegendId') {
+      //     legend = getLegend(this.legends, value)
+      //   }
+      //   this.update.setSetting(key, value, legend, (oly) => {
+      //     this.initial._select.overlay(oly)
+      //   })
+      // }, 500),
+      // selectOverlay (overlay) {
+      //   let points = null
+      //   const type = overlay.type
 
-        try {
-          points = overlay.getPath()
-        } catch {
-          points = [overlay.getPosition()]
-        }
+      //   try {
+      //     points = overlay.getPath()
+      //   } catch {
+      //     points = [overlay.getPosition()]
+      //   }
 
-        const viewPort = this.map.getViewport(points)
-        this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-        if (type.includes('special')) {
-          overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
-        }
-        this.initial._select.overlay(overlay)
-      },
-      saveOverlays () {
-        const result = {}
+      //   const viewPort = this.map.getViewport(points)
+      //   this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+      //   if (type.includes('special')) {
+      //     overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
+      //   }
+      //   this.initial._select.overlay(overlay)
+      // },
+      // saveOverlays () {
+      //   const result = {}
 
-        result.creates = getCreateOverlays(this.overlays, this.polylineCenters)
-        if (Object.keys(this.updateOverlays).length === 0 &&
-          this.removeOverlays.length === 0 && !result.creates) {
-          notify('info', '没有需要修改的信息。')
-          return
-        }
-        if (this.removeOverlays.length > 0) {
-          result.removes = this.removeOverlays
-        }
-        if (Object.keys(this.updateOverlays).length > 0) {
-          result.updates = getUpdateOverlays(this.updateOverlays)
-        }
-        this.$emit('save', result)
-      }
+      //   result.creates = getCreateOverlays(this.overlays, this.polylineCenters)
+      //   if (Object.keys(this.updateOverlays).length === 0 &&
+      //     this.removeOverlays.length === 0 && !result.creates) {
+      //     notify('info', '没有需要修改的信息。')
+      //     return
+      //   }
+      //   if (this.removeOverlays.length > 0) {
+      //     result.removes = this.removeOverlays
+      //   }
+      //   if (Object.keys(this.updateOverlays).length > 0) {
+      //     result.updates = getUpdateOverlays(this.updateOverlays)
+      //   }
+      //   this.$emit('save', result)
+      // }
     }
   }
 </script>

@@ -2,9 +2,9 @@ import BMap from 'BMap'
 import cloneDeep from 'lodash.clonedeep'
 import { notify } from 'mussel'
 
-import { calcRectAllPoints } from './calc/point'
-import { calcMarkerOnLinePosition } from './calc/position'
-import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/overlay'
+import { calcRectAllPoints } from '../components/map/calc/point'
+import { calcMarkerOnLinePosition } from '../components/map/calc/position'
+import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../components/map/calc/overlay'
 
 import Update from './update'
 

@@ -66,7 +66,7 @@
             document.msExitFullscreen()
           }
         } else {
-          const element = document.querySelector('.map-wrapper')
+          const element = document.querySelector('#map')
           this.fullScreen = true
           if (element.requestFullscreen) {
             element.requestFullscreen()

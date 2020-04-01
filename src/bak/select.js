@@ -1,12 +1,12 @@
-import { tools } from '../../constants'
-import { isOverlayInFrame } from './calc/geo'
-import { getPolylineIncludeSpecials } from './calc/overlay'
+import { tools } from '../constants'
+import { isOverlayInFrame } from '../components/map/calc/geo'
+import { getPolylineIncludeSpecials } from '../components/map/calc/overlay'
 
-import Add from '../../bak/add'
-import Drag from '../../bak/drag'
-import DrawingManager from '../../bak/drawingManager'
-import Editing from '../../bak/editing'
-import { removeMarkers } from '../../bak/remove'
+import Add from './add'
+import Drag from './drag'
+import DrawingManager from './drawingManager'
+import Editing from './editing'
+import { removeMarkers } from './remove'
 import { defaultStyle } from './setting'
 
 class Select {

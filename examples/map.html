@@ -17,39 +17,33 @@
   <div id="app">
     <h2>Map Example</h2>
     <hr>
-    <map-bidu
-      :command-org="false"
-      :events="events"
-      :legends="legends"
-      :overlays="overlays"
-      :structures="structures"
+    <maguro
+      :map-events="events"
+      :map-legends="legends"
+      :map-overlays="overlays"
+      :map-structures="structures"
       @save="saveOverlays">
-      <map-mode></map-mode>
-      <map-toolkit>
+      <!-- <maguro-mode></maguro-mode> -->
+      <!-- <maguro-toolkit>
         <mu-button
           button-style="text"
           @click="onUploadPolyline">
           <span style="font-size: 14px;">+</span>
           导入线路
         </mu-button>
-      </map-toolkit>
-      <map-overlay-toolkit></map-overlay-toolkit>
-      <map-overlay-list
+      </maguro-toolkit>
+      <maguro-overlay-toolkit></maguro-overlay-toolkit>
+      <maguro-overlay-list
         :source-column-visible="false">
-      </map-overlay-list>
-      <map-overlay-form></map-overlay-form>
-    </map-bidu>
+      </maguro-overlay-list>
+      <maguro-overlay-form></maguro-overlay-form> -->
+    </maguro>
   </div>
 
   <script type="text/javascript">
     var app = new Vue({
       el: '#app',
       data: {
-        context: {
-          currentOrg: {
-            id: 10
-          }
-        },
         events: {},
         legends: [
           {
@@ -103,7 +97,6 @@
             id: 1019,
             type: 'special',
             value: 'specialDoubleLine',
-            iconUrl: 'http://dev.mctech.vip/fss/iwop-dev/intelli-quantity/map-legend/15368183468982430837415124692641.png?FSSAccessKeyId=LTAIMMsdxTwnzzof&Expires=1585281784&Signature=HW9EOFM%2BiuPXjZ7EkbznoE11imM%3D',
             disabled: true,
             isRemoved: false
           }
@@ -150,9 +143,12 @@
           }
         }
 
-        this.events.mouseover = (e, overlay) => {
-          console.log('mouseover')
+        this.events = {
+          mouseover: (e, overlay) => {
+            console.log('mouseover')
+          }
         }
+
         this.overlays.push(
           {
             id: 102,
@@ -186,8 +182,6 @@
             disabled: false
           }
         )
-        
-        maguro.refresh()
       },
       methods: {
         onUploadPolyline () {

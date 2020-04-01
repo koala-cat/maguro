@@ -1,6 +1,6 @@
 // 创建和保存都放这里
 import { notify } from 'mussel'
-import { calcMarkerOnLinePosition } from './calc/position'
+import { calcMarkerOnLinePosition } from '../components/map/calc/position'
 
 import Draw from './draw'
 import { removeMarkers } from './remove'

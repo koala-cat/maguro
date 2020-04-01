@@ -1,4 +1,4 @@
-import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from './calc/overlay'
+import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../components/map/calc/overlay'
 
 import Add from './add'
 import Draw from './draw'

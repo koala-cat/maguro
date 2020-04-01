@@ -1,9 +1,9 @@
 import BMap from 'BMap'
 import { notify } from 'mussel'
 
-import { calcRectAllPoints } from './calc/point'
-import { calcMarkerOnLinePosition } from './calc/position'
-import { getSpecialAttachPolyline } from './calc/overlay'
+import { calcRectAllPoints } from '../components/map/calc/point'
+import { calcMarkerOnLinePosition } from '../components/map/calc/position'
+import { getSpecialAttachPolyline } from '../components/map/calc/overlay'
 
 class Editing {
   constructor (map, overlays, selectedOverlays, marker) {
