@@ -53,7 +53,7 @@
       width: 50%;
       height: 100%;
       margin-left: 4px;
-      background: url(assets/maptype.png) no-repeat 0 0;
+      background: url(assets/images/maptype.png) no-repeat 0 0;
       background-size: 86px 240px;
       border: 1px solid transparent;
       border-radius: 2px;
