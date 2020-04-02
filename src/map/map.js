@@ -1,15 +1,15 @@
 import BMap from 'BMap'
 import { showOverlays } from './calc/clusterer'
 // import { getOverlaySettings } from './setting'
-import { getLegend, getLegendType } from './legend'
+import { getLegend, getLegendType } from './overlay/legend'
 
 export default {
   methods: {
     init () {
-      this.initListener()
-      this.initKeyboard()
+      this.bindMapEvents()
+      this.bindDocumentEvents()
     },
-    initListener () {
+    bindMapEvents () {
       this.baiduMap.addEventListener('zoomend', () => {
         showOverlays(this.baiduMap, this.overlays, this.specialOverlays)
       })
@@ -23,15 +23,8 @@ export default {
         }
       })
     },
-    initEvents () {
-      const click = (e, overlay) => {
-        // 点击覆盖物方法
-      }
-
-      this.events.click = click
-    },
-    initKeyboard () {
-      document.onkeydown = (e) => {
+    bindDocumentEvents () {
+      document.addEventListener('keydown', (e) => {
         e = e || window.event
         const keyCode = e.keyCode || e.which || e.charCode
         if (keyCode === 46) { // Delete
@@ -42,7 +35,14 @@ export default {
           // 终止绘制
           // 取消选中覆盖物
         }
+      })
+    },
+    bindOverlayEvents () {
+      const click = (e, overlay) => {
+        // 点击覆盖物方法
       }
+
+      this.events.click = click
     },
     initOverlays () {
       if (this.overlays.length === 0) return

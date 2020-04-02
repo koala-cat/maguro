@@ -1,4 +1,4 @@
-import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../calc/overlay'
+import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 
 function showOverlay (overlay, options) {
   const { key, value, overlays } = options

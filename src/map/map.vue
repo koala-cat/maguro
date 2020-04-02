@@ -3,6 +3,7 @@
     <div
       id="map"
       class="mu-absolute-fit" />
+    <mode />
     <slot />
   </div>
 </template>
@@ -17,7 +18,12 @@
 
   // import { getLegend } from './legend'
 
+  import Mode from './mode/mode.vue'
+
   export default {
+    components: {
+      Mode
+    },
     provide () {
       return {
         baiduMap: this
@@ -73,7 +79,7 @@
       mapOverlays () {
         this.overlays = cloneDeep(this.mapOverlays)
         // 比较一下events
-        this.initEvents()
+        this.bindOverlayEvents()
         this.initOverlays()
       }
     },

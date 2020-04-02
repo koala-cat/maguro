@@ -2,7 +2,7 @@ import BMap from 'BMap'
 import CustomSvg from 'CustomSvg'
 
 import { addEvents } from './event'
-import { getOverlaySettings, setOverlaySettings, settingsToStyle } from './setting'
+import { getOverlaySettings, setOverlaySettings, settingsToStyle } from '../setting'
 import { updateOverlay, showOverlay } from './operate/update-overlay'
 import { removeOverlay } from './operate/remove-overlay'
 import { dragOverlay } from './operate/drag-overlay'

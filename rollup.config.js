@@ -6,17 +6,12 @@ import { terser } from 'rollup-plugin-terser'
 
 import postcss from 'rollup-plugin-postcss'
 import postcssAutoprefixer from 'autoprefixer'
-import postcssCalc from 'postcss-calc'
 import postcssClean from 'postcss-clean'
-import postcssConditionals from 'postcss-conditionals'
-import postcssFor from 'postcss-for'
-import postcssEach from 'postcss-each'
 import postcssImport from 'postcss-import'
 import postcssNested from 'postcss-nested'
 import postcssVars from 'postcss-simple-vars'
 import postcssUnprefix from 'postcss-unprefix'
-
-import variables from './src/theme'
+import theme from './src/theme'
 
 export default {
   input: 'src/index.js',
@@ -29,12 +24,8 @@ export default {
       plugins: [
         postcssImport,
         postcssUnprefix,
-        postcssEach,
-        postcssFor,
-        postcssVars({ variables }),
-        postcssCalc,
+        postcssVars({variables: theme}),
         postcssNested,
-        postcssConditionals,
         postcssAutoprefixer,
         postcssClean
       ]

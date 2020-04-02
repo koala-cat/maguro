@@ -7,8 +7,6 @@ import OverlayForm from './overlay-form.vue'
 import OverlayList from './overlay-list.vue'
 import OverlayToolkit from './overlay-toolkit.vue'
 
-import './theme.pcss'
-
 function install ($Vue = Vue) {
   $Vue.component('maguro', MapBidu)
   $Vue.component('maguro-toolkit', Toolkit)
