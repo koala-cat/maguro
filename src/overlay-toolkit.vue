@@ -49,16 +49,16 @@
   import { tools } from './constants'
 
   export default {
-    inject: ['map'],
+    inject: ['baiduMap'],
     computed: {
       legends () {
-        return this.map.legends
+        return this.baiduMap.legends
       },
       tools () {
         return tools
       },
       activeTool () {
-        return this.map.active.tool
+        return this.baiduMap.activeLegend
       },
       activeToolType () {
         return this.activeTool?.type || this.activeTool?.value || null
@@ -102,16 +102,16 @@
         }
         this.onSelect(tool)
       },
-      onSelect (tool) {
-        this.map.selectTool(tool)
+      onSelect (legend) {
+        this.baiduMap.selectLegend(legend)
       },
       removeLegend (legend) {
-        this.map.removeLegend(legend)
+        this.baiduMap.removeLegend(legend)
       },
       uploadLegend (legend) {
         this.$refs.fileSelector.click()
         this.$refs.fileSelector.addEventListener('change', (e) => {
-          this.map.addLegend(e)
+          this.baiduMap.addLegend(e)
         })
       }
     }
@@ -119,7 +119,7 @@
 </script>
 
 <style scoped>
-  .overlay-bar {
+  .overlay-toolkit {
     position: absolute !important;
     top: 40px;
     width: 40px;
@@ -128,14 +128,14 @@
     z-index: 100;
   }
 
-  .overlay-bar > div {
+  .overlay-toolkit > div {
     background: $bgColorLight;
     &::-webkit-scrollbar {
       width: 0;
     }
   }
 
-  .overlay-bar > div:last-child {
+  .overlay-toolkit > div:last-child {
     position: absolute;
     width: 152px;
     max-height: 120px;
@@ -157,7 +157,7 @@
     }
   }
 
-  .overlay-bar .mu-list-item {
+  .overlay-toolkit .mu-list-item {
     padding: 0 6px;
     width: 40px;
     line-height: 40px;

@@ -1,5 +1,7 @@
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 
+import { settingsToStyle } from '../setting'
+
 function showOverlay (overlay, options) {
   const { key, value, overlays } = options
   const { type } = overlay
@@ -35,8 +37,8 @@ function showOverlay (overlay, options) {
   })
 }
 
-function updateOverlay (overlay, options) {
-  let { key, value, updateOverlays, polylinePointIds } = options
+function updateOverlay (key, value, options) {
+  const { updateOverlays, polylinePointIds, activeOverlay: overlay } = options
   const { id, name, projectGeoKey, invented } = overlay
 
   overlay[key] = value
@@ -73,6 +75,45 @@ function updateOverlay (overlay, options) {
   )
 }
 
+function updateMarker (key, value, options) {
+  const {
+    baiduMap,
+    overlays,
+    updateOverlays,
+    polylinePointIds,
+    activeOverlay: overlay,
+    newOverlay,
+    callback
+  } = options
+
+  if (['name', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
+    showOverlay(overlay, { key, value })
+    return
+  }
+
+  if (key !== 'projectMapLegendId' && overlay.svg) {
+    const style = settingsToStyle({ [key]: value })
+    for (const s in style) {
+      overlay.setStyle(s, style[s])
+    }
+    if (key === 'width') {
+      overlay.setSize(value)
+    }
+    return
+  }
+
+  const index = overlays.findIndex(item => item.id === overlay.id)
+
+  overlay.disableEditing()
+  overlay.remove()
+
+  baiduMap.addOverlay(newOverlay)
+  overlays.splice(index, 1, newOverlay)
+  updateOverlay(newOverlay, { key, value, updateOverlays, polylinePointIds })
+
+  if (callback) callback(newOverlay)
+}
+
 function onLineupdate (overlay, options) {
   const { editable, lineupdate } = options
 
@@ -97,6 +138,7 @@ function onLineupdate (overlay, options) {
 
 export {
   updateOverlay,
+  updateMarker,
   showOverlay,
   onLineupdate
 }

@@ -1,6 +1,8 @@
 import BMap from 'BMap'
 import { showOverlays } from './calc/clusterer'
 // import { getOverlaySettings } from './setting'
+import { initDrawing } from './overlay/operate/drawing-overlay'
+import { selectOverlay } from './overlay/operate/select-overlay'
 import { getLegend, getLegendType } from './overlay/legend'
 
 export default {
@@ -8,6 +10,7 @@ export default {
     init () {
       this.bindMapEvents()
       this.bindDocumentEvents()
+      initDrawing(this.$data)
     },
     bindMapEvents () {
       this.baiduMap.addEventListener('zoomend', () => {
@@ -15,10 +18,14 @@ export default {
       })
 
       this.baiduMap.addEventListener('click', (e) => {
-        if ((this.active.tool && !this.active.tool.type) || !this.active.tool) {
-          this.active.tool = null
+        if ((this.activeTool && !this.activeTool.type) || !this.activeTool) {
+          this.activeTool = null
           if (!e.overlay) {
-            // 取消选中覆盖物
+            this.selectedOverlays.map(oly => {
+              oly.disableEditing()
+            })
+            this.selectedOverlays.splice(0)
+            this.activeOverlay = null
           }
         }
       })
@@ -40,6 +47,7 @@ export default {
     bindOverlayEvents () {
       const click = (e, overlay) => {
         // 点击覆盖物方法
+        selectOverlay(e, overlay, this.$data)
       }
 
       this.events.click = click

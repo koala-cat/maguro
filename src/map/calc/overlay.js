@@ -1,6 +1,6 @@
 import BMap from 'BMap'
 import { getOverlayPoints } from './point'
-import { getOverlaySettings } from '../setting'
+import { getOverlaySettings } from '../overlay/setting'
 
 function getCreateOverlays (overlays, polylineCenters) {
   const creates = []

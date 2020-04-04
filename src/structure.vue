@@ -53,7 +53,7 @@
   import TreeNode from './tree-node.vue'
 
   export default {
-    inject: ['map'],
+    inject: ['baiduMap'],
     components: {
       TreeNode
     },
@@ -115,7 +115,7 @@
       }, 500),
       onChecked (value, structure) {
         const projectStructureId = value ? structure?.id || null : null
-        this.map.updateOverlay('projectStructureId', projectStructureId)
+        this.baiduMap.updateOverlay('projectStructureId', projectStructureId)
       }
     }
   }

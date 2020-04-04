@@ -1,6 +1,6 @@
 import BMap from 'BMap'
 import { notify } from 'mussel'
-import { getPolylineIncludeSpecials } from '../calc/overlay'
+import { getPolylineIncludeSpecials } from '../../calc/overlay'
 
 function removeOverlay (baiduMap, overlay, options) {
   const { overlays, removedOverlays, marker } = options

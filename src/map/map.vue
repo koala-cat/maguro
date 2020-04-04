@@ -16,7 +16,7 @@
   // import { notify } from 'mussel'
   // import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
 
-  // import { getLegend } from './legend'
+  import { selectLegend } from './overlay/legend'
 
   import Mode from './mode/mode.vue'
 
@@ -51,6 +51,7 @@
     data () {
       return {
         baiduMap: null,
+        drawingManager: null,
         events: this.mapEvents,
         legends: this.mapLegends,
         overlays: [],
@@ -62,16 +63,12 @@
         specialOverlays: {},
         polylineCenters: {},
         polylinePointIds: {},
-        active: {
-          mode: 'normal',
-          overlay: null,
-          tool: null
-        },
-        marker: {
-          overlays: [],
-          points: [],
-          positions: []
-        },
+        activeMode: 'normal',
+        activeOverlay: null,
+        activeLegend: null,
+        markerOverlays: [],
+        markerPoints: [],
+        markerPositions: [],
         view: true
       }
     },
@@ -93,12 +90,12 @@
     },
     methods: {
       // setMapType (val, mode) {
-      //   this.active.mode = val
+      //   this.activeMode = val
       //   this.baiduMap.setMapType(mode)
       //   this.$emit('setMapType', val)
       // }
       // switchOverlayWindow (key) {
-      //   this.active.tool = null
+      //   this.activeLegend = null
       //   this[key] = !this[key]
       // },
       // addLegend (legend) {
@@ -107,14 +104,14 @@
       // removeLegend (legend) {
       //   this.$emit('removeLegend', legend)
       // },
-      // selectTool (val, style = {}) {
-      //   if (this.overlayListVisible) {
-      //     this.overlayListVisible = false
-      //   }
+      selectLegend (val, style = {}) {
+        if (this.overlayListVisible) {
+          this.overlayListVisible = false
+        }
 
-      //   this.active.tool = val
-      //   this.initial._select.tool()
-      // },
+        this.activeLegend = val
+        selectLegend(this.$data)
+      }
       // updateOverlay: debounce(function (key, value) {
       //   let legend = null
       //   if (key === 'projectMapLegendId') {

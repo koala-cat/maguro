@@ -5,21 +5,16 @@ class CustomSvg extends CustomOverlay {
     super()
     this.baiduMap = baiduMap
     this.point = point
-    this.options = {
-      ...options,
-      position: 'absolute',
-      width: `${options.width || 0}px`
-    }
+    this.options = options
   }
 
   initialize () {
     const {
       fill,
       fillOpacity: opacity,
-      position,
       svg,
       width
-    } = this.options
+    } = this.options.settings
     const viewBox = svg.getAttribute('viewBox')
     this.div.innerHTML = `
       <svg class="icon" viewBox="${viewBox}">
@@ -31,7 +26,7 @@ class CustomSvg extends CustomOverlay {
       svgDoc.style,
       {
         display: 'inherit',
-        width,
+        width: `${width}px`,
         fill,
         opacity
       }
@@ -39,7 +34,7 @@ class CustomSvg extends CustomOverlay {
     Object.assign(
       this.div.style,
       {
-        position,
+        position: 'absolute',
         border: '1px solid transparent',
         transition: 'all 0'
       }
@@ -49,7 +44,15 @@ class CustomSvg extends CustomOverlay {
   }
 
   draw () {
-    super.setTransform()
+    super.setPosition(this.point)
+  }
+
+  enableEditing () {
+    this.setBorder('#5E87DB')
+  }
+
+  disableEditing () {
+    this.setBorder('transparent')
   }
 
   setStyle (key, value) {

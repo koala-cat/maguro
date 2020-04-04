@@ -1,5 +1,5 @@
 import BMap from 'BMap'
-import { getPolylineIncludeSpecials } from '../calc/overlay'
+import { getPolylineIncludeSpecials } from '../../calc/overlay'
 
 let startPoint = null
 let startPixel = null
@@ -46,7 +46,7 @@ function dragMove (e, baiduMap, options) {
   e.stopPropagation()
   const movePixel = { x: e.clientX, y: e.clientY }
   const movePoint = baiduMap.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
-  const { selectedOverlays } = options
+  const { overlays, selectedOverlays } = options
 
   const dx = movePixel.x - startPixel.x
   const dy = movePixel.y - startPixel.y
@@ -64,18 +64,18 @@ function dragMove (e, baiduMap, options) {
 
     if (['marker', 'label'].includes(type)) {
       const point = oly.getPosition()
-      const mPoint = this.getPoint(point, dlng, dlat)
+      const mPoint = getPoint(point, dlng, dlat)
 
       oly.setPosition(mPoint)
     } else if (['circle'].includes(type)) {
       const point = oly.getCenter()
-      const mPoint = this.getPoint(point, dlng, dlat)
+      const mPoint = getPoint(point, dlng, dlat)
 
       oly.setCenter(new BMap.Point(mPoint.lng, mPoint.lat))
     } else {
-      this.setPath(oly, dlng, dlat)
-      const specialOlys = getPolylineIncludeSpecials(oly, this._overlays)
-      specialOlys.map(item => this.setPath(item, dlng, dlat))
+      setPath(oly, dlng, dlat)
+      const specialOlys = getPolylineIncludeSpecials(oly, overlays)
+      specialOlys.map(item => setPath(item, dlng, dlat))
     }
 
     oly.disableEditing()
@@ -112,9 +112,24 @@ function dragEnd (e, options) {
 
     specials.push(oly)
     specials.map(item => {
-      item.update({ key: 'points', value: points })
+      item.update('points', points)
     })
   })
+}
+
+function getPoint (point, dlng, dlat) {
+  const mPoint = new BMap.Point(point.lng + dlng, point.lat + dlat)
+  return mPoint
+}
+
+function setPath (oly, dlng, dlat) {
+  const points = oly.getPath()
+  const newPoints = []
+  points.map(point => {
+    const mPoint = getPoint(point, dlng, dlat)
+    newPoints.push(new BMap.Point(mPoint.lng, mPoint.lat))
+  })
+  oly.setPath(newPoints)
 }
 
 export {

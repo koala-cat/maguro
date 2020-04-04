@@ -99,7 +99,7 @@
   import { listSvg } from './assets/svg-icons'
 
   export default {
-    inject: ['map'],
+    inject: ['baiduMap'],
     props: {
       title: String,
       hiddenFilterVisible: {
@@ -128,13 +128,13 @@
     },
     computed: {
       overlays () {
-        return this.map.overlays
+        return this.baiduMap.overlays
       },
       overlayListVisible () {
-        return this.map.overlayListVisible
+        return this.baiduMap.overlayListVisible
       },
       overlay () {
-        return this.map.active.overlay || {}
+        return this.baiduMap.activeOverlay || {}
       },
       filterOverlays () {
         const groupIds = []
@@ -194,7 +194,7 @@
         return { conditionDisplay, conditionStructure }
       },
       onClickOverlayWindow () {
-        this.map.switchOverlayWindow('overlayListVisible')
+        this.baiduMap.switchOverlayWindow('overlayListVisible')
       },
       onClickOverlay (oly) {
         const display =
@@ -202,11 +202,11 @@
             ? oly.isDisplay
             : oly.isCommandDisplay
         if (display) {
-          this.map.selectOverlay(oly)
+          this.baiduMap.selectOverlay(oly)
         }
       },
       onChange (item, key) {
-        this.map.updateOverlay(key, item[key])
+        this.baiduMap.updateOverlay(key, item[key])
       }
     }
   }

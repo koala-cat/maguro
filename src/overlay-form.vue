@@ -211,7 +211,7 @@
   import StructureTree from './structure.vue'
 
   export default {
-    inject: ['map'],
+    inject: ['baiduMap'],
     components: {
       ColorPicker,
       StructureTree
@@ -238,13 +238,13 @@
         return this.expanded ? 'triangle-down' : 'triangle-right'
       },
       legends () {
-        return this.map.legends
+        return this.baiduMap.legends
       },
       structures () {
-        return this.map.structures
+        return this.baiduMap.structures
       },
       overlay () {
-        return this.map.active.overlay || {}
+        return this.baiduMap.activeOverlay || {}
       },
       disabled () {
         return this.overlay.disabled
@@ -290,8 +290,7 @@
           return this.overlay.name
         },
         set (val) {
-          console.log(this.map)
-          this.map.updateOverlay('name', val)
+          this.baiduMap.updateOverlay('name', val)
         }
       },
       specialFile () {
@@ -302,7 +301,7 @@
           return this.overlay.width
         },
         set (val) {
-          this.map.updateOverlay('width', parseFloat(val))
+          this.baiduMap.updateOverlay('width', parseFloat(val))
         }
       },
       height: {
@@ -310,7 +309,7 @@
           return this.overlay.height || null
         },
         set (val) {
-          this.map.updateOverlay('height', parseFloat(val))
+          this.baiduMap.updateOverlay('height', parseFloat(val))
         }
       },
       fillColor: {
@@ -319,7 +318,7 @@
         },
         set (val) {
           if (this.fillFieldVisible) {
-            this.map.updateOverlay('fillColor', val)
+            this.baiduMap.updateOverlay('fillColor', val)
           }
         }
       },
@@ -329,7 +328,7 @@
         },
         set (val) {
           if (val === 0) val = 0.00001
-          this.map.updateOverlay('fillOpacity', fixedNumber(val / 100, 4))
+          this.baiduMap.updateOverlay('fillOpacity', fixedNumber(val / 100, 4))
         }
       },
       strokeColor: {
@@ -337,7 +336,7 @@
           return this.overlay.strokeColor
         },
         set (val) {
-          this.map.updateOverlay('strokeColor', val)
+          this.baiduMap.updateOverlay('strokeColor', val)
         }
       },
       strokeWeight: {
@@ -345,7 +344,7 @@
           return this.overlay.strokeWeight
         },
         set (val) {
-          this.map.updateOverlay('strokeWeight', val)
+          this.baiduMap.updateOverlay('strokeWeight', val)
         }
       },
       strokeStyle () {
@@ -356,7 +355,7 @@
           return this.overlay.isLocked
         },
         set (val) {
-          this.map.updateOverlay('isLocked', val)
+          this.baiduMap.updateOverlay('isLocked', val)
         }
       },
       isDisplay: {
@@ -365,7 +364,7 @@
         },
         set (val) {
           const key = this.overlay.isCommand ? 'isDisplay' : 'isCommandDisplay'
-          this.map.updateOverlay(key, val)
+          this.baiduMap.updateOverlay(key, val)
         }
       },
       structureName () {
@@ -399,10 +398,10 @@
         this.visible = false
       },
       onComboBoxSelect (key, val) {
-        this.map.updateOverlay(key, val)
+        this.baiduMap.updateOverlay(key, val)
       },
       onChangeLevel (val) {
-        this.map.updateOverlay('level', val)
+        this.baiduMap.updateOverlay('level', val)
       }
     }
   }

@@ -1,13 +1,37 @@
 import BMap from 'BMap'
 
+import { getOverlaySettings } from './setting'
+import { updateMarker } from './operate/update-overlay'
+import { removeOverlay } from './operate/remove-overlay'
+import { dragOverlay } from './operate/drag-overlay'
+
 class CustomOverlay extends BMap.Overlay {
   constructor () {
     super()
     this.div = document.createElement('div')
   }
 
+  drag () {
+    const { baiduMap, options } = this
+    dragOverlay(baiduMap, this, options)
+  }
+
+  update (key, value) {
+    const { events, activeLegend: legend } = this.options
+    const point = this.getPosition()
+    const settings = {
+      ...getOverlaySettings(this),
+      iconUrl: legend?.iconUrl || this.iconUrl,
+      svg: legend?.svg || this.svg
+    }
+    const newOverlay = this.draw(point, false, settings, events)
+    this.options.newOverlay = newOverlay
+    updateMarker(key, value, this.options)
+  }
+
   remove () {
     this.div.remove()
+    removeOverlay(this.baiduMap, this, this.options)
   }
 
   addEventListener (type, fn, capture = false) {
@@ -19,26 +43,26 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   getPosition (mpoint) {
-    return this.options.point
+    return this.point
   }
 
   setPosition (mpoint) {
-    this.options.point = mpoint
+    this.point = mpoint
     this.setTransform()
   }
 
   setSize (value) {
-    this.options.width = value
+    this.options.settings.width = value
     this.setTransform()
   }
 
   setTransform () {
-    const { offsetX: x = 0, offsetY: y = 0, point, width } = this.options
+    const { offsetX: x = 0, offsetY: y = 0, width } = this.options.settings
     const offset = {
       x: x - parseFloat(width) / 2,
       y: y - parseFloat(width) / 2
     }
-    const pixel = this.baiduMap.pointToOverlayPixel(point)
+    const pixel = this.baiduMap.pointToOverlayPixel(this.point)
     const px = pixel.x + offset.x + 'px'
     const py = pixel.y + offset.y + 'px'
     this.div.style.transform = `translate3d(${px}, ${py}, 0)`

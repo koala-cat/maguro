@@ -29,7 +29,7 @@
         return mapTypes
       },
       mode () {
-        return this.baiduMap.active.mode
+        return this.baiduMap.activeMode
       }
     },
     methods: {
