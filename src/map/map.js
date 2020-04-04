@@ -1,4 +1,6 @@
 import BMap from 'BMap'
+import BMapLib from 'BMapLib'
+
 import { showOverlays } from './calc/clusterer'
 // import { getOverlaySettings } from './setting'
 import { initDrawing } from './overlay/operate/drawing-overlay'
@@ -10,6 +12,11 @@ export default {
     init () {
       this.bindMapEvents()
       this.bindDocumentEvents()
+
+      if (!this.baseMapVisible) {
+        this.baiduMap.setNormalMapDisplay(false)
+      }
+
       initDrawing(this.$data)
     },
     bindMapEvents () {
@@ -64,7 +71,7 @@ export default {
       for (const oly of this.overlays) {
         const legend = getLegend(this.legends, oly)
         const type = oly.type = getLegendType(legend)
-        const { id, projectGeoKey, points } = oly
+        const { id, projectGeoKey, points: points=[] } = oly
         const mPoints = []
 
         if (projectGeoKey) {

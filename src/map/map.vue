@@ -2,7 +2,8 @@
   <div class="mu-absolute-fit">
     <div
       id="map"
-      class="mu-absolute-fit" />
+      class="mu-absolute-fit"
+      :invisible="!baseMapVisible" />
     <mode />
     <slot />
   </div>
@@ -31,6 +32,10 @@
     },
     mixins: [MapMixin],
     props: {
+      baseMapVisible: {
+        type: Boolean,
+        default: true
+      },
       mapEvents: {
         type: Object,
         default: () => ({})
@@ -81,6 +86,7 @@
       }
     },
     mounted () {
+      console.log(this.baseMapVisible)
       this.baiduMap = new BMap.Map('map', { enableMapClick: false })
       this.baiduMap.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
       this.baiduMap.setCurrentCity('北京')
@@ -158,3 +164,9 @@
     }
   }
 </script>
+
+<style>
+  [invisible] .anchorBL {
+    display: none;
+  }
+</style>
