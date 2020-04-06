@@ -33,7 +33,7 @@ function showOverlay (overlay, options) {
       oly.hide()
       oly.disableEditing()
     }
-    updateOverlay(oly, { key, value })
+    updateOverlay(key, value, options)
   })
 }
 
@@ -79,8 +79,6 @@ function updateMarker (key, value, options) {
   const {
     baiduMap,
     overlays,
-    updateOverlays,
-    polylinePointIds,
     activeOverlay: overlay,
     newOverlay,
     callback
@@ -104,12 +102,14 @@ function updateMarker (key, value, options) {
 
   const index = overlays.findIndex(item => item.id === overlay.id)
 
-  overlay.disableEditing()
-  overlay.remove()
+  if (index > -1) {
+    overlay.disableEditing()
+    overlay.remove()
 
-  baiduMap.addOverlay(newOverlay)
-  overlays.splice(index, 1, newOverlay)
-  updateOverlay(newOverlay, { key, value, updateOverlays, polylinePointIds })
+    baiduMap.addOverlay(newOverlay)
+    overlays.splice(index, 1, newOverlay)
+  }
+  updateOverlay(key, value, options)
 
   if (callback) callback(newOverlay)
 }
@@ -122,11 +122,11 @@ function onLineupdate (overlay, options) {
       let points = null
       try {
         points = [overlay.getCenter()]
-        updateOverlay(overlay, { key: 'width', value: overlay.getRadius() })
+        updateOverlay('width', overlay.getRadius(), options)
       } catch {
         points = overlay.getPath()
       }
-      updateOverlay(overlay, { key: 'points', value: points })
+      updateOverlay('points', points, options)
     }
   }
   if (editable) {

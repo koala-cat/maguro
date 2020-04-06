@@ -4,8 +4,8 @@ import { getPolylineIncludeSpecials } from '../../calc/overlay'
 let startPoint = null
 let startPixel = null
 
-function dragOverlay (baiduMap, overlay, options) {
-  const { overlays, selectedOverlays } = options
+function dragOverlay (overlay) {
+  const { baiduMap, overlays, selectedOverlays } = overlay.options
 
   if (overlay.type.includes('rectangle')) {
     this.rectMarker(overlay, 6)

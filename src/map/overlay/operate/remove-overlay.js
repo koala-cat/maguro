@@ -2,8 +2,15 @@ import BMap from 'BMap'
 import { notify } from 'mussel'
 import { getPolylineIncludeSpecials } from '../../calc/overlay'
 
-function removeOverlay (baiduMap, overlay, options) {
-  const { overlays, removedOverlays, marker } = options
+function removeOverlay (overlay) {
+  const {
+    baiduMap,
+    overlays,
+    removedOverlays,
+    markerOverlays,
+    markerPoints,
+    markerPositions
+  } = overlay.options
   const { type } = overlay
 
   if (!overlay || overlay.isLocked || overlay.disabled) return
@@ -27,16 +34,16 @@ function removeOverlay (baiduMap, overlay, options) {
   if (overlay.id) {
     removedOverlays.push(parseInt(overlay.id))
   }
-  removeAnchorOverlays(baiduMap, marker)
+  removeAnchorOverlays(baiduMap, markerOverlays, markerPoints, markerPositions)
 }
 
-function removeAnchorOverlays (baiduMap, marker) {
-  marker.overlays.map(item => {
+function removeAnchorOverlays (baiduMap, markerOverlays, markerPoints, markerPositions) {
+  markerOverlays.map(item => {
     baiduMap.removeOverlay(item)
   })
-  marker.overlays.splice(0)
-  marker.points.splice(0)
-  marker.positions.splice(0)
+  markerOverlays.splice(0)
+  markerPoints.splice(0)
+  markerPositions.splice(0)
 }
 
 export {

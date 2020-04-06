@@ -1,9 +1,8 @@
 import CustomOverlay from './overlay'
 
 class CustomSvg extends CustomOverlay {
-  constructor (baiduMap, point, options) {
+  constructor (point, options) {
     super()
-    this.baiduMap = baiduMap
     this.point = point
     this.options = options
   }
@@ -39,7 +38,7 @@ class CustomSvg extends CustomOverlay {
         transition: 'all 0'
       }
     )
-    this.baiduMap.getPanes().labelPane.appendChild(this.div)
+    this.options.baiduMap.getPanes().labelPane.appendChild(this.div)
     return this.div
   }
 

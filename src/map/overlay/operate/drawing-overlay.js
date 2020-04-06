@@ -1,8 +1,10 @@
 import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
-import Marker from '../overlay-marker'
+import { drawMarker } from '../operate/draw-overlay'
 import { setOverlaySettings } from '../setting'
+
+import Marker from '../overlay-marker'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
@@ -100,6 +102,7 @@ function drawingOverlay (settings = {}, callback, options) {
   }
 
   function markerComplete (marker) {
+    const { point } = marker
     Object.assign(
       options,
       {
@@ -114,7 +117,7 @@ function drawingOverlay (settings = {}, callback, options) {
       }
     )
 
-    const newMarker = new Marker(baiduMap, marker.point, options)
+    const newMarker = drawMarker(point, options)
     baiduMap.clearOverlays()
     baiduMap.addOverlay(newMarker)
     drawingManager.close()

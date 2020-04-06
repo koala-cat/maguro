@@ -12,8 +12,7 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   drag () {
-    const { baiduMap, options } = this
-    dragOverlay(baiduMap, this, options)
+    dragOverlay(this)
   }
 
   update (key, value) {
@@ -31,7 +30,7 @@ class CustomOverlay extends BMap.Overlay {
 
   remove () {
     this.div.remove()
-    removeOverlay(this.baiduMap, this, this.options)
+    removeOverlay(this)
   }
 
   addEventListener (type, fn, capture = false) {
@@ -62,7 +61,7 @@ class CustomOverlay extends BMap.Overlay {
       x: x - parseFloat(width) / 2,
       y: y - parseFloat(width) / 2
     }
-    const pixel = this.baiduMap.pointToOverlayPixel(this.point)
+    const pixel = this.options.baiduMap.pointToOverlayPixel(this.point)
     const px = pixel.x + offset.x + 'px'
     const py = pixel.y + offset.y + 'px'
     this.div.style.transform = `translate3d(${px}, ${py}, 0)`

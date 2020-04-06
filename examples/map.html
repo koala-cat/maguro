@@ -18,7 +18,7 @@
     <h2>Map Example</h2>
     <hr>
     <maguro
-      :base-map-visible="false"
+      :base-map-visible="true"
       :map-events="events"
       :map-legends="legends"
       :map-overlays="overlays"
@@ -51,14 +51,16 @@
             type: 'marker',
             value: 'marker',
             disabled: true,
-            iconUrl: "./assets/images/s1.svg"
+            iconUrl: "./assets/images/s1.svg",
+            format: 'svg'
           },
           {
             id: 1009,
             type: 'marker',
             value: 'marker',
             disabled: true,
-            iconUrl: "./assets/images/s2.svg"
+            iconUrl: "./assets/images/cat-claw.png",
+            format: 'png'
           },
           {
             type: 'marker',
@@ -126,7 +128,7 @@
       },
       mounted () {
         for (const item of this.legends) {
-          if (!item.iconUrl) continue
+          if (!item.iconUrl || item.format !== 'svg') continue
           try {
             let xmlhttp = null
             if (window.XMLHttpRequest) {
