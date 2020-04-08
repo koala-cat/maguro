@@ -71,7 +71,7 @@ export default {
       for (const oly of this.overlays) {
         const legend = getLegend(this.legends, oly)
         const type = oly.type = getLegendType(legend)
-        const { id, projectGeoKey, points: points=[] } = oly
+        const { id, projectGeoKey, points = [] } = oly
         const mPoints = []
 
         if (projectGeoKey) {

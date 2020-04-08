@@ -215,7 +215,7 @@
 <style scoped>
   .overlay-list > :first-child {
     position: absolute;
-    top: -16px;
+    top: 52px;
     left: 16px;
     width: 40px;
     height: 40px;
@@ -238,7 +238,7 @@
     position: absolute !important;
     width: 320px;
     height: 292px;
-    top: -16px;
+    top: 52px;
     left: 64px;
     background: $bgColorLight;
     & * {
@@ -249,7 +249,7 @@
       text-align: left;
     }
     & > .mu-bar {
-      padding: 4px 12px;
+      padding: 8px 12px;
       color: $fontColorWhite;
     }
     & > [header] {

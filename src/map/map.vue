@@ -100,10 +100,10 @@
       //   this.baiduMap.setMapType(mode)
       //   this.$emit('setMapType', val)
       // }
-      // switchOverlayWindow (key) {
-      //   this.activeLegend = null
-      //   this[key] = !this[key]
-      // },
+      switchOverlayWindow (key) {
+        this.activeLegend = null
+        this[key] = !this[key]
+      },
       // addLegend (legend) {
       //   this.$emit('addLegend', legend)
       // },
@@ -168,5 +168,12 @@
 <style>
   [invisible] .anchorBL {
     display: none;
+  }
+
+  #map {
+    top: 60px;
+    left: 72px;
+    right: 16px;
+    bottom: 16px;
   }
 </style>

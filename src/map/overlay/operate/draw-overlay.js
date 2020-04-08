@@ -21,7 +21,6 @@ function drawMarker (point, options) {
   setOverlaySettings(marker, settings)
   addEvents(events, marker)
   if (callback) callback(marker)
-
   return marker
 }
 
@@ -30,7 +29,7 @@ function drawIcon (options) {
     width: sizeWidth = 16,
     width: sizeHeight = 16,
     imageOffset: offset = [0, 0],
-    _anchor: anchor = [sizeWidth / 2, sizeHeight / 2]
+    anchor = [sizeWidth / 2, sizeHeight / 2]
   } = options
 
   return new BMap.Icon(options.iconUrl,
@@ -44,9 +43,9 @@ function drawIcon (options) {
 
 function drawSymbol (options) {
   const {
-    _rotation: rotation = 0,
-    _scale: scale = 4,
-    _symbol: symbol = BMap_Symbol_SHAPE_CIRCLE,
+    rotation = 0,
+    scale = 4,
+    symbol = BMap_Symbol_SHAPE_CIRCLE,
     height: anchorHeight = 0,
     width: anchorWidth = 0,
     fillColor,
