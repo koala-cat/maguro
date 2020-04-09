@@ -1,5 +1,4 @@
 import BMap from 'BMap'
-import BMapLib from 'BMapLib'
 
 import { showOverlays } from './calc/clusterer'
 // import { getOverlaySettings } from './setting'
@@ -65,7 +64,7 @@ export default {
       const wholePoints = []
       const overlays = []
 
-      this.baiduMap.clearOverlays()
+      this.clearOverlays()
       this.specialOverlays = {}
 
       for (const oly of this.overlays) {
@@ -74,7 +73,7 @@ export default {
         const { id, projectGeoKey, points = [] } = oly
         const mPoints = []
 
-        if (projectGeoKey) {
+        if (projectGeoKey && points) {
           this.polylinePointIds[id] = points.map(point => { return point.id })
         }
 
@@ -131,6 +130,14 @@ export default {
         //   }
         // })
       }
+    },
+    clearOverlays () {
+      const overlays = this.baiduMap.getOverlays()
+      overlays.map(oly => {
+        if (!(oly instanceof BMap.GroundOverlay)) {
+          this.baiduMap.removeOverlay(oly)
+        }
+      })
     }
   }
 }

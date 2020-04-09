@@ -21,7 +21,7 @@ function breakDrawing (options) {
   const { baiduMap, overlays } = options
 
   baiduMap.getOverlays().map(oly => {
-    if (!overlays.includes(oly)) {
+    if (!overlays.includes(oly) && !(oly instanceof BMap.GroundOverlay)) {
       baiduMap.removeOverlay(oly)
     }
   })
