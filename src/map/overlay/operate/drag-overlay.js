@@ -1,29 +1,30 @@
 import BMap from 'BMap'
+import cloneDeep from 'lodash.clonedeep'
+
+import { calcRectAllPoints } from '../../calc/point'
 import { getPolylineIncludeSpecials } from '../../calc/overlay'
 
 let startPoint = null
 let startPixel = null
 
-function dragOverlay (overlay) {
-  const { baiduMap, overlays, selectedOverlays } = overlay.options
-
+function dragOverlay (overlay, options) {
   if (overlay.type.includes('rectangle')) {
-    this.rectMarker(overlay, 6)
+    dragAnchorOverlay(overlay, options)
   }
   if (overlay.bindEvent) return
 
   const start = (e) => {
-    dragStart(e, baiduMap)
+    dragStart(e, options)
     window.addEventListener('mousemove', move)
     window.addEventListener('mouseup', end)
   }
 
   const move = (e) => {
-    dragMove(e, baiduMap, { selectedOverlays })
+    dragMove(e, options)
   }
 
   const end = (e) => {
-    dragEnd(e, { overlays, selectedOverlays })
+    dragEnd(e, options)
     window.removeEventListener('mousemove', move)
     window.removeEventListener('mouseup', end)
   }
@@ -32,7 +33,8 @@ function dragOverlay (overlay) {
   overlay.addEventListener('mousedown', start)
 }
 
-function dragStart (e, baiduMap) {
+function dragStart (e, options) {
+  const { baiduMap } = options
   try {
     e.domEvent.stopPropagation()
   } catch {
@@ -42,11 +44,11 @@ function dragStart (e, baiduMap) {
   startPoint = baiduMap.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
 }
 
-function dragMove (e, baiduMap, options) {
+function dragMove (e, options) {
   e.stopPropagation()
+  const { baiduMap, overlays, selectedOverlays } = options
   const movePixel = { x: e.clientX, y: e.clientY }
   const movePoint = baiduMap.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
-  const { overlays, selectedOverlays } = options
 
   const dx = movePixel.x - startPixel.x
   const dy = movePixel.y - startPixel.y
@@ -106,13 +108,52 @@ function dragEnd (e, options) {
     if (!type.includes('special') && specials.length === 0) {
       oly.enableEditing()
       if (type === 'rectangle') {
-        this.rectMarker(oly)
+        dragAnchorOverlay(oly, options)
       }
     }
 
     specials.push(oly)
     specials.map(item => {
       item.update('points', points)
+    })
+  })
+}
+
+function dragAnchorOverlay (overlay, options) {
+  let endPoint = null
+  const count = 6
+
+  const mPoints = overlay.getPath()
+  let points = calcRectAllPoints(mPoints[0], mPoints[2], count)
+  let pointsTmp = cloneDeep(points)
+
+  const { markerOverlays } = options
+  const markers = markerOverlays.filter(item => item.parentId === overlay.id)
+  markers.map(marker => {
+    marker.addEventListener('mousedown', (e) => {
+      endPoint = e.target.point
+    })
+    marker.addEventListener('dragging', (e) => {
+      const point = e.point
+      for (let j = 0; j < pointsTmp.length; j++) {
+        if (endPoint.lng === pointsTmp[j].lng) {
+          points[j].lng = point.lng
+        }
+
+        if (endPoint.lat === pointsTmp[j].lat) {
+          points[j].lat = point.lat
+        }
+      }
+      points = calcRectAllPoints(points[0], points[4], count)
+      for (let j = 0; j < markers.length; j++) {
+        markers[j].setPosition(points[j])
+      }
+
+      const rectPoints = [points[0], points[2], points[4], points[6]]
+      overlay.setPath(rectPoints)
+    })
+    marker.addEventListener('dragend', (e) => {
+      pointsTmp = cloneDeep(points)
     })
   })
 }

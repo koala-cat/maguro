@@ -6,16 +6,13 @@ function removeOverlay (overlay) {
   const {
     baiduMap,
     overlays,
-    removedOverlays,
-    markerOverlays,
-    markerPoints,
-    markerPositions
+    removeOverlays
   } = overlay.options
   const { type } = overlay
 
   if (!overlay || overlay.isLocked || overlay.disabled) return
   if (type === 'polyline') {
-    const specials = getPolylineIncludeSpecials(overlay)
+    const specials = getPolylineIncludeSpecials(overlay, overlays)
     if (specials.length > 0) {
       notify('info', '请先删除线上的特殊线（桥、隧道等）。')
       return
@@ -32,12 +29,13 @@ function removeOverlay (overlay) {
   }
 
   if (overlay.id) {
-    removedOverlays.push(parseInt(overlay.id))
+    removeOverlays.push(parseInt(overlay.id))
   }
-  removeAnchorOverlays(baiduMap, markerOverlays, markerPoints, markerPositions)
+  removeAnchorOverlays(overlay.options)
 }
 
-function removeAnchorOverlays (baiduMap, markerOverlays, markerPoints, markerPositions) {
+function removeAnchorOverlays (options) {
+  const { baiduMap, markerOverlays, markerPoints, markerPositions } = options
   markerOverlays.map(item => {
     baiduMap.removeOverlay(item)
   })
@@ -47,5 +45,6 @@ function removeAnchorOverlays (baiduMap, markerOverlays, markerPoints, markerPos
 }
 
 export {
-  removeOverlay
+  removeOverlay,
+  removeAnchorOverlays
 }

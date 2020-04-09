@@ -1,10 +1,7 @@
 import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
-import { drawMarker } from '../operate/draw-overlay'
-import { setOverlaySettings } from '../setting'
-
-import Marker from '../overlay-marker'
+import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon } from '../operate/draw-overlay'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
@@ -46,7 +43,7 @@ function closeDrawing (options) {
 
 function drawingOverlay (settings = {}, callback, options) {
   const { baiduMap, drawingManager, activeLegend } = options
-  const type = activeLegend.value || activeLegend.type
+  const type = activeLegend.type === 'polyline' ? activeLegend.type : activeLegend.value || activeLegend.type
   const modes = {
     marker: BMAP_DRAWING_MARKER,
     polyline: BMAP_DRAWING_POLYLINE,
@@ -77,7 +74,7 @@ function drawingOverlay (settings = {}, callback, options) {
     drawingManager._mask.addEventListener('click', click)
     return
   } else {
-    listenerEvent(`${type}complete`, complete[type], drawingManager)
+    listenerEvent(`${type}complete`, complete[type])
   }
 
   drawingManager.open()
@@ -94,14 +91,12 @@ function drawingOverlay (settings = {}, callback, options) {
   }
 
   function drawNewOverlay (overlay, newOverlay) {
-    setOverlaySettings(newOverlay, settings)
     baiduMap.removeOverlay(overlay)
+    baiduMap.addOverlay(newOverlay)
     drawingManager.close()
-    // super.bindEvents(this.events, newOverlay)
-    if (callback) callback(newOverlay)
   }
 
-  function markerComplete (marker) {
+  function markerComplete (e, marker) {
     const { point } = marker
     Object.assign(
       options,
@@ -118,31 +113,31 @@ function drawingOverlay (settings = {}, callback, options) {
     )
 
     const newMarker = drawMarker(point, options)
-    baiduMap.clearOverlays()
+    baiduMap.removeOverlay(marker)
     baiduMap.addOverlay(newMarker)
     drawingManager.close()
   }
 
   function polylineComplete (line) {
     const points = line.getPath()
-    const newLine = new BMap.Polyline(points, settings)
+    const newLine = drawPolyline(points, { ...options, settings })
     drawNewOverlay(line, newLine)
   }
 
   function circleComplete (circle) {
     const center = circle.getCenter()
     const radius = circle.getRadius()
-    const newCircle = new BMap.Circle(center, radius, settings)
+    const newCircle = drawCircle(center, radius, { ...options, settings })
     drawNewOverlay(circle, newCircle)
   }
 
-  function rectangleComplete (polygon) {
-    polygonComplete(polygon)
+  function rectangleComplete (rectangle) {
+    const newRectangle = drawRectangle(rectangle.getPath(), { ...options, settings })
+    drawNewOverlay(rectangle, newRectangle)
   }
 
   function polygonComplete (polygon) {
-    const newPolygon = new BMap.Polygon(polygon.getPath(), settings)
-    newPolygon.type = type
+    const newPolygon = drawPolygon(polygon.getPath(), { ...options, settings })
     drawNewOverlay(polygon, newPolygon)
   }
 }

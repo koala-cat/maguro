@@ -12,7 +12,7 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   drag () {
-    dragOverlay(this)
+    dragOverlay(this, this.options)
   }
 
   update (key, value) {

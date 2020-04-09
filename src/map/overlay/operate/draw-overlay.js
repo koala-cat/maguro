@@ -5,9 +5,13 @@ import { setOverlaySettings } from '../setting'
 
 import Marker from '../overlay-marker'
 import CustomSvg from '../overlay-svg'
+import Polyline from '../overlay-polyline'
+import Circle from '../overlay-circle'
+import Rectangle from '../overlay-rectangle'
+import Polygon from '../overlay-polygon'
 
 function drawMarker (point, options) {
-  const { events, activeLegend, settings, isSymbol, callback } = options
+  const { activeLegend, settings, isSymbol } = options
   const { svg } = activeLegend
   let marker = null
   if (svg) {
@@ -18,10 +22,7 @@ function drawMarker (point, options) {
     marker = new Marker(point, options)
   }
 
-  setOverlaySettings(marker, settings)
-  addEvents(events, marker)
-  if (callback) callback(marker)
-  return marker
+  return setOverlay(marker, options)
 }
 
 function drawIcon (options) {
@@ -69,6 +70,39 @@ function drawSvg (point, options) {
   return svg
 }
 
+function drawPolyline (points, options) {
+  const polyline = new Polyline(points, options)
+  return setOverlay(polyline, options)
+}
+
+function drawCircle (center, radius, options) {
+  const circle = new Circle(center, radius, options)
+  return setOverlay(circle, options)
+}
+
+function drawRectangle (points, options) {
+  const rectangle = new Rectangle(points, options)
+  return setOverlay(rectangle, options)
+}
+
+function drawPolygon (points, options) {
+  const polygon = new Polygon(points, options)
+  return setOverlay(polygon, options)
+}
+
+function setOverlay (overlay, options) {
+  const { events, settings, callback } = options
+
+  setOverlaySettings(overlay, settings)
+  addEvents(events, overlay)
+  if (callback) callback(overlay)
+  return overlay
+}
+
 export {
-  drawMarker
+  drawMarker,
+  drawPolyline,
+  drawCircle,
+  drawRectangle,
+  drawPolygon
 }

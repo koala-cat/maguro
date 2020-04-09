@@ -30,7 +30,7 @@ class Marker extends BMap.Marker {
   }
 
   drag () {
-    dragOverlay(this)
+    dragOverlay(this, this.options)
   }
 
   update (key, value) {

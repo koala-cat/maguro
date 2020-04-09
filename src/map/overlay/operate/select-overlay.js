@@ -18,7 +18,7 @@ function selectOverlay (e, overlay, options) {
     return
   }
 
-  if (activeLegendType && type === 'polyline' && e) {
+  if (activeLegendType === 'special' && type === 'polyline' && e) {
     options.settings = {
       ...defaultStyle(),
       type: activeLegend?.value || '',
