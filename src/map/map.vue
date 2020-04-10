@@ -74,6 +74,8 @@
         markerOverlays: [],
         markerPoints: [],
         markerPositions: [],
+        id: -1,
+        parentId: -1,
         view: true
       }
     },

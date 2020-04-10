@@ -34,6 +34,21 @@ function removeOverlay (overlay) {
   removeAnchorOverlays(overlay.options)
 }
 
+function removeSelectedOverlays (options) {
+  const { baiduMap, overlays, selectedOverlays } = options
+  for (const oly of selectedOverlays) {
+    if (oly.isLocked || oly.disabled) continue
+
+    const idx = overlays.findIndex(item => item === oly)
+    if (idx > -1) {
+      oly.remove()
+      overlays.splice(idx, 1)
+      baiduMap.removeOverlay(oly)
+    }
+  }
+  selectedOverlays.splice(0)
+}
+
 function removeAnchorOverlays (options) {
   const { baiduMap, markerOverlays, markerPoints, markerPositions } = options
   markerOverlays.map(item => {
@@ -46,5 +61,6 @@ function removeAnchorOverlays (options) {
 
 export {
   removeOverlay,
+  removeSelectedOverlays,
   removeAnchorOverlays
 }

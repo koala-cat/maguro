@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { showOverlays } from './calc/clusterer'
 // import { getOverlaySettings } from './setting'
-import { initDrawing } from './overlay/operate/drawing-overlay'
+import { initDrawing, breakDrawing } from './overlay/operate/drawing-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
 import { getLegend, getLegendType } from './overlay/legend'
 
@@ -20,7 +20,7 @@ export default {
     },
     bindMapEvents () {
       this.baiduMap.addEventListener('zoomend', () => {
-        showOverlays(this.baiduMap, this.overlays, this.specialOverlays)
+        // showOverlays(this.baiduMap, this.overlays, this.specialOverlays)
       })
 
       this.baiduMap.addEventListener('click', (e) => {
@@ -45,7 +45,7 @@ export default {
         }
 
         if (keyCode === 27) { // Escape
-          // 终止绘制
+          breakDrawing(this.$data)
           // 取消选中覆盖物
         }
       })

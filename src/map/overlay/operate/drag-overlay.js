@@ -1,15 +1,22 @@
 import BMap from 'BMap'
 import cloneDeep from 'lodash.clonedeep'
+import { notify } from 'mussel'
 
 import { calcRectAllPoints } from '../../calc/point'
-import { getPolylineIncludeSpecials } from '../../calc/overlay'
+import { calcMarkerOnLinePosition } from '../../calc/position'
+import { getPolylineIncludeSpecials, getSpecialAttachPolyline } from '../../calc/overlay'
 
 let startPoint = null
 let startPixel = null
 
-function dragOverlay (overlay, options) {
+function dragOverlay (overlay, options, callback) {
   if (overlay.type.includes('rectangle')) {
-    dragAnchorOverlay(overlay, options)
+    dragRectAnchorOverlay(overlay, options)
+  }
+
+  if (overlay.type.includes('special')) {
+    dragSpecialAnchorOverlay(overlay, options, callback)
+    return
   }
   if (overlay.bindEvent) return
 
@@ -108,7 +115,7 @@ function dragEnd (e, options) {
     if (!type.includes('special') && specials.length === 0) {
       oly.enableEditing()
       if (type === 'rectangle') {
-        dragAnchorOverlay(oly, options)
+        dragRectAnchorOverlay(oly, options)
       }
     }
 
@@ -119,7 +126,7 @@ function dragEnd (e, options) {
   })
 }
 
-function dragAnchorOverlay (overlay, options) {
+function dragRectAnchorOverlay (overlay, options) {
   let endPoint = null
   const count = 6
 
@@ -158,6 +165,35 @@ function dragAnchorOverlay (overlay, options) {
   })
 }
 
+function dragSpecialAnchorOverlay (overlay, options, callback) {
+  let endPoint = null
+  let movePointIdx = null
+  const { baiduMap, overlays, markerOverlays, markerPoints, markerPositions } = options
+  const polyline = getSpecialAttachPolyline(overlay, overlays)
+  const markers = markerOverlays.filter(item => item.parentId === overlay.id)
+
+  for (let i = 0; i < markers.length; i++) {
+    const marker = markers[i]
+    marker.addEventListener('mousedown', (e) => {
+      endPoint = e.point
+      const distanceA = baiduMap.getDistance(endPoint, markerPoints[0])
+      const distanceB = baiduMap.getDistance(endPoint, markerPoints[1])
+      movePointIdx = distanceA < distanceB ? 0 : 1
+    })
+    marker.addEventListener('dragend', (e) => {
+      const dragIdx = calcMarkerOnLinePosition(e.point, polyline, true)
+      if (dragIdx > -1) {
+        markerPoints.splice(movePointIdx, 1, e.point)
+        markerPositions.splice(movePointIdx, 1, dragIdx)
+        if (callback) callback(polyline)
+      } else {
+        marker.setPosition(markerPoints[movePointIdx])
+        notify('info', '拖动后点的不在线上，请放大地图重新拖动。')
+      }
+    })
+  }
+}
+
 function getPoint (point, dlng, dlat) {
   const mPoint = new BMap.Point(point.lng + dlng, point.lat + dlat)
   return mPoint
@@ -174,5 +210,6 @@ function setPath (oly, dlng, dlat) {
 }
 
 export {
-  dragOverlay
+  dragOverlay,
+  dragSpecialAnchorOverlay
 }

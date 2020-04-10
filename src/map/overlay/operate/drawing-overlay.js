@@ -1,7 +1,8 @@
 import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
-import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon } from '../operate/draw-overlay'
+import { addOverlay } from './add-overlay'
+import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from '../operate/draw-overlay'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
@@ -16,9 +17,9 @@ function initDrawing (options) {
 
 function breakDrawing (options) {
   const { baiduMap, overlays } = options
-
   baiduMap.getOverlays().map(oly => {
-    if (!overlays.includes(oly) && !(oly instanceof BMap.GroundOverlay)) {
+    const overlay = overlays.find(item => item.id === oly.id)
+    if (!overlay && !(oly instanceof BMap.GroundOverlay)) {
       baiduMap.removeOverlay(oly)
     }
   })
@@ -58,16 +59,16 @@ function drawingOverlay (settings = {}, callback, options) {
     rectangle: rectangleComplete,
     polygon: polygonComplete
   }
+  Object.assign(options, { settings })
 
   drawingManager[`${type}Options`] = settings
 
   if (type === 'label') {
     const click = (e) => {
-      // super.label(e.point, this.options, events)
-      const label = null
-      if (callback) callback(label)
+      const label = drawLabel(e.point, { ...options, settings })
       drawingManager._mask.removeEventListener('click', click)
       drawingManager.close()
+      if (callback) callback(label)
     }
     drawingManager.open()
     drawingManager.setDrawingMode(null)
@@ -92,8 +93,9 @@ function drawingOverlay (settings = {}, callback, options) {
 
   function drawNewOverlay (overlay, newOverlay) {
     baiduMap.removeOverlay(overlay)
-    baiduMap.addOverlay(newOverlay)
+    addOverlay(newOverlay, options)
     drawingManager.close()
+    if (callback) callback(newOverlay)
   }
 
   function markerComplete (e, marker) {
@@ -107,37 +109,37 @@ function drawingOverlay (settings = {}, callback, options) {
           fillColor: '#333',
           fillOpacity: 1
         },
-        isSymbol: false,
-        callback
+        isSymbol: false
       }
     )
 
     const newMarker = drawMarker(point, options)
     baiduMap.removeOverlay(marker)
-    baiduMap.addOverlay(newMarker)
+    addOverlay(newMarker, options)
     drawingManager.close()
+    if (callback) callback(newMarker)
   }
 
   function polylineComplete (line) {
     const points = line.getPath()
-    const newLine = drawPolyline(points, { ...options, settings })
+    const newLine = drawPolyline(points, options)
     drawNewOverlay(line, newLine)
   }
 
   function circleComplete (circle) {
     const center = circle.getCenter()
     const radius = circle.getRadius()
-    const newCircle = drawCircle(center, radius, { ...options, settings })
+    const newCircle = drawCircle(center, radius, options)
     drawNewOverlay(circle, newCircle)
   }
 
   function rectangleComplete (rectangle) {
-    const newRectangle = drawRectangle(rectangle.getPath(), { ...options, settings })
+    const newRectangle = drawRectangle(rectangle.getPath(), options)
     drawNewOverlay(rectangle, newRectangle)
   }
 
   function polygonComplete (polygon) {
-    const newPolygon = drawPolygon(polygon.getPath(), { ...options, settings })
+    const newPolygon = drawPolygon(polygon.getPath(), options)
     drawNewOverlay(polygon, newPolygon)
   }
 }

@@ -17,7 +17,7 @@ function getLegendType (legend) {
 
 function selectLegend (options) {
   let type = null
-  const legend = options.activeLegend
+  const { activeLegend: legend } = options
   const settings = {
     ...defaultStyle(),
     iconUrl: legend.iconUrl,

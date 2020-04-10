@@ -1,15 +1,7 @@
-import Marker from '../overlay-marker'
-
-import { getPolylineIncludeSpecials } from '../../calc/overlay'
-import { defaultStyle } from '../setting'
+import CustomSpecial from '../overlay-special'
 
 function selectOverlay (e, overlay, options) {
-  const {
-    baiduMap,
-    selectedOverlays,
-    activeOverlay,
-    activeLegend
-  } = options
+  const { selectedOverlays, activeOverlay, activeLegend } = options
   const type = overlay.type
   const activeLegendType = activeLegend?.type || ''
 
@@ -17,35 +9,16 @@ function selectOverlay (e, overlay, options) {
     activeOverlay === overlay) {
     return
   }
-
   if (activeLegendType === 'special' && type === 'polyline' && e) {
-    options.settings = {
-      ...defaultStyle(),
-      type: activeLegend?.value || '',
-      iconUrl: activeLegend.iconUrl,
-      projectMapLegendId: activeLegend.id
-    }
-    Object.assign(
-      options,
-      {
-        settings: {
-          ...defaultStyle(),
-          type: activeLegend?.value || '',
-          iconUrl: activeLegend.iconUrl,
-          projectMapLegendId: activeLegend.id
-        },
-        isSymbol: true
-      }
-    )
-    const marker = new Marker(baiduMap, e.point, options)
-    baiduMap.addOverlay(marker)
+    const special = new CustomSpecial(e.point, overlay, options)
+    special.draw()
   } else {
     multipleOverlays(e, overlay, options)
   }
 }
 
 function multipleOverlays (e, overlay, options) {
-  const { overlays, selectedOverlays, specialOverlays, activeOverlay } = options
+  const { selectedOverlays, specialOverlays, activeOverlay } = options
   // removeMarkers(this._map, this._options)
 
   // const mac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
@@ -63,9 +36,7 @@ function multipleOverlays (e, overlay, options) {
   options.activeOverlay = modKey ? activeOverlay || selectedOverlays[0] : selectedOverlays[0]
 
   if (!overlay.disabled) {
-    if (getPolylineIncludeSpecials(overlay, overlays).length === 0) {
-      overlay.enableEditing()
-    }
+    overlay.enableEditing()
     overlay.drag()
   }
 }

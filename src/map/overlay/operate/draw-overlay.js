@@ -1,7 +1,6 @@
 import BMap from 'BMap'
 
 import { addEvents } from '../event'
-import { setOverlaySettings } from '../setting'
 
 import Marker from '../overlay-marker'
 import CustomSvg from '../overlay-svg'
@@ -9,6 +8,7 @@ import Polyline from '../overlay-polyline'
 import Circle from '../overlay-circle'
 import Rectangle from '../overlay-rectangle'
 import Polygon from '../overlay-polygon'
+import Label from '../overlay-label'
 
 function drawMarker (point, options) {
   const { activeLegend, settings, isSymbol } = options
@@ -25,15 +25,15 @@ function drawMarker (point, options) {
   return setOverlay(marker, options)
 }
 
-function drawIcon (options) {
+function drawIcon (settings) {
   const {
     width: sizeWidth = 16,
     width: sizeHeight = 16,
     imageOffset: offset = [0, 0],
     anchor = [sizeWidth / 2, sizeHeight / 2]
-  } = options
+  } = settings
 
-  return new BMap.Icon(options.iconUrl,
+  return new BMap.Icon(settings.iconUrl,
     new BMap.Size(sizeWidth, sizeHeight), {
       anchor: new BMap.Size(anchor[0], anchor[1]),
       imageSize: new BMap.Size(sizeWidth, sizeHeight),
@@ -42,7 +42,7 @@ function drawIcon (options) {
   )
 }
 
-function drawSymbol (options) {
+function drawSymbol (settings) {
   const {
     rotation = 0,
     scale = 4,
@@ -52,7 +52,7 @@ function drawSymbol (options) {
     fillColor,
     fillOpacity,
     strokeColor
-  } = options
+  } = settings
 
   return new BMap.Symbol(symbol, {
     rotation,
@@ -90,10 +90,33 @@ function drawPolygon (points, options) {
   return setOverlay(polygon, options)
 }
 
-function setOverlay (overlay, options) {
-  const { events, settings, callback } = options
+function drawLabel (point, options) {
+  const settings = {
+    ...options.settings,
+    strokeColor: '#333',
+    fillOpacity: 1,
+    width: 12
+  }
 
-  setOverlaySettings(overlay, settings)
+  const style = {
+    color: settings.strokeColor,
+    fontSize: `${settings.width}px`,
+    lineHeight: '20px',
+    textAlign: 'center',
+    padding: '0 10px',
+    backgroundColor: 'rgba(0, 0, 0, 0)',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'rgba(0, 0, 0, 0)'
+  }
+  const label = new Label(point, options)
+  label.setStyle(style)
+  return setOverlay(label, options)
+}
+
+function setOverlay (overlay, options) {
+  const { events, callback } = options
+
   addEvents(events, overlay)
   if (callback) callback(overlay)
   return overlay
@@ -101,8 +124,10 @@ function setOverlay (overlay, options) {
 
 export {
   drawMarker,
+  drawSymbol,
   drawPolyline,
   drawCircle,
   drawRectangle,
-  drawPolygon
+  drawPolygon,
+  drawLabel
 }
