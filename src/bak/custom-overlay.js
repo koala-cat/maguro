@@ -16,7 +16,7 @@ class ComplexCustomOverlay extends BMap.Overlay {
     this._div = document.createElement('div')
   }
 
-  remove () {
+  delete () {
     this._div.remove()
   }
 

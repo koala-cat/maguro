@@ -1,5 +1,6 @@
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 
+import { addOverlay } from './add-overlay'
 import { settingsToStyle } from '../setting'
 
 function showOverlay (overlay, options) {
@@ -77,11 +78,10 @@ function updateOverlay (key, value, options) {
 
 function updateMarker (key, value, options) {
   const {
-    baiduMap,
+    map,
     overlays,
     activeOverlay: overlay,
-    newOverlay,
-    callback
+    settings
   } = options
 
   if (['name', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
@@ -89,6 +89,7 @@ function updateMarker (key, value, options) {
     return
   }
 
+  // updateOverlay(key, value, options)
   if (key !== 'projectMapLegendId' && overlay.svg) {
     const style = settingsToStyle({ [key]: value })
     for (const s in style) {
@@ -100,18 +101,27 @@ function updateMarker (key, value, options) {
     return
   }
 
-  const index = overlays.findIndex(item => item.id === overlay.id)
+  if (['projectMapLegendId', 'width'].includes(key)) {
+    const index = overlays.findIndex(item => item.id === overlay.id)
 
-  if (index > -1) {
-    overlay.disableEditing()
-    overlay.remove()
+    console.log(value)
+    Object.assign(
+      settings,
+      {
+        width: key === 'width' ? value : settings.width,
+        projectMapLegendId: key === 'projectMapLegendId' ? value : null
+      }
+    )
+    if (index > -1) {
+      overlay.disableEditing()
+      overlay.delete()
 
-    baiduMap.addOverlay(newOverlay)
-    overlays.splice(index, 1, newOverlay)
+      const newOverlay = overlay.redraw(options)
+      map.removeOverlay(overlay)
+      addOverlay(newOverlay, options)
+      overlays.splice(index, 1, newOverlay)
+    }
   }
-  updateOverlay(key, value, options)
-
-  if (callback) callback(newOverlay)
 }
 
 function onLineupdate (overlay, options) {

@@ -36,7 +36,7 @@
       <maguro-overlay-list
         :source-column-visible="false">
       </maguro-overlay-list>
-      <!-- <maguro-overlay-form></maguro-overlay-form> -->
+      <maguro-overlay-form></maguro-overlay-form>
     </maguro>
   </div>
 
@@ -184,6 +184,7 @@
             disabled: false
           }
         )
+        this.drawSvg()
       },
       methods: {
         onUploadPolyline () {

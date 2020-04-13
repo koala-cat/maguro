@@ -41,21 +41,21 @@ function dragOverlay (overlay, options, callback) {
 }
 
 function dragStart (e, options) {
-  const { baiduMap } = options
+  const { map } = options
   try {
     e.domEvent.stopPropagation()
   } catch {
     e.stopPropagation()
   }
   startPixel = { x: e.clientX, y: e.clientY }
-  startPoint = baiduMap.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
+  startPoint = map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
 }
 
 function dragMove (e, options) {
   e.stopPropagation()
-  const { baiduMap, overlays, selectedOverlays } = options
+  const { map, overlays, selectedOverlays } = options
   const movePixel = { x: e.clientX, y: e.clientY }
-  const movePoint = baiduMap.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
+  const movePoint = map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
 
   const dx = movePixel.x - startPixel.x
   const dy = movePixel.y - startPixel.y
@@ -168,7 +168,7 @@ function dragRectAnchorOverlay (overlay, options) {
 function dragSpecialAnchorOverlay (overlay, options, callback) {
   let endPoint = null
   let movePointIdx = null
-  const { baiduMap, overlays, markerOverlays, markerPoints, markerPositions } = options
+  const { map, overlays, markerOverlays, markerPoints, markerPositions } = options
   const polyline = getSpecialAttachPolyline(overlay, overlays)
   const markers = markerOverlays.filter(item => item.parentId === overlay.id)
 
@@ -176,8 +176,8 @@ function dragSpecialAnchorOverlay (overlay, options, callback) {
     const marker = markers[i]
     marker.addEventListener('mousedown', (e) => {
       endPoint = e.point
-      const distanceA = baiduMap.getDistance(endPoint, markerPoints[0])
-      const distanceB = baiduMap.getDistance(endPoint, markerPoints[1])
+      const distanceA = map.getDistance(endPoint, markerPoints[0])
+      const distanceB = map.getDistance(endPoint, markerPoints[1])
       movePointIdx = distanceA < distanceB ? 0 : 1
     })
     marker.addEventListener('dragend', (e) => {

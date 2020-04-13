@@ -94,18 +94,18 @@
     padding: 4px 8px;
     background: $bgColorLight;
     z-index: 100;
-    & > button {
-      color: $fontColorWhite !important;
-      font-size: $fontSize !important;
-      &[icon-only] {
-        font-size: 18px !important;
-      }
-      &:hover {
-        background: $bgColorDark !important;
-      }
-      &[disabled] {
-        color: $fontColorGrey !important;
-      }
+  }
+  button {
+    color: $fontColorWhite !important;
+    font-size: $fontSize !important;
+    &[icon-only] {
+      font-size: 18px !important;
+    }
+    &:hover {
+      background: $bgColorDark !important;
+    }
+    &[disabled] {
+      color: $fontColorGrey !important;
     }
   }
 </style>

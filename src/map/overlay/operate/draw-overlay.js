@@ -1,6 +1,7 @@
 import BMap from 'BMap'
 
 import { addEvents } from '../event'
+import { getLegend } from '../legend'
 
 import Marker from '../overlay-marker'
 import CustomSvg from '../overlay-svg'
@@ -11,15 +12,22 @@ import Polygon from '../overlay-polygon'
 import Label from '../overlay-label'
 
 function drawMarker (point, options) {
-  const { activeLegend, settings, isSymbol } = options
-  const { svg } = activeLegend
+  const { legends, activeLegend, settings, isSymbol } = options
+  const { projectMapLegendId: legendId } = settings
+  const legend = legendId ? getLegend(legends, legendId) : activeLegend
+  const { svg } = legend
   let marker = null
   if (svg) {
+    Object.assign(settings, { svg, iconUrl: legend.iconUrl })
     marker = drawSvg(point, options)
   } else {
     const icon = isSymbol ? drawSymbol(settings) : drawIcon(settings)
     options.icon = icon
     marker = new Marker(point, options)
+  }
+  marker.redraw = function (_options) {
+    const mPoint = this.getPosition()
+    return drawMarker(mPoint, _options)
   }
 
   return setOverlay(marker, options)

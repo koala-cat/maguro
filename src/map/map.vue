@@ -11,13 +11,16 @@
 <script>
   import BMap from 'BMap'
   import cloneDeep from 'lodash.clonedeep'
+  import debounce from 'lodash.debounce'
 
   import MapMixin from './map'
-  // import debounce from 'lodash.debounce'
+  import CustomSvg from '../map/overlay/overlay-svg'
+  import { selectOverlay } from '../map/overlay/operate/select-overlay'
+
   // import { notify } from 'mussel'
   // import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
 
-  import { selectLegend } from './overlay/legend'
+  import { startDrawing } from './overlay/operate/drawing-overlay'
 
   import Mode from './mode/mode.vue'
 
@@ -55,7 +58,7 @@
     },
     data () {
       return {
-        baiduMap: null,
+        map: null,
         drawingManager: null,
         events: this.mapEvents,
         legends: this.mapLegends,
@@ -88,18 +91,17 @@
       }
     },
     mounted () {
-      console.log(this.baseMapVisible)
-      this.baiduMap = new BMap.Map('map', { enableMapClick: false })
-      this.baiduMap.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
-      this.baiduMap.setCurrentCity('北京')
-      this.baiduMap.enableScrollWheelZoom(true)
+      this.map = new BMap.Map('map', { enableMapClick: false })
+      this.map.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
+      this.map.setCurrentCity('北京')
+      this.map.enableScrollWheelZoom(true)
 
       this.init()
     },
     methods: {
       // setMapType (val, mode) {
       //   this.activeMode = val
-      //   this.baiduMap.setMapType(mode)
+      //   this.map.setMapType(mode)
       //   this.$emit('setMapType', val)
       // }
       switchOverlayWindow (key) {
@@ -118,34 +120,28 @@
         }
 
         this.activeLegend = val
-        selectLegend(this.$data)
-      }
-      // updateOverlay: debounce(function (key, value) {
-      //   let legend = null
-      //   if (key === 'projectMapLegendId') {
-      //     legend = getLegend(this.legends, value)
-      //   }
-      //   this.update.setSetting(key, value, legend, (oly) => {
-      //     this.initial._select.overlay(oly)
-      //   })
-      // }, 500),
-      // selectOverlay (overlay) {
-      //   let points = null
-      //   const type = overlay.type
+        startDrawing(this.$data)
+      },
+      updateOverlay: debounce(function (key, value) {
+        this.activeOverlay.update(key, value)
+      }, 500),
+      selectOverlay (overlay) {
+        let points = null
+        const type = overlay.type
 
-      //   try {
-      //     points = overlay.getPath()
-      //   } catch {
-      //     points = [overlay.getPosition()]
-      //   }
+        try {
+          points = overlay.getPath()
+        } catch {
+          points = [overlay.getPosition()]
+        }
 
-      //   const viewPort = this.map.getViewport(points)
-      //   this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-      //   if (type.includes('special')) {
-      //     overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
-      //   }
-      //   this.initial._select.overlay(overlay)
-      // },
+        if (type.includes('special')) {
+          overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
+        }
+        selectOverlay(null, overlay, this.$data)
+        const viewPort = this.map.getViewport(points)
+        this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+      },
       // saveOverlays () {
       //   const result = {}
 
@@ -163,6 +159,11 @@
       //   }
       //   this.$emit('save', result)
       // }
+      drawSvg (point, options) {
+        console.log(123123123)
+        const overlay = new CustomSvg(point, options)
+        return overlay
+      }
     }
   }
 </script>

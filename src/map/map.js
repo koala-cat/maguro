@@ -7,23 +7,24 @@ import { selectOverlay } from './overlay/operate/select-overlay'
 import { getLegend, getLegendType } from './overlay/legend'
 
 export default {
+  watch: {
+    baseMapVisible (val) {
+      this.map.setNormalMapDisplay(val)
+    }
+  },
   methods: {
     init () {
       this.bindMapEvents()
       this.bindDocumentEvents()
 
-      if (!this.baseMapVisible) {
-        this.baiduMap.setNormalMapDisplay(false)
-      }
-
       initDrawing(this.$data)
     },
     bindMapEvents () {
-      this.baiduMap.addEventListener('zoomend', () => {
-        // showOverlays(this.baiduMap, this.overlays, this.specialOverlays)
+      this.map.addEventListener('zoomend', () => {
+        // showOverlays(this.map, this.overlays, this.specialOverlays)
       })
 
-      this.baiduMap.addEventListener('click', (e) => {
+      this.map.addEventListener('click', (e) => {
         if ((this.activeTool && !this.activeTool.type) || !this.activeTool) {
           this.activeTool = null
           if (!e.overlay) {
@@ -37,11 +38,15 @@ export default {
       })
     },
     bindDocumentEvents () {
+      const overlays = this.selectedOverlays
       document.addEventListener('keydown', (e) => {
         e = e || window.event
         const keyCode = e.keyCode || e.which || e.charCode
-        if (keyCode === 46) { // Delete
-          // 删除覆盖物 overlay.remove()
+        if (keyCode === 17) { // Delete 46
+          overlays.map(oly => {
+            console.log(17171717)
+            oly.delete()
+          })
         }
 
         if (keyCode === 27) { // Escape
@@ -95,7 +100,7 @@ export default {
           const overlay = this.draw.overlay(oly, mPoints, this.events) // 加覆盖物到地图
           overlay.hide()
           overlays.push(overlay)
-          this.baiduMap.addOverlay(overlay)
+          this.map.addOverlay(overlay)
         } catch {
           continue
         }
@@ -104,10 +109,10 @@ export default {
       this.initSpecialOverlays()
 
       if (this.view) {
-        const viewPort = this.baiduMap.getViewport(wholePoints)
-        this.baiduMap.centerAndZoom(viewPort.center, viewPort.zoom)
+        const viewPort = this.map.getViewport(wholePoints)
+        this.map.centerAndZoom(viewPort.center, viewPort.zoom)
       } else {
-        showOverlays(this.baiduMap, this.overlays, this.specialOverlays)
+        showOverlays(this.map, this.overlays, this.specialOverlays)
       }
     },
     initSpecialOverlays () {
@@ -132,10 +137,10 @@ export default {
       }
     },
     clearOverlays () {
-      const overlays = this.baiduMap.getOverlays()
+      const overlays = this.map.getOverlays()
       overlays.map(oly => {
         if (!(oly instanceof BMap.GroundOverlay)) {
-          this.baiduMap.removeOverlay(oly)
+          this.map.removeOverlay(oly)
         }
       })
     }

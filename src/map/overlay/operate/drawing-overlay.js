@@ -2,11 +2,12 @@ import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
 import { addOverlay } from './add-overlay'
+import { defaultStyle } from '../setting'
 import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from '../operate/draw-overlay'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
-    options.drawingManager = new BMapLib.DrawingManager(options.baiduMap, {
+    options.drawingManager = new BMapLib.DrawingManager(options.map, {
       isOpen: false,
       enableDrawingTool: false
     })
@@ -16,34 +17,77 @@ function initDrawing (options) {
 }
 
 function breakDrawing (options) {
-  const { baiduMap, overlays } = options
-  baiduMap.getOverlays().map(oly => {
+  const { map, overlays } = options
+  map.getOverlays().map(oly => {
     const overlay = overlays.find(item => item.id === oly.id)
     if (!overlay && !(oly instanceof BMap.GroundOverlay)) {
-      baiduMap.removeOverlay(oly)
+      map.removeOverlay(oly)
     }
   })
   closeDrawing(options)
 }
 
 function openDrawing (options) {
-  const { baiduMap, drawingManager } = options
+  const { map, drawingManager } = options
 
   if (!drawingManager) return
   drawingManager.open()
-  baiduMap.setDefaultCursor('crosshair')
+  map.setDefaultCursor('crosshair')
 }
 
 function closeDrawing (options) {
-  const { baiduMap, drawingManager } = options
+  const { map, drawingManager } = options
 
   if (!drawingManager) return
   drawingManager.close()
-  baiduMap.setDefaultCursor('pointer')
+  map.setDefaultCursor('pointer')
+}
+
+function startDrawing (options) {
+  let type = null
+  const { activeLegend: legend } = options
+  const settings = {
+    ...defaultStyle(),
+    iconUrl: legend.iconUrl,
+    svg: legend.svg
+  }
+
+  if (!legend.type && ['marker', 'polyline', 'polygon', 'special'].includes(legend.value)) {
+    breakDrawing(options)
+    return
+  }
+
+  if (['polyline', 'special'].includes(legend.type)) {
+    type = legend.type
+    settings.strokeStyle = type === 'polyline' ? legend.value : 'solid'
+  } else {
+    type = legend.value || legend.type
+    settings.strokeStyle = 'solid'
+  }
+  settings.type = type
+
+  if (type === 'select') {
+    closeDrawing(options)
+    this.frameOverlays()
+  } else if (type === 'special') {
+    closeDrawing(options)
+    // this.unSelectOverlays()
+  } else {
+    const complete = (overlay) => {
+      setTimeout(() => {
+        // this.unSelectTool()
+      }, 10)
+    }
+    closeDrawing(options)
+    // removeMarkers(this._map, this._options)
+
+    // this.unSelectOverlays()
+    drawingOverlay(settings, complete, options)
+  }
 }
 
 function drawingOverlay (settings = {}, callback, options) {
-  const { baiduMap, drawingManager, activeLegend } = options
+  const { map, drawingManager, activeLegend } = options
   const type = activeLegend.type === 'polyline' ? activeLegend.type : activeLegend.value || activeLegend.type
   const modes = {
     marker: BMAP_DRAWING_MARKER,
@@ -92,7 +136,7 @@ function drawingOverlay (settings = {}, callback, options) {
   }
 
   function drawNewOverlay (overlay, newOverlay) {
-    baiduMap.removeOverlay(overlay)
+    map.removeOverlay(overlay)
     addOverlay(newOverlay, options)
     drawingManager.close()
     if (callback) callback(newOverlay)
@@ -114,7 +158,7 @@ function drawingOverlay (settings = {}, callback, options) {
     )
 
     const newMarker = drawMarker(point, options)
-    baiduMap.removeOverlay(marker)
+    map.removeOverlay(marker)
     addOverlay(newMarker, options)
     drawingManager.close()
     if (callback) callback(newMarker)
@@ -149,5 +193,5 @@ export {
   breakDrawing,
   openDrawing,
   closeDrawing,
-  drawingOverlay
+  startDrawing
 }

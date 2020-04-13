@@ -1,10 +1,9 @@
-import BMap from 'BMap'
 import { notify } from 'mussel'
 import { getPolylineIncludeSpecials } from '../../calc/overlay'
 
-function removeOverlay (overlay) {
+function deleteOverlays (overlay) {
   const {
-    baiduMap,
+    map,
     overlays,
     removeOverlays
   } = overlay.options
@@ -19,40 +18,36 @@ function removeOverlay (overlay) {
     }
   }
 
-  const idx = overlays.findIndex(item => item === overlay)
+  const idx = overlays.findIndex(item => item.id === overlay.id)
   if (idx > -1) {
     overlays.splice(idx, 1)
-    if (overlay instanceof BMap.Overlay) {
-      overlay.remove()
+    map.removeOverlay(overlay)
+    if (overlay.id) {
+      removeOverlays.push(parseInt(overlay.id))
     }
-    baiduMap.removeOverlay(overlay)
+    deleteAnchorOverlays(overlay.options)
   }
-
-  if (overlay.id) {
-    removeOverlays.push(parseInt(overlay.id))
-  }
-  removeAnchorOverlays(overlay.options)
 }
 
-function removeSelectedOverlays (options) {
-  const { baiduMap, overlays, selectedOverlays } = options
+function deleteSelectedOverlays (options) {
+  const { map, overlays, selectedOverlays } = options
   for (const oly of selectedOverlays) {
     if (oly.isLocked || oly.disabled) continue
 
     const idx = overlays.findIndex(item => item === oly)
     if (idx > -1) {
-      oly.remove()
+      oly.delete()
       overlays.splice(idx, 1)
-      baiduMap.removeOverlay(oly)
+      map.removeOverlay(oly)
     }
   }
   selectedOverlays.splice(0)
 }
 
-function removeAnchorOverlays (options) {
-  const { baiduMap, markerOverlays, markerPoints, markerPositions } = options
+function deleteAnchorOverlays (options) {
+  const { map, markerOverlays, markerPoints, markerPositions } = options
   markerOverlays.map(item => {
-    baiduMap.removeOverlay(item)
+    map.removeOverlay(item)
   })
   markerOverlays.splice(0)
   markerPoints.splice(0)
@@ -60,7 +55,7 @@ function removeAnchorOverlays (options) {
 }
 
 export {
-  removeOverlay,
-  removeSelectedOverlays,
-  removeAnchorOverlays
+  deleteOverlays,
+  deleteSelectedOverlays,
+  deleteAnchorOverlays
 }

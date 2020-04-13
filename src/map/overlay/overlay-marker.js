@@ -1,8 +1,7 @@
 import BMap from 'BMap'
 
-import { getOverlaySettings } from './setting'
 import { updateMarker } from './operate/update-overlay'
-import { removeOverlay } from './operate/remove-overlay'
+import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Marker extends BMap.Marker {
@@ -34,20 +33,11 @@ class Marker extends BMap.Marker {
   }
 
   update (key, value) {
-    const { events, activeLegend: legend, svg, icon } = this.options
-    const point = this.getPosition()
-    const settings = {
-      ...getOverlaySettings(this),
-      iconUrl: legend?.iconUrl || this.iconUrl || this.imageUrl,
-      svg: legend?.svg || svg
-    }
-    // const newOverlay = this.draw(point, { icon })
-    // this.options.xnewOverlay = newOverlay
     updateMarker(key, value, this.options)
   }
 
-  remove () {
-    removeOverlay(this)
+  delete () {
+    deleteOverlays(this)
   }
 }
 

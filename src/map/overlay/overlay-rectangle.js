@@ -3,7 +3,7 @@ import BMap from 'BMap'
 import { calcRectAllPoints } from '../calc/point'
 
 import { updateOverlay } from './operate/update-overlay'
-import { removeOverlay, removeAnchorOverlays } from './operate/remove-overlay'
+import { deleteOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Rectangle extends BMap.Polygon {
@@ -13,7 +13,7 @@ class Rectangle extends BMap.Polygon {
   }
 
   enableEditing () {
-    const { baiduMap, markerOverlays, settings } = this.options
+    const { map, markerOverlays, settings } = this.options
     const mPoints = this.getPath()
     const points = calcRectAllPoints(mPoints[0], mPoints[2], 6)
 
@@ -38,13 +38,13 @@ class Rectangle extends BMap.Polygon {
       marker.setIcon(moveIcon)
       marker.setShadow(shadow)
       markers.push(marker)
-      baiduMap.addOverlay(marker)
+      map.addOverlay(marker)
     }
     markerOverlays.push(...markers)
   }
 
   disableEditing () {
-    removeAnchorOverlays(this.options)
+    deleteAnchorOverlays(this.options)
   }
 
   drag () {
@@ -55,8 +55,8 @@ class Rectangle extends BMap.Polygon {
     updateOverlay(key, value, this.options)
   }
 
-  remove () {
-    removeOverlay(this)
+  delete () {
+    deleteOverlays(this)
   }
 }
 

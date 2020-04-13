@@ -38,7 +38,7 @@ class CustomSvg extends CustomOverlay {
         transition: 'all 0'
       }
     )
-    this.options.baiduMap.getPanes().labelPane.appendChild(this.div)
+    this.options.map.getPanes().labelPane.appendChild(this.div)
     return this.div
   }
 

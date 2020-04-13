@@ -1,7 +1,7 @@
 import BMap from 'BMap'
 
 import { updateOverlay } from './operate/update-overlay'
-import { removeOverlay } from './operate/remove-overlay'
+import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Label extends BMap.Label {
@@ -29,8 +29,8 @@ class Label extends BMap.Label {
     updateOverlay(key, value, this.options)
   }
 
-  remove () {
-    removeOverlay(this)
+  delete () {
+    deleteOverlays(this)
   }
 }
 

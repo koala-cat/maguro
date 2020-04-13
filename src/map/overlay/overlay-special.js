@@ -10,7 +10,7 @@ import { addOverlay } from './operate/add-overlay'
 import { drawSymbol } from './operate/draw-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 import { updateOverlay } from './operate/update-overlay'
-import { removeSelectedOverlays, removeAnchorOverlays } from './operate/remove-overlay'
+import { deleteOverlays, deleteSelectedOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 
 import { addEvents } from './event'
 import { defaultStyle } from './setting'
@@ -24,7 +24,7 @@ class CustomSpecial {
 
   draw () {
     const {
-      baiduMap,
+      map,
       activeLegend,
       markerOverlays,
       markerPoints,
@@ -47,7 +47,7 @@ class CustomSpecial {
     if (markerOverlays.length > 0) {
       const marker = markerOverlays[0]
       if (marker.parentLineId !== this.polyline.id) {
-        removeAnchorOverlays(this.options)
+        deleteAnchorOverlays(this.options)
       }
     }
 
@@ -56,7 +56,7 @@ class CustomSpecial {
     if (idx > -1) {
       const icon = drawSymbol({ ...settings, fillOpacity: 1 })
       const marker = new BMap.Marker(this.point, { icon })
-      baiduMap.addOverlay(marker)
+      map.addOverlay(marker)
       marker.parentLineId = this.polyline.id
       markerOverlays.push(marker)
       markerPoints.push(this.point)
@@ -75,7 +75,7 @@ class CustomSpecial {
   drawSpecial (data, callback) {
     // data -- points or polylineOverlay
     const {
-      baiduMap,
+      map,
       specialOverlays,
       markerPoints,
       markerPositions,
@@ -100,7 +100,7 @@ class CustomSpecial {
     }
 
     const { type, width } = settings
-    const { wPoint, wPixel } = distanceToPointAndPixel(baiduMap, width)
+    const { wPoint, wPixel } = distanceToPointAndPixel(map, width)
     let overlays = []
 
     Object.assign(
@@ -121,7 +121,7 @@ class CustomSpecial {
     }
     specialOverlays[parentId] = overlays
     addOverlay(overlays, this.options)
-    removeAnchorOverlays(this.options)
+    deleteAnchorOverlays(this.options)
 
     if (callback) callback(overlays)
     return overlays
@@ -179,29 +179,38 @@ class CustomSpecial {
 
   drawPolyline (points, settings, events) {
     const polyline = new BMap.Polyline(points, settings)
-    if (events) {
-      polyline.enableEditing = () => {
-        this.enableEditing(polyline)
-      }
-      polyline.disableEditing = () => {
-        this.disableEditing(polyline)
-      }
-      polyline.drag = () => {
-        this.drag(polyline)
-      }
-      addEvents(events, polyline)
-    }
+    this.extend(events, polyline)
     return polyline
   }
 
-  drawRectangle (points, seetings) {
-    const rectangle = new BMap.Polygon(points, seetings)
+  drawRectangle (points, settings, events) {
+    const rectangle = new BMap.Polygon(points, settings)
+    this.extend(events, rectangle)
     return rectangle
+  }
+
+  extend (events, overlay) {
+    overlay.options = this.options
+    if (events) {
+      addEvents(events, overlay)
+      overlay.enableEditing = () => {
+        this.enableEditing(overlay)
+      }
+      overlay.disableEditing = () => {
+        this.disableEditing(overlay)
+      }
+      overlay.drag = () => {
+        this.drag(overlay)
+      }
+    }
+    overlay.delete = () => {
+      this.delete(overlay)
+    }
   }
 
   enableEditing (overlay) {
     const {
-      baiduMap,
+      map,
       overlays,
       markerOverlays,
       markerPoints,
@@ -234,7 +243,7 @@ class CustomSpecial {
       marker.setIcon(moveIcon)
       marker.setShadow(shadow)
       markers.push(marker)
-      baiduMap.addOverlay(marker)
+      map.addOverlay(marker)
 
       const idx = calcMarkerOnLinePosition(points[i], polyline)
       markerPositions.push(idx)
@@ -243,7 +252,7 @@ class CustomSpecial {
   }
 
   disableEditing () {
-    removeAnchorOverlays(this.options)
+    deleteAnchorOverlays(this.options)
   }
 
   drag (polyline) {
@@ -282,14 +291,14 @@ class CustomSpecial {
         removeOverlays.push(...ids)
       }
 
-      removeSelectedOverlays(this.options)
+      deleteSelectedOverlays(this.options)
       selectedOverlays.push(...olys)
       this.options.activeOverlay = olys[0]
     })
   }
 
-  remove () {
-    return false
+  delete (overlay) {
+    deleteOverlays(overlay)
   }
 }
 export default CustomSpecial

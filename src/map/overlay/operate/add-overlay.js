@@ -2,7 +2,7 @@ import { setOverlaySettings } from '../setting'
 
 function addOverlay (data, options) {
   let overlay = null
-  const { baiduMap, overlays, polylineCenters, settings } = options
+  const { map, overlays, polylineCenters, settings } = options
 
   if (!Array.isArray(data)) {
     overlay = data
@@ -21,9 +21,11 @@ function addOverlay (data, options) {
     }
     if (type === 'polyline') oly.parentLineId = oly.id
     if (oly.invented) overlay = oly
-    baiduMap.addOverlay(oly)
+    map.addOverlay(oly)
     overlays.push(oly)
   }
+  overlay.enableEditing()
+  options.activeOverlay = overlay
   return overlay
 }
 

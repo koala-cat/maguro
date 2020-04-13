@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { getOverlaySettings } from './setting'
 import { updateMarker } from './operate/update-overlay'
-import { removeOverlay } from './operate/remove-overlay'
+import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class CustomOverlay extends BMap.Overlay {
@@ -28,9 +28,9 @@ class CustomOverlay extends BMap.Overlay {
     updateMarker(key, value, this.options)
   }
 
-  remove () {
+  delete () {
     this.div.remove()
-    removeOverlay(this)
+    deleteOverlays(this)
   }
 
   addEventListener (type, fn, capture = false) {
@@ -56,12 +56,13 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   setTransform () {
-    const { offsetX: x = 0, offsetY: y = 0, width } = this.options.settings
+    const { map, settings } = this.options
+    const { offsetX: x = 0, offsetY: y = 0, width } = settings
     const offset = {
       x: x - parseFloat(width) / 2,
       y: y - parseFloat(width) / 2
     }
-    const pixel = this.options.baiduMap.pointToOverlayPixel(this.point)
+    const pixel = map.pointToOverlayPixel(this.point)
     const px = pixel.x + offset.x + 'px'
     const py = pixel.y + offset.y + 'px'
     this.div.style.transform = `translate3d(${px}, ${py}, 0)`

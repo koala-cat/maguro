@@ -80,7 +80,7 @@
             v-show="displayColumnVisible"
             size="60px">
             <mu-toggle
-              v-if="item.isCurrentOrg"
+              v-if="item.isCommand"
               v-model="item.isDisplay"
               @click.stop=""
               @change="onChange(item, 'isDisplay')" />
@@ -139,8 +139,9 @@
       filterOverlays () {
         const groupIds = []
         const result = []
+        console.log(this.overlays)
         for (const oly of this.overlays) {
-          if (!oly.isCurrentOrg && !oly.isDisplay) continue
+          if (!oly.isCommand && !oly.isDisplay) continue
 
           const {
             conditionDisplay,
@@ -185,7 +186,7 @@
     },
     methods: {
       getDisplay (oly) {
-        const display = oly.isCurrentOrg ? oly.isDisplay : oly.isCommandDisplay
+        const display = oly.isCommand ? oly.isDisplay : oly.isCommandDisplay
         const conditionDisplay = this.showHiddenOverlay ? !display : true
         const conditionStructure =
           this.showUnlinkOverlay
@@ -198,7 +199,7 @@
       },
       onClickOverlay (oly) {
         const display =
-          oly.isCurrentOrg
+          oly.isCommand
             ? oly.isDisplay
             : oly.isCommandDisplay
         if (display) {
@@ -260,9 +261,9 @@
       }
     }
     .list-item {
+      text-align: center;
       & > *{
         padding: 8px 0;
-        text-align: center;
       }
       &:after {
         content: '';
