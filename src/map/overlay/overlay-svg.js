@@ -15,8 +15,9 @@ class CustomSvg extends CustomOverlay {
       width
     } = this.options.settings
     const viewBox = svg.getAttribute('viewBox')
+    const _class = svg.getAttribute('class')
     this.div.innerHTML = `
-      <svg class="icon" viewBox="${viewBox}">
+      <svg class="${_class}" viewBox="${viewBox}">
         ${svg.innerHTML}
       </svg>
     `
