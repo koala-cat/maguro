@@ -1,4 +1,5 @@
 import CustomOverlay from './overlay'
+import { calcOnePixelToPoint } from '../calc/point'
 
 class CustomSvg extends CustomOverlay {
   constructor (point, options) {
@@ -12,7 +13,8 @@ class CustomSvg extends CustomOverlay {
       fill,
       fillOpacity: opacity,
       svg,
-      width
+      width,
+      height
     } = this.options.settings
     const viewBox = svg.getAttribute('viewBox')
     const _class = svg.getAttribute('class')
@@ -27,6 +29,7 @@ class CustomSvg extends CustomOverlay {
       {
         display: 'inherit',
         width: `${width}px`,
+        height: height ? `${height}px` : `${width}px`,
         fill,
         opacity
       }
@@ -53,6 +56,26 @@ class CustomSvg extends CustomOverlay {
 
   disableEditing () {
     this.setBorder('transparent')
+  }
+
+  getBounds () {
+    const { map } = this.options
+    const width = this.div.clientWidth
+    const height = this.div.clientHeight
+    const entry = calcOnePixelToPoint(map)
+    const { lng, lat } = this.point
+
+    const dLng = entry.lng * width / 2
+    const dLat = entry.lat * height / 2
+
+    return {
+      getSouthWest: () => {
+        return { lng: lng - dLng, lat: lat - dLat }
+      },
+      getNorthEast: () => {
+        return { lng: lng + dLng, lat: lat + dLat }
+      }
+    }
   }
 
   setStyle (key, value) {
