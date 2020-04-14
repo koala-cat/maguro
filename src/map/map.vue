@@ -160,7 +160,6 @@
       //   this.$emit('save', result)
       // }
       drawSvg (point, options) {
-        console.log(123123123)
         const overlay = new CustomSvg(point, options)
         return overlay
       }
