@@ -44,11 +44,13 @@ class CustomSvg extends CustomOverlay {
       }
     )
     this.options.map.getPanes().labelPane.appendChild(this.div)
+    this.getBounds()
     return this.div
   }
 
   draw () {
     super.setPosition(this.point)
+    this.setBounds()
   }
 
   enableEditing () {
@@ -70,9 +72,36 @@ class CustomSvg extends CustomOverlay {
     const dLat = entry.lat * height / 2
     const sw = new BMap.Point(lng - dLng, lat - dLat)
     const ne = new BMap.Point(lng + dLng, lat + dLat)
-    const bounds = new BMap.Bounds(sw, ne)
+    this.bounds = new BMap.Bounds(sw, ne)
 
-    return bounds
+    return this.bounds
+  }
+
+  setBounds () {
+    const { map } = this.options
+    const sw = this.bounds.getSouthWest()
+    const ne = this.bounds.getNorthEast()
+
+    const pixelSw = map.pointToOverlayPixel(sw)
+    const pixelNe = map.pointToOverlayPixel(ne)
+
+    const width = Math.abs(pixelNe.x - pixelSw.x)
+    const height = Math.abs(pixelNe.y - pixelSw.y)
+    Object.assign(
+      this.div.querySelector('svg').style,
+      {
+        width: `${width}px`,
+        height: `${height}px`
+      }
+    )
+    Object.assign(
+      this.options.settings,
+      {
+        width: `${width}px`,
+        height: `${height}px`
+      }
+    )
+    this.setTransform()
   }
 
   setStyle (key, value) {

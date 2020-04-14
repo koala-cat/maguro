@@ -57,10 +57,10 @@ class CustomOverlay extends BMap.Overlay {
 
   setTransform () {
     const { map, settings } = this.options
-    const { offsetX: x = 0, offsetY: y = 0, width } = settings
+    const { offsetX: x = 0, offsetY: y = 0, width, height } = settings
     const offset = {
       x: x - parseFloat(width) / 2,
-      y: y - parseFloat(width) / 2
+      y: height ? y - parseFloat(height) / 2 : y - parseFloat(width) / 2
     }
     const pixel = map.pointToOverlayPixel(this.point)
     const px = pixel.x + offset.x + 'px'

@@ -15,6 +15,7 @@
 
   import MapMixin from './map'
   import CustomSvg from '../map/overlay/overlay-svg'
+  import { addOverlay } from '../map/overlay/operate/add-overlay'
   import { selectOverlay } from '../map/overlay/operate/select-overlay'
 
   // import { notify } from 'mussel'
@@ -162,6 +163,9 @@
       drawSvg (point, options) {
         const overlay = new CustomSvg(point, options)
         return overlay
+      },
+      addOverlay (overlay) {
+        addOverlay(overlay, this.$data)
       }
     }
   }
