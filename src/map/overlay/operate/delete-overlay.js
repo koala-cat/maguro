@@ -34,7 +34,7 @@ function deleteSelectedOverlays (options) {
   for (const oly of selectedOverlays) {
     if (oly.isLocked || oly.disabled) continue
 
-    const idx = overlays.findIndex(item => item === oly)
+    const idx = overlays.findIndex(item => item.id === oly.id)
     if (idx > -1) {
       oly.delete()
       overlays.splice(idx, 1)

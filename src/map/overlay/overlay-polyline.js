@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { getPolylineIncludeSpecials } from '../calc/overlay'
 
-import { updateOverlay } from './operate/update-overlay'
+import { updatePolyline } from './operate/update-overlay'
 import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
@@ -24,7 +24,7 @@ class Polyline extends BMap.Polyline {
   }
 
   update (key, value) {
-    updateOverlay(key, value, this.options)
+    updatePolyline(key, value, this.options)
   }
 
   delete () {

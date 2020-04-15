@@ -17,8 +17,8 @@ function drawMarker (point, options) {
   const legend = legendId ? getLegend(legends, legendId) : activeLegend
   const { svg } = legend
   let marker = null
+  Object.assign(settings, { svg, iconUrl: legend.iconUrl })
   if (svg) {
-    Object.assign(settings, { svg, iconUrl: legend.iconUrl })
     marker = drawSvg(point, options)
   } else {
     const icon = isSymbol ? drawSymbol(settings) : drawIcon(settings)

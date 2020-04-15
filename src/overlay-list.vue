@@ -11,9 +11,10 @@
     </mu-icon-button>
     <mu-v-box
       v-show="overlayListVisible">
-      <mu-bar>
+      <mu-bar style="border-bottom: 1px solid #a5a5a5;">
         {{ title || '元件列表' }}
-        <div size="auto" />
+      </mu-bar>
+      <mu-bar>
         <label
           v-show="hiddenFilterVisible">
           <input
@@ -29,68 +30,72 @@
           只显示未关联
         </label>
       </mu-bar>
-      <mu-h-box header>
-        <mu-flex-item
-          v-for="(item, index) in headers"
-          v-show="!item.hidden"
-          :key="index"
-          :size="item.size"
-          :text-align="item.textAlign">
-          {{ item.label }}
-        </mu-flex-item>
-      </mu-h-box>
       <mu-v-box
-        size="auto"
-        style="overflow: auto;">
-        <mu-h-box
-          v-for="(item, i) in filterOverlays"
-          :key="item.id"
-          :class="{active: item === overlay}"
-          class="list-item"
-          align-items="center"
-          @click.native="onClickOverlay(item)">
+        class="grid"
+        size="auto">
+        <mu-h-box header>
           <mu-flex-item
-            size="60px">
-            {{ i + 1 }}
-          </mu-flex-item>
-          <mu-flex-item
-            size="auto"
-            text-align="left"
-            style="width: 0;">
-            <div
-              class="mu-text-ellipsis"
-              style="color: #fff;"
-              :title="item.name">
-              {{ item.name }}
-            </div>
-            <div
-              class="mu-text-ellipsis"
-              :title="item.structureName">
-              {{ item.structureName }}
-            </div>
-          </mu-flex-item>
-          <mu-flex-item
-            v-show="sourceColumnVisible"
-            size="80px"
-            class="mu-text-ellipsis"
-            :title="item.orgName">
-            {{ item.orgName }}
-          </mu-flex-item>
-          <mu-flex-item
-            v-show="displayColumnVisible"
-            size="60px">
-            <mu-toggle
-              v-if="item.isCommand"
-              v-model="item.isDisplay"
-              @click.stop=""
-              @change="onChange(item, 'isDisplay')" />
-            <mu-toggle
-              v-else
-              v-model="item.isCommandDisplay"
-              @click.stop=""
-              @change="onChange(item, 'isCommandDisplay')" />
+            v-for="(item, index) in headers"
+            v-show="!item.hidden"
+            :key="index"
+            :size="item.size"
+            :text-align="item.textAlign">
+            {{ item.label }}
           </mu-flex-item>
         </mu-h-box>
+        <mu-v-box
+          size="auto"
+          style="overflow: auto;">
+          <mu-h-box
+            v-for="(item, i) in filterOverlays"
+            :key="item.id"
+            :class="{active: item === overlay}"
+            class="list-item"
+            align-items="center"
+            @click.native="onClickOverlay(item)">
+            <mu-flex-item
+              size="60px">
+              {{ i + 1 }}
+            </mu-flex-item>
+            <mu-flex-item
+              size="auto"
+              text-align="left"
+              style="width: 0;">
+              <div
+                class="mu-text-ellipsis"
+                style="color: #fff;"
+                :title="item.name">
+                {{ item.name }}
+              </div>
+              <div
+                class="mu-text-ellipsis"
+                :title="item.structureName">
+                {{ item.structureName }}
+              </div>
+            </mu-flex-item>
+            <mu-flex-item
+              v-show="sourceColumnVisible"
+              size="80px"
+              class="mu-text-ellipsis"
+              :title="item.orgName">
+              {{ item.orgName }}
+            </mu-flex-item>
+            <mu-flex-item
+              v-show="displayColumnVisible"
+              size="60px">
+              <mu-toggle
+                v-if="item.isCommand"
+                v-model="item.isDisplay"
+                @click.stop=""
+                @change="onChange(item, 'isDisplay')" />
+              <mu-toggle
+                v-else
+                v-model="item.isCommandDisplay"
+                @click.stop=""
+                @change="onChange(item, 'isCommandDisplay')" />
+            </mu-flex-item>
+          </mu-h-box>
+        </mu-v-box>
       </mu-v-box>
     </mu-v-box>
   </mu-v-box>
@@ -139,7 +144,6 @@
       filterOverlays () {
         const groupIds = []
         const result = []
-        console.log(this.overlays)
         for (const oly of this.overlays) {
           if (!oly.isCommand && !oly.isDisplay) continue
 
@@ -214,6 +218,9 @@
 </script>
 
 <style scoped>
+  input[type="checkbox"] {
+    margin: 3px 0;
+  }
   .overlay-list > :first-child {
     position: absolute;
     top: 52px;
@@ -249,11 +256,15 @@
     & [text-align="left"] {
       text-align: left;
     }
-    & > .mu-bar {
+    & .grid {
+      margin: 0 12px 12px;
+      border: 1px solid #217091;
+    }
+    & .mu-bar {
       padding: 8px 12px;
       color: $fontColorWhite;
     }
-    & > [header] {
+    & [header] {
       text-align: center;
       background: $bgColorDark;
       & > * {
@@ -265,14 +276,8 @@
       & > *{
         padding: 8px 0;
       }
-      &:after {
-        content: '';
-        position: absolute;
-        height: 1px;
-        right: 10px;
-        bottom: 0;
-        left: 10px;
-        background: $bgColorDark;
+      & + .list-item {
+        border-top: 1px solid #217091;
       }
       &:hover {
         cursor: pointer;

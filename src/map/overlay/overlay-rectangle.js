@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { calcRectAllPoints } from '../calc/point'
 
-import { updateOverlay } from './operate/update-overlay'
+import { updateRectangle } from './operate/update-overlay'
 import { deleteOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
@@ -52,7 +52,7 @@ class Rectangle extends BMap.Polygon {
   }
 
   update (key, value) {
-    updateOverlay(key, value, this.options)
+    updateRectangle(key, value, this.options)
   }
 
   delete () {

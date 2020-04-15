@@ -1,7 +1,7 @@
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 
 import { addOverlay } from './add-overlay'
-import { settingsToStyle } from '../setting'
+import { setOverlaySettings, settingsToStyle } from '../setting'
 
 function showOverlay (overlay, options) {
   const { key, value, overlays } = options
@@ -39,7 +39,8 @@ function showOverlay (overlay, options) {
 }
 
 function updateOverlay (key, value, options) {
-  const { updateOverlays, polylinePointIds, activeOverlay: overlay } = options
+  const { updateOverlays, polylinePointIds } = options
+  const overlay = options.overlay || options.activeOverlay
   const { id, name, projectGeoKey, invented } = overlay
 
   overlay[key] = value
@@ -77,19 +78,16 @@ function updateOverlay (key, value, options) {
 }
 
 function updateMarker (key, value, options) {
-  const {
-    map,
-    overlays,
-    activeOverlay: overlay,
-    settings
-  } = options
+  const { map, overlays, activeOverlay: overlay, settings } = options
+
+  settings[key] = value
+  updateOverlay(key, value, options)
 
   if (['name', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
     showOverlay(overlay, { key, value })
     return
   }
 
-  // updateOverlay(key, value, options)
   if (key !== 'projectMapLegendId' && overlay.svg) {
     const style = settingsToStyle({ [key]: value })
     for (const s in style) {
@@ -103,25 +101,69 @@ function updateMarker (key, value, options) {
 
   if (['projectMapLegendId', 'width'].includes(key)) {
     const index = overlays.findIndex(item => item.id === overlay.id)
-
-    console.log(value)
-    Object.assign(
-      settings,
-      {
-        width: key === 'width' ? value : settings.width,
-        projectMapLegendId: key === 'projectMapLegendId' ? value : null
-      }
-    )
     if (index > -1) {
       overlay.disableEditing()
       overlay.delete()
 
       const newOverlay = overlay.redraw(options)
       map.removeOverlay(overlay)
+      setOverlaySettings(newOverlay, settings)
       addOverlay(newOverlay, options)
       overlays.splice(index, 1, newOverlay)
     }
   }
+}
+
+function updatePolyline (key, value, options) {
+  const { activeOverlay: overlay, settings } = options
+
+  settings[key] = value
+  updateOverlay(key, value, options)
+
+  if (['name', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
+    showOverlay(overlay, { key, value })
+    return
+  }
+
+  if (key !== 'points') {
+    overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
+  }
+}
+
+function updateCircle (key, value, options) {
+  updatePolyline(key, value, options)
+}
+
+function updateRectangle (key, value, options) {
+  updatePolyline(key, value, options)
+}
+
+function updatePolygon (key, value, options) {
+  updatePolyline(key, value, options)
+}
+
+function updateLabel (key, value, options) {
+  const { activeOverlay: overlay, settings } = options
+
+  settings[key] = value
+  updateOverlay(key, value, options)
+
+  if (key === 'name') {
+    overlay.setContent(value, { key, value })
+    return
+  }
+
+  if (['isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
+    showOverlay(overlay, { key, value })
+    return
+  }
+
+  const style = settingsToStyle(options, 'label')
+  overlay.setStyle(style)
+}
+
+function updateSpecial (key, value, options) {
+  updateOverlay(key, value, options)
 }
 
 function onLineupdate (overlay, options) {
@@ -149,6 +191,12 @@ function onLineupdate (overlay, options) {
 export {
   updateOverlay,
   updateMarker,
+  updatePolyline,
+  updateCircle,
+  updateRectangle,
+  updatePolygon,
+  updateLabel,
+  updateSpecial,
   showOverlay,
   onLineupdate
 }

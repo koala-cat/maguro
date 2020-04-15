@@ -25,7 +25,10 @@ function multipleOverlays (e, overlay, options) {
   const modKey = e?.ctrlKey || false
   const type = overlay.type
 
-  if (!modKey) selectedOverlays.splice(0)
+  if (!modKey) {
+    selectedOverlays.map(oly => oly.disableEditing())
+    selectedOverlays.splice(0)
+  }
 
   if (type.includes('special')) {
     selectedOverlays.push(...specialOverlays[overlay.parentId])

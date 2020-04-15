@@ -21,177 +21,204 @@
         style="fill: #fff;"
         @click="onClose" />
     </mu-bar>
-    <mu-v-box
-      v-show="expanded">
-      <mu-form
-        v-if="basicVisible"
-        layout="flow"
-        label-width="48px"
-        label-align="left"
-        :cellpadding="false">
-        <mu-form-field
-          label="名称">
-          <mu-editor
-            v-model.trim="name"
-            :disabled="disabled" />
-        </mu-form-field>
-        <mu-form-field
-          v-show="overlay.type==='special'"
-          label="路宽"
-          align-items="center">
-          <mu-editor
-            v-model.trim="width"
-            type="number"
-            :disabled="disabled"
-            size="auto" />
-          <mu-flex-item size="8px" />
-          <mu-flex-item>m</mu-flex-item>
-        </mu-form-field>
-        <mu-form-field
-          v-if="legendFieldVisible"
-          label="图例">
-          <mu-h-box
-            :style="{maxWidth: maxWidth}">
-            <img :src="specialFile" width="16" height="16">
-            <mu-combo-box
-              :clearable="false"
-              :disabled="disabled"
-              popup-height="154px">
-              <mu-option
-                v-for="legend in specialLegends"
-                :key="legend.id"
-                style="padding: 5px 0; text-align: center;"
-                @click="onComboBoxSelect('projectMapLegendId', legend.id)">
-                <img :src="legend.iconUrl" width="16" height="16">
-              </mu-option>
-            </mu-combo-box>
-          </mu-h-box>
-          <mu-flex-item size="8px" />
-          <mu-h-box
-            v-show="overlay.type==='marker'"
-            align-items="center">
-            <mu-combo-box
-              v-model="width"
-              :options="legendSpecs"
-              :clearable="false"
-              :popup-render-to-body="true"
-              :disabled="disabled"
-              popup-height="154px"
-              :style="{maxWidth: maxWidth, maxHeight: '154px'}" />
-            <mu-flex-item size="8px" />
-            <mu-flex-item>px</mu-flex-item>
-          </mu-h-box>
-        </mu-form-field>
-        <mu-form-field
-          v-if="fillFieldVisible"
-          label="填充">
-          <mu-h-box
-            :style="{maxWidth: maxWidth}">
-            <mu-input
-              :style="{width: maxWidth, background: fillColor}" />
-            <color-picker
-              v-model.trim="fillColor"
-              :clearable="false"
+    <mu-tabs
+      v-show="expanded"
+      v-model="activeTabName"
+      model-control="external"
+      style="padding: 0 8px;"
+      @change="onTabChange">
+      <mu-tab-panel
+        name="基本信息"
+        size="auto"
+        style="padding: 8px 0;">
+        <mu-form
+          v-if="basicVisible"
+          layout="flow"
+          label-width="48px"
+          label-align="left"
+          :cellpadding="false">
+          <mu-form-field
+            label="名称">
+            <mu-editor
+              v-model.trim="name"
               :disabled="disabled" />
-          </mu-h-box>
-          <mu-flex-item size="8px" />
-          <mu-h-box
+          </mu-form-field>
+          <mu-form-field
+            v-show="overlay.type==='special'"
+            label="路宽"
             align-items="center">
             <mu-editor
-              v-model.trim="fillOpacity"
+              v-model.trim="width"
+              type="number"
+              :disabled="disabled"
+              size="auto" />
+            <mu-flex-item size="8px" />
+            <mu-flex-item>m</mu-flex-item>
+          </mu-form-field>
+          <mu-form-field
+            v-if="legendFieldVisible"
+            label="图例">
+            <mu-h-box
+              :style="{maxWidth: maxWidth}">
+              <img :src="specialFile" width="16" height="16">
+              <mu-combo-box
+                :clearable="false"
+                :disabled="disabled"
+                popup-height="154px">
+                <mu-option
+                  v-for="legend in specialLegends"
+                  :key="legend.id"
+                  style="padding: 5px 0; text-align: center;"
+                  @click="onComboBoxSelect('projectMapLegendId', legend.id)">
+                  <img :src="legend.iconUrl" width="16" height="16">
+                </mu-option>
+              </mu-combo-box>
+            </mu-h-box>
+            <mu-flex-item size="8px" />
+            <mu-h-box
+              v-show="overlay.type==='marker'"
+              align-items="center">
+              <mu-combo-box
+                v-model="width"
+                :options="legendSpecs"
+                :clearable="false"
+                :popup-render-to-body="true"
+                :disabled="disabled"
+                popup-height="154px"
+                :style="{maxWidth: maxWidth, maxHeight: '154px'}" />
+              <mu-flex-item size="8px" />
+              <mu-flex-item>px</mu-flex-item>
+            </mu-h-box>
+          </mu-form-field>
+          <mu-form-field
+            v-if="fillFieldVisible"
+            label="填充">
+            <mu-h-box
+              :style="{maxWidth: maxWidth}">
+              <mu-input
+                :style="{width: maxWidth, background: fillColor}" />
+              <color-picker
+                v-model.trim="fillColor"
+                :clearable="false"
+                :disabled="disabled" />
+            </mu-h-box>
+            <mu-flex-item size="8px" />
+            <mu-h-box
+              align-items="center">
+              <mu-editor
+                v-model.trim="fillOpacity"
+                type="number"
+                :clearable="false"
+                :disabled="disabled"
+                :style="{maxWidth: maxWidth}" />
+              <mu-flex-item size="8px" />
+              <mu-flex-item>%</mu-flex-item>
+            </mu-h-box>
+          </mu-form-field>
+          <mu-form-field
+            v-if="strokeFieldVisible"
+            label="边框">
+            <mu-h-box
+              :style="{maxWidth: maxWidth}">
+              <mu-input
+                :style="{width: maxWidth, background: strokeColor}" />
+              <color-picker
+                v-model.trim="strokeColor"
+                :disabled="disabled"
+                :clearable="false" />
+            </mu-h-box>
+            <mu-flex-item size="8px" />
+            <mu-editor
+              v-model.trim="strokeWeight"
               type="number"
               :clearable="false"
               :disabled="disabled"
               :style="{maxWidth: maxWidth}" />
             <mu-flex-item size="8px" />
-            <mu-flex-item>%</mu-flex-item>
-          </mu-h-box>
-        </mu-form-field>
-        <mu-form-field
-          v-if="strokeFieldVisible"
-          label="边框">
-          <mu-h-box
-            :style="{maxWidth: maxWidth}">
-            <mu-input
-              :style="{width: maxWidth, background: strokeColor}" />
-            <color-picker
-              v-model.trim="strokeColor"
-              :disabled="disabled"
-              :clearable="false" />
-          </mu-h-box>
-          <mu-flex-item size="8px" />
-          <mu-editor
-            v-model.trim="strokeWeight"
-            type="number"
-            :clearable="false"
-            :disabled="disabled"
-            :style="{maxWidth: maxWidth}" />
-          <mu-flex-item size="8px" />
-          <mu-h-box
-            v-show="overlay.type !== 'special'"
-            :style="{maxWidth: maxWidth}">
-            <mu-icon
-              combo-icon
-              :svg="getPath(strokeStyle)" />
+            <mu-h-box
+              v-show="overlay.type !== 'special'"
+              :style="{maxWidth: maxWidth}">
+              <mu-icon
+                combo-icon
+                :svg="getPath(strokeStyle)" />
+              <mu-combo-box
+                :clearable="false"
+                :disabled="disabled"
+                :popup-render-to-body="true">
+                <mu-option
+                  v-for="stroke in strokeSpecs"
+                  :key="stroke.value"
+                  style="padding: 5px 0; text-align: center;"
+                  @click="onComboBoxSelect('strokeStyle', stroke.value)">
+                  <mu-icon
+                    :svg="getPath(stroke.value)" />
+                </mu-option>
+              </mu-combo-box>
+            </mu-h-box>
+          </mu-form-field>
+          <mu-form-field
+            v-if="fontFieldVisible"
+            align-items="center"
+            label="字体">
+            <mu-h-box
+              :style="{maxWidth: maxWidth}">
+              <mu-input
+                :style="{width: maxWidth, background: strokeColor}" />
+              <color-picker
+                v-model.trim="strokeColor"
+                :disabled="disabled"
+                :clearable="false" />
+            </mu-h-box>
+            <mu-flex-item size="8px" />
             <mu-combo-box
+              v-model="width"
+              :options="fontSpecs"
               :clearable="false"
+              :popup-render-to-body="false"
               :disabled="disabled"
-              :popup-render-to-body="true">
-              <mu-option
-                v-for="stroke in strokeSpecs"
-                :key="stroke.value"
-                style="padding: 5px 0; text-align: center;"
-                @click="onComboBoxSelect('strokeStyle', stroke.value)">
-                <mu-icon
-                  :svg="getPath(stroke.value)" />
-              </mu-option>
-            </mu-combo-box>
-          </mu-h-box>
-        </mu-form-field>
-        <mu-form-field
-          v-if="fontFieldVisible"
-          align-items="center"
-          label="字体">
-          <mu-h-box
-            :style="{maxWidth: maxWidth}">
-            <mu-input
-              :style="{width: maxWidth, background: strokeColor}" />
-            <color-picker
-              v-model.trim="strokeColor"
-              :disabled="disabled"
-              :clearable="false" />
-          </mu-h-box>
-          <mu-flex-item size="8px" />
-          <mu-combo-box
-            v-model="width"
-            :options="fontSpecs"
-            :clearable="false"
-            :popup-render-to-body="false"
-            :disabled="disabled"
-            popup-height="154px"
-            :style="{maxWidth: maxWidth}" />
-          <mu-flex-item size="8px" />
-          <mu-flex-item>px</mu-flex-item>
-        </mu-form-field>
-        <mu-form-field
-          label="锁定">
-          <mu-toggle
-            v-model="isLocked"
-            :disabled="disabled" />
-        </mu-form-field>
-        <mu-form-field
-          label="显示">
-          <mu-toggle v-model="isDisplay" />
-        </mu-form-field>
-        <mu-form-field
-          v-if="structures"
-          label="构筑物"
-          :title="structureName">
-          <label>{{ structureName }}</label>
-        </mu-form-field>
-      </mu-form>
-      <slot name="basic" />
-    </mu-v-box>
+              popup-height="154px"
+              :style="{maxWidth: maxWidth}" />
+            <mu-flex-item size="8px" />
+            <mu-flex-item>px</mu-flex-item>
+          </mu-form-field>
+          <mu-form-field
+            label="锁定">
+            <mu-toggle
+              v-model="isLocked"
+              :disabled="disabled" />
+          </mu-form-field>
+          <mu-form-field
+            label="显示">
+            <mu-toggle v-model="isDisplay" />
+          </mu-form-field>
+          <mu-form-field
+            v-if="structures"
+            label="构筑物"
+            :title="structureName">
+            <label>{{ structureName }}</label>
+          </mu-form-field>
+          <slot name="basic" />
+        </mu-form>
+      </mu-tab-panel>
+      <mu-tab-panel
+        name="扩展信息"
+        size="auto"
+        style="padding: 8px 0;">
+        <mu-form
+          v-if="basicVisible"
+          layout="flow"
+          label-width="48px"
+          label-align="left"
+          :cellpadding="false">
+          <mu-form-field
+            label="备注">
+            <mu-editor
+              v-model.trim="remark"
+              :disabled="disabled" />
+          </mu-form-field>
+        </mu-form>
+      </mu-tab-panel>
+    </mu-tabs>
     <structure-tree
       v-if="structures"
       :structures="structures"
@@ -205,7 +232,7 @@
   import { legendSpecs, fontSpecs, strokeSpecs } from './constants'
   import { fixedNumber } from './map/calc/data'
 
-  import { dashedSvg, solidSvg } from './assets/svg-icons'
+  import { dashedSvg, solidSvg, triangleDownSvg, triangleRightSvg } from './assets/svg-icons'
 
   import ColorPicker from './color-picker.vue'
   import StructureTree from './structure.vue'
@@ -230,12 +257,13 @@
     data () {
       return {
         visible: true,
-        expanded: true
+        expanded: true,
+        activeTabName: '基本信息'
       }
     },
     computed: {
       triangle () {
-        return this.expanded ? 'triangle-down' : 'triangle-right'
+        return this.expanded ? triangleDownSvg : triangleRightSvg
       },
       legends () {
         return this.baiduMap.legends
@@ -270,6 +298,12 @@
       },
       fontFieldVisible () {
         return this.overlay.type === 'label'
+      },
+      lockVisible () {
+        return this.overlay.type !== 'hotSpot'
+      },
+      displayVisible () {
+        return this.lockVisible
       },
       legendSpecs () {
         return this.getComboOptions(legendSpecs)
@@ -369,6 +403,14 @@
       },
       structureName () {
         return this.overlay.structureName
+      },
+      remark: {
+        get () {
+          return this.overlay.remark
+        },
+        set (val) {
+          this.baiduMap.updateOverlay('remark', val)
+        }
       }
     },
     watch: {
@@ -385,7 +427,7 @@
           dashed: dashedSvg,
           solid: solidSvg
         }
-        return svg[icon]
+        return svg[icon] || icon
       },
       getComboOptions (data) {
         const map = []
@@ -402,17 +444,15 @@
       },
       onChangeLevel (val) {
         this.baiduMap.updateOverlay('level', val)
+      },
+      onTabChange () {
+        console.log(123123)
       }
     }
   }
 </script>
 
 <style scoped>
-  * {
-    color: $fontColorGrey;
-    font-size: $fontSize !important;
-  }
-
   button:hover {
     color: $fontColorWhite !important;
   }
@@ -442,6 +482,10 @@
     bottom: 108px;
     overflow: auto;
     z-index: 10;
+    & *:not(.mu-tab-item):not(.mu-tab-label){
+      color: $fontColorGrey;
+      font-size: $fontSize !important;
+    }
     & > * {
       background: $bgColorLight;
       &.mu-bar,

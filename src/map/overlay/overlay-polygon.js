@@ -1,6 +1,6 @@
 import BMap from 'BMap'
 
-import { updateOverlay } from './operate/update-overlay'
+import { updatePolygon } from './operate/update-overlay'
 import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
@@ -15,7 +15,7 @@ class Polygon extends BMap.Polygon {
   }
 
   update (key, value) {
-    updateOverlay(key, value, this.options)
+    updatePolygon(key, value, this.options)
   }
 
   delete () {

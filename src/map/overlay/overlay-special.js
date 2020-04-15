@@ -9,11 +9,12 @@ import { getSpecialAttachPolyline } from '../calc/overlay'
 import { addOverlay } from './operate/add-overlay'
 import { drawSymbol } from './operate/draw-overlay'
 import { dragOverlay } from './operate/drag-overlay'
-import { updateOverlay } from './operate/update-overlay'
+import { updateSpecial } from './operate/update-overlay'
 import { deleteOverlays, deleteSelectedOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 
 import { addEvents } from './event'
-import { defaultStyle } from './setting'
+import { getLegend } from './legend'
+import { defaultStyle, getOverlaySettings, setOverlaySettings } from './setting'
 
 class CustomSpecial {
   constructor (point, polyline, options) {
@@ -55,7 +56,9 @@ class CustomSpecial {
 
     if (idx > -1) {
       const icon = drawSymbol({ ...settings, fillOpacity: 1 })
-      const marker = new BMap.Marker(this.point, { icon })
+      const marker = new BMap.Marker(this.point, {
+        icon: icon
+      })
       map.addOverlay(marker)
       marker.parentLineId = this.polyline.id
       markerOverlays.push(marker)
@@ -76,6 +79,7 @@ class CustomSpecial {
     // data -- points or polylineOverlay
     const {
       map,
+      legends,
       specialOverlays,
       markerPoints,
       markerPositions,
@@ -99,7 +103,8 @@ class CustomSpecial {
       newPoints = data
     }
 
-    const { type, width } = settings
+    const { projectMapLegendId, width } = settings
+    const type = getLegend(legends, projectMapLegendId)?.value || ''
     const { wPoint, wPixel } = distanceToPointAndPixel(map, width)
     let overlays = []
 
@@ -120,8 +125,8 @@ class CustomSpecial {
       overlays = this.drawSpecialRect(newPoints)
     }
     specialOverlays[parentId] = overlays
-    addOverlay(overlays, this.options)
     deleteAnchorOverlays(this.options)
+    addOverlay(overlays, this.options)
 
     if (callback) callback(overlays)
     return overlays
@@ -179,12 +184,14 @@ class CustomSpecial {
 
   drawPolyline (points, settings, events) {
     const polyline = new BMap.Polyline(points, settings)
+    setOverlaySettings(polyline, settings)
     this.extend(events, polyline)
     return polyline
   }
 
   drawRectangle (points, settings, events) {
     const rectangle = new BMap.Polygon(points, settings)
+    setOverlaySettings(rectangle, settings)
     this.extend(events, rectangle)
     return rectangle
   }
@@ -205,6 +212,10 @@ class CustomSpecial {
     }
     overlay.delete = () => {
       this.delete(overlay)
+    }
+    overlay.update = (key, value) => {
+      this.options.overlay = overlay
+      updateSpecial(key, value, this.options)
     }
   }
 
@@ -262,11 +273,17 @@ class CustomSpecial {
   }
 
   update (key, value, overlay) {
-    const { selectedOverlays, selectedOverlays: specials, removeOverlays } = this.options
+    const { selectedOverlays, selectedOverlays: specials, removeOverlays, settings } = this.options
     const polyline = value || specials[specials.length - 1]
 
     const width = key === 'width' && value < 10 ? 10 : overlay.width
-    this.options.settings.width = width
+    Object.assign(
+      settings,
+      {
+        ...getOverlaySettings(specials[0]),
+        width
+      }
+    )
 
     this.drawSpecial(polyline, (olys) => {
       specials.sort((a, b) => a.invented * 1 - b.invented * 1)
@@ -274,11 +291,11 @@ class CustomSpecial {
         for (let i = 0; i < olys.length; i++) {
           olys[i].id = specials[i].id
           if (key === 'width') {
-            updateOverlay(key, width, this.options)
+            updateSpecial(key, width, this.options)
             continue
           }
           if (key === 'points') {
-            updateOverlay(key, olys[i].getPath(), this.options)
+            updateSpecial(key, olys[i].getPath(), this.options)
           }
         }
       } else {

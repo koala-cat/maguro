@@ -19,6 +19,7 @@ function defaultSettings () {
     strokeColor: '#457bd8',
     strokeWeight: 2,
     level: 1,
+    invented: false,
     isLocked: false,
     isDisplay: true,
     isCommandDisplay: true,

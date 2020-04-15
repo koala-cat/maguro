@@ -2,7 +2,7 @@ import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
 import { addOverlay } from './add-overlay'
-import { defaultStyle } from '../setting'
+import { defaultStyle, setOverlaySettings } from '../setting'
 import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from '../operate/draw-overlay'
 
 function initDrawing (options) {
@@ -49,7 +49,8 @@ function startDrawing (options) {
   const settings = {
     ...defaultStyle(),
     iconUrl: legend.iconUrl,
-    svg: legend.svg
+    svg: legend.svg,
+    projectMapLegendId: legend.id
   }
 
   if (!legend.type && ['marker', 'polyline', 'polygon', 'special'].includes(legend.value)) {
@@ -137,6 +138,7 @@ function drawingOverlay (settings = {}, callback, options) {
 
   function drawNewOverlay (overlay, newOverlay) {
     map.removeOverlay(overlay)
+    setOverlaySettings(newOverlay, settings)
     addOverlay(newOverlay, options)
     drawingManager.close()
     if (callback) callback(newOverlay)
@@ -159,6 +161,7 @@ function drawingOverlay (settings = {}, callback, options) {
 
     const newMarker = drawMarker(point, options)
     map.removeOverlay(marker)
+    setOverlaySettings(newMarker, settings)
     addOverlay(newMarker, options)
     drawingManager.close()
     if (callback) callback(newMarker)

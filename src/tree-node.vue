@@ -80,7 +80,7 @@
         return this.node.expanded
       },
       svg () {
-        return this.expanded ? expandCircleSvg : collapseCircleSvg
+        return this.expanded ? collapseCircleSvg : expandCircleSvg
       },
       subNodes () {
         return this.node.subNodes || []

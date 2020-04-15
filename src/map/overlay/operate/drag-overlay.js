@@ -118,10 +118,9 @@ function dragEnd (e, options) {
         dragRectAnchorOverlay(oly, options)
       }
     }
-
-    specials.push(oly)
+    oly.update('points', points)
     specials.map(item => {
-      item.update('points', points)
+      item.update('points', item.getPath())
     })
   })
 }

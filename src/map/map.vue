@@ -3,7 +3,8 @@
     <div
       id="map"
       class="mu-absolute-fit"
-      :invisible="!baseMapVisible" />
+      :invisible="!baseMapVisible"
+      style="top: 40px;" />
     <mode />
     <slot />
   </div>
@@ -174,12 +175,5 @@
 <style>
   [invisible] .anchorBL {
     display: none;
-  }
-
-  #map {
-    top: 60px;
-    left: 72px;
-    right: 16px;
-    bottom: 16px;
   }
 </style>

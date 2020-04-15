@@ -18,9 +18,10 @@ class CustomSvg extends CustomOverlay {
       height
     } = this.options.settings
     const viewBox = svg.getAttribute('viewBox')
-    const _class = svg.getAttribute('class')
+    this.class = svg.getAttribute('class')
+
     this.div.innerHTML = `
-      <svg class="${_class}" viewBox="${viewBox}">
+      <svg class="${this.class}" viewBox="${viewBox}">
         ${svg.innerHTML}
       </svg>
     `
@@ -50,7 +51,9 @@ class CustomSvg extends CustomOverlay {
 
   draw () {
     super.setPosition(this.point)
-    this.setBounds()
+    if (this.class && this.class.includes('vtk')) {
+      this.setBounds()
+    }
   }
 
   enableEditing () {
@@ -78,12 +81,15 @@ class CustomSvg extends CustomOverlay {
   }
 
   setBounds () {
+    const precision = 0.1
     const { map } = this.options
     const sw = this.bounds.getSouthWest()
     const ne = this.bounds.getNorthEast()
+    const _sw = new BMap.Point(sw.lng + precision, sw.lat + precision)
+    const _ne = new BMap.Point(ne.lng - precision, ne.lat - precision)
 
-    const pixelSw = map.pointToOverlayPixel(sw)
-    const pixelNe = map.pointToOverlayPixel(ne)
+    const pixelSw = map.pointToOverlayPixel(_sw)
+    const pixelNe = map.pointToOverlayPixel(_ne)
 
     const width = Math.abs(pixelNe.x - pixelSw.x)
     const height = Math.abs(pixelNe.y - pixelSw.y)
