@@ -7,6 +7,7 @@ import { calcMarkerOnLinePosition } from '../calc/position'
 import { getSpecialAttachPolyline } from '../calc/overlay'
 
 import { addOverlay } from './operate/add-overlay'
+import { deselectLegend } from './operate/deselect-overlay'
 import { drawSymbol } from './operate/draw-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 import { updateSpecial } from './operate/update-overlay'
@@ -126,6 +127,8 @@ class CustomSpecial {
     }
     specialOverlays[parentId] = overlays
     deleteAnchorOverlays(this.options)
+    deleteSelectedOverlays(this.options)
+    deselectLegend(this.options)
     addOverlay(overlays, this.options)
 
     if (callback) callback(overlays)
@@ -307,7 +310,6 @@ class CustomSpecial {
         removeOverlays.push(...ids)
       }
 
-      deleteSelectedOverlays(this.options)
       selectedOverlays.push(...olys)
       this.options.activeOverlay = olys[0]
     })

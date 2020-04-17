@@ -29,7 +29,6 @@ export default {
         if ((this.activeLegend && !this.activeLegend.type) || !this.activeLegend) {
           if (!e.overlay) {
             deselectOverlays(this.$data)
-            this.activeOverlay = null
           }
         }
       })

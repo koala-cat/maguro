@@ -3,12 +3,10 @@ import BMapLib from 'BMapLib'
 
 import { addOverlay } from './add-overlay'
 import { deleteAnchorOverlays } from './delete-overlay'
-import { deselectOverlays } from './deselect-overlay'
+import { deselectOverlays, deselectLegend } from './deselect-overlay'
 import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from './draw-overlay'
 import { frameSelectOverlays } from './select-overlay'
 import { defaultStyle, setOverlaySettings } from '../setting'
-
-import { tools } from '../../../constants'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
@@ -88,22 +86,15 @@ function startDrawing (options) {
     })
   } else if (type !== 'special') {
     deleteAnchorOverlays(options)
-    deselectOverlays(options)
-    drawingOverlay(settings, options)
+    drawingOverlay(settings, options, (newOverlay) => {
+      addOverlay(newOverlay, options)
+    })
   }
 }
 
 function endDrawing (options) {
-  const { activeLegend } = options
   closeDrawing(options)
-  setTimeout(() => {
-    let legend = null
-    const activeType = activeLegend.type
-    if (activeType) {
-      legend = tools.find(item => item.value === activeType)
-    }
-    options.activeLegend = legend
-  }, 10)
+  deselectLegend(options)
 }
 
 function drawingOverlay (settings = {}, options, callback) {
@@ -157,9 +148,6 @@ function drawingOverlay (settings = {}, options, callback) {
   function drawNewOverlay (overlay, newOverlay) {
     map.removeOverlay(overlay)
     setOverlaySettings(newOverlay, options.settings)
-    if (activeLegend.value !== 'select') {
-      addOverlay(newOverlay, options)
-    }
     endDrawing(options)
     if (callback) callback(newOverlay)
   }

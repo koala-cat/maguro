@@ -42,7 +42,6 @@ function multipleOverlays (e, overlay, options) {
 
   options.activeOverlay = modKey ? activeOverlay || selectedOverlays[0] : selectedOverlays[0]
 
-  console.log(options.activeOverlay)
   if (!overlay.disabled) {
     overlay.enableEditing()
     overlay.drag()
