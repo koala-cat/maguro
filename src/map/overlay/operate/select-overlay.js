@@ -1,5 +1,10 @@
 import CustomSpecial from '../overlay-special'
 
+import { isOverlayInFrame } from '../../calc/geo.js'
+import { getPolylineIncludeSpecials } from '../../calc/overlay'
+
+import { deselectOverlays } from './deselect-overlay'
+
 function selectOverlay (e, overlay, options) {
   const { selectedOverlays, activeOverlay, activeLegend } = options
   const type = overlay.type
@@ -26,8 +31,7 @@ function multipleOverlays (e, overlay, options) {
   const type = overlay.type
 
   if (!modKey) {
-    selectedOverlays.map(oly => oly.disableEditing())
-    selectedOverlays.splice(0)
+    deselectOverlays(options)
   }
 
   if (type.includes('special')) {
@@ -38,12 +42,44 @@ function multipleOverlays (e, overlay, options) {
 
   options.activeOverlay = modKey ? activeOverlay || selectedOverlays[0] : selectedOverlays[0]
 
+  console.log(options.activeOverlay)
   if (!overlay.disabled) {
     overlay.enableEditing()
     overlay.drag()
   }
 }
 
+function frameSelectOverlays (overlay, options) {
+  const { map, overlays, selectedOverlays } = options
+
+  for (const oly of overlays) {
+    const parentIds = []
+    const type = oly.type
+    if (parentIds.includes(oly.parentId) || !oly.visible) continue
+    const { result, parentId } = isOverlayInFrame(oly, overlay)
+    if (result) {
+      if (type.includes('special')) {
+        const specials = overlays.reduce((arr, item) => {
+          if (item.parentId === oly.parentId) {
+            arr.push(item)
+          }
+          return arr
+        }, [])
+        selectedOverlays.push(...specials)
+      } else {
+        selectedOverlays.push(oly)
+        if (getPolylineIncludeSpecials(oly, overlays).length === 0) {
+          oly.enableEditing()
+        }
+      }
+      oly.drag()
+    }
+    if (parentId) parentIds.push(parentId)
+    map.removeOverlay(overlay)
+  }
+}
+
 export {
-  selectOverlay
+  selectOverlay,
+  frameSelectOverlays
 }

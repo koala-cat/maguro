@@ -25,8 +25,7 @@
       v-show="expanded"
       v-model="activeTabName"
       model-control="external"
-      style="padding: 0 8px;"
-      @change="onTabChange">
+      style="padding: 0 8px;">
       <mu-tab-panel
         name="基本信息"
         size="auto"
@@ -444,9 +443,6 @@
       },
       onChangeLevel (val) {
         this.baiduMap.updateOverlay('level', val)
-      },
-      onTabChange () {
-        console.log(123123)
       }
     }
   }
@@ -476,7 +472,7 @@
   }
 
   .overlay-form {
-    width: 262px;
+    width: 280px;
     top: 72px;
     right: 32px;
     bottom: 108px;

@@ -21,6 +21,7 @@ function deleteOverlays (overlay) {
   const idx = overlays.findIndex(item => item.id === overlay.id)
   if (idx > -1) {
     overlays.splice(idx, 1)
+    overlay.disableEditing()
     map.removeOverlay(overlay)
     if (overlay.id) {
       removeOverlays.push(parseInt(overlay.id))
@@ -30,15 +31,13 @@ function deleteOverlays (overlay) {
 }
 
 function deleteSelectedOverlays (options) {
-  const { map, overlays, selectedOverlays } = options
+  const { overlays, selectedOverlays } = options
   for (const oly of selectedOverlays) {
     if (oly.isLocked || oly.disabled) continue
 
     const idx = overlays.findIndex(item => item.id === oly.id)
     if (idx > -1) {
       oly.delete()
-      overlays.splice(idx, 1)
-      map.removeOverlay(oly)
     }
   }
   selectedOverlays.splice(0)

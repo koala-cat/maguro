@@ -244,7 +244,7 @@
 
   .overlay-list > :last-child {
     position: absolute !important;
-    width: 320px;
+    width: 300px;
     height: 292px;
     top: 52px;
     left: 64px;

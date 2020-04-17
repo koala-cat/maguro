@@ -2,8 +2,13 @@ import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
 import { addOverlay } from './add-overlay'
+import { deleteAnchorOverlays } from './delete-overlay'
+import { deselectOverlays } from './deselect-overlay'
+import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from './draw-overlay'
+import { frameSelectOverlays } from './select-overlay'
 import { defaultStyle, setOverlaySettings } from '../setting'
-import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from '../operate/draw-overlay'
+
+import { tools } from '../../../constants'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
@@ -14,17 +19,6 @@ function initDrawing (options) {
   } else {
     options.drawingManager.open()
   }
-}
-
-function breakDrawing (options) {
-  const { map, overlays } = options
-  map.getOverlays().map(oly => {
-    const overlay = overlays.find(item => item.id === oly.id)
-    if (!overlay && !(oly instanceof BMap.GroundOverlay)) {
-      map.removeOverlay(oly)
-    }
-  })
-  closeDrawing(options)
 }
 
 function openDrawing (options) {
@@ -43,6 +37,17 @@ function closeDrawing (options) {
   map.setDefaultCursor('pointer')
 }
 
+function breakDrawing (options) {
+  const { map, overlays } = options
+  map.getOverlays().map(oly => {
+    const overlay = overlays.find(item => item.id === oly.id)
+    if (!overlay && !(oly instanceof BMap.GroundOverlay)) {
+      map.removeOverlay(oly)
+    }
+  })
+  endDrawing(options)
+}
+
 function startDrawing (options) {
   let type = null
   const { activeLegend: legend } = options
@@ -54,7 +59,6 @@ function startDrawing (options) {
   }
 
   if (!legend.type && ['marker', 'polyline', 'polygon', 'special'].includes(legend.value)) {
-    breakDrawing(options)
     return
   }
 
@@ -67,29 +71,43 @@ function startDrawing (options) {
   }
   settings.type = type
 
-  if (type === 'select') {
-    closeDrawing(options)
-    this.frameOverlays()
-  } else if (type === 'special') {
-    closeDrawing(options)
-    // this.unSelectOverlays()
-  } else {
-    const complete = (overlay) => {
-      setTimeout(() => {
-        // this.unSelectTool()
-      }, 10)
-    }
-    closeDrawing(options)
-    // removeMarkers(this._map, this._options)
+  closeDrawing(options)
+  deselectOverlays(options)
 
-    // this.unSelectOverlays()
-    drawingOverlay(settings, complete, options)
+  if (type === 'select') {
+    Object.assign(
+      settings,
+      {
+        fillOpacity: 0.2,
+        strokeWeight: 1,
+        strokeStyle: 'dashed'
+      }
+    )
+    drawingOverlay(settings, options, (overlay) => {
+      frameSelectOverlays(overlay, options)
+    })
+  } else if (type !== 'special') {
+    deleteAnchorOverlays(options)
+    deselectOverlays(options)
+    drawingOverlay(settings, options)
   }
 }
 
-function drawingOverlay (settings = {}, callback, options) {
+function endDrawing (options) {
+  const { activeLegend } = options
+  closeDrawing(options)
+  setTimeout(() => {
+    let legend = null
+    const activeType = activeLegend.type
+    if (activeType) {
+      legend = tools.find(item => item.value === activeType)
+    }
+    options.activeLegend = legend
+  }, 10)
+}
+
+function drawingOverlay (settings = {}, options, callback) {
   const { map, drawingManager, activeLegend } = options
-  const type = activeLegend.type === 'polyline' ? activeLegend.type : activeLegend.value || activeLegend.type
   const modes = {
     marker: BMAP_DRAWING_MARKER,
     polyline: BMAP_DRAWING_POLYLINE,
@@ -104,27 +122,27 @@ function drawingOverlay (settings = {}, callback, options) {
     rectangle: rectangleComplete,
     polygon: polygonComplete
   }
-  Object.assign(options, { settings })
+  let type = activeLegend.type === 'polyline' ? activeLegend.type : activeLegend.value || activeLegend.type
+  type = type === 'select' ? 'rectangle' : type
 
+  Object.assign(options, { settings })
   drawingManager[`${type}Options`] = settings
+  drawingManager.open()
 
   if (type === 'label') {
     const click = (e) => {
-      const label = drawLabel(e.point, { ...options, settings })
+      e.stopPropagation()
+
+      const label = drawLabel(e.point, options)
       drawingManager._mask.removeEventListener('click', click)
-      drawingManager.close()
-      if (callback) callback(label)
+      drawNewOverlay(label, label)
     }
-    drawingManager.open()
     drawingManager.setDrawingMode(null)
     drawingManager._mask.addEventListener('click', click)
-    return
   } else {
     listenerEvent(`${type}complete`, complete[type])
+    drawingManager.setDrawingMode(modes[type])
   }
-
-  drawingManager.open()
-  drawingManager.setDrawingMode(modes[type])
 
   function listenerEvent (e, overlayComplete) {
     const listeners = drawingManager.__listeners || {}
@@ -138,9 +156,11 @@ function drawingOverlay (settings = {}, callback, options) {
 
   function drawNewOverlay (overlay, newOverlay) {
     map.removeOverlay(overlay)
-    setOverlaySettings(newOverlay, settings)
-    addOverlay(newOverlay, options)
-    drawingManager.close()
+    setOverlaySettings(newOverlay, options.settings)
+    if (activeLegend.value !== 'select') {
+      addOverlay(newOverlay, options)
+    }
+    endDrawing(options)
     if (callback) callback(newOverlay)
   }
 
@@ -160,11 +180,7 @@ function drawingOverlay (settings = {}, callback, options) {
     )
 
     const newMarker = drawMarker(point, options)
-    map.removeOverlay(marker)
-    setOverlaySettings(newMarker, settings)
-    addOverlay(newMarker, options)
-    drawingManager.close()
-    if (callback) callback(newMarker)
+    drawNewOverlay(marker, newMarker)
   }
 
   function polylineComplete (line) {
@@ -193,8 +209,9 @@ function drawingOverlay (settings = {}, callback, options) {
 
 export {
   initDrawing,
-  breakDrawing,
   openDrawing,
   closeDrawing,
-  startDrawing
+  breakDrawing,
+  startDrawing,
+  endDrawing
 }

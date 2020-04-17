@@ -3,6 +3,7 @@ import BMap from 'BMap'
 import { showOverlays } from './calc/clusterer'
 // import { getOverlaySettings } from './setting'
 import { initDrawing, breakDrawing } from './overlay/operate/drawing-overlay'
+import { deselectOverlays } from './overlay/operate/deselect-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
 import { getLegend, getLegendType } from './overlay/legend'
 
@@ -25,13 +26,9 @@ export default {
       })
 
       this.map.addEventListener('click', (e) => {
-        if ((this.activeTool && !this.activeTool.type) || !this.activeTool) {
-          this.activeTool = null
+        if ((this.activeLegend && !this.activeLegend.type) || !this.activeLegend) {
           if (!e.overlay) {
-            this.selectedOverlays.map(oly => {
-              oly.disableEditing()
-            })
-            this.selectedOverlays.splice(0)
+            deselectOverlays(this.$data)
             this.activeOverlay = null
           }
         }
@@ -44,14 +41,12 @@ export default {
         const keyCode = e.keyCode || e.which || e.charCode
         if (keyCode === 17) { // Delete 46
           overlays.map(oly => {
-            console.log(17171717)
             oly.delete()
           })
         }
 
         if (keyCode === 27) { // Escape
           breakDrawing(this.$data)
-          // 取消选中覆盖物
         }
       })
     },

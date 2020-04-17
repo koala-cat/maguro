@@ -99,16 +99,19 @@ function drawPolygon (points, options) {
 }
 
 function drawLabel (point, options) {
-  const settings = {
-    ...options.settings,
-    strokeColor: '#333',
-    fillOpacity: 1,
-    width: 12
-  }
+  const { settings } = options
+  Object.assign(
+    settings,
+    {
+      strokeColor: '#333',
+      fillOpacity: 1,
+      width: 12
+    }
+  )
 
   const style = {
-    color: settings.strokeColor,
-    fontSize: `${settings.width}px`,
+    color: options.settings.strokeColor,
+    fontSize: `${options.settings.width}px`,
     lineHeight: '20px',
     textAlign: 'center',
     padding: '0 10px',

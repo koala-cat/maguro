@@ -3,9 +3,18 @@ import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc
 import { addOverlay } from './add-overlay'
 import { setOverlaySettings, settingsToStyle } from '../setting'
 
-function showOverlay (overlay, options) {
-  const { key, value, overlays } = options
-  const { type } = overlay
+const ignoreFields = [
+  'name',
+  'isLocked',
+  'isDisplay',
+  'isCommandDisplay',
+  'projectStructureId',
+  'remark'
+]
+
+function showOverlay (key, value, options) {
+  const { overlays, activeOverlay: overlay } = options
+  const type = overlay.type
 
   let polylineVisible = true
   const data = []
@@ -24,7 +33,7 @@ function showOverlay (overlay, options) {
   }
 
   if (type === 'polyline') {
-    data.push(...getPolylineIncludeSpecials(overlay))
+    data.push(...getPolylineIncludeSpecials(overlay, overlays))
   }
 
   data.map(oly => {
@@ -34,13 +43,13 @@ function showOverlay (overlay, options) {
       oly.hide()
       oly.disableEditing()
     }
-    updateOverlay(key, value, options)
+    updateOverlay(key, value, options, oly)
   })
 }
 
-function updateOverlay (key, value, options) {
-  const { updateOverlays, polylinePointIds } = options
-  const overlay = options.overlay || options.activeOverlay
+function updateOverlay (key, value, options, overlay) {
+  const { updateOverlays, polylinePointIds, activeOverlay } = options
+  overlay = overlay || activeOverlay
   const { id, name, projectGeoKey, invented } = overlay
 
   overlay[key] = value
@@ -83,8 +92,8 @@ function updateMarker (key, value, options) {
   settings[key] = value
   updateOverlay(key, value, options)
 
-  if (['name', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
-    showOverlay(overlay, { key, value })
+  if (ignoreFields.includes(key)) {
+    showOverlay(key, value, options)
     return
   }
 
@@ -120,8 +129,8 @@ function updatePolyline (key, value, options) {
   settings[key] = value
   updateOverlay(key, value, options)
 
-  if (['name', 'isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
-    showOverlay(overlay, { key, value })
+  if (ignoreFields.includes(key)) {
+    showOverlay(key, value, options)
     return
   }
 
@@ -153,12 +162,12 @@ function updateLabel (key, value, options) {
     return
   }
 
-  if (['isLocked', 'isDisplay', 'isCommandDisplay', 'projectStructureId'].includes(key)) {
-    showOverlay(overlay, { key, value })
+  if (ignoreFields.includes(key)) {
+    showOverlay(key, value, options)
     return
   }
 
-  const style = settingsToStyle(options, 'label')
+  const style = settingsToStyle({ [key]: value }, 'label')
   overlay.setStyle(style)
 }
 

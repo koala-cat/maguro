@@ -214,8 +214,7 @@ class CustomSpecial {
       this.delete(overlay)
     }
     overlay.update = (key, value) => {
-      this.options.overlay = overlay
-      updateSpecial(key, value, this.options)
+      updateSpecial(key, value, this.options, overlay)
     }
   }
 
