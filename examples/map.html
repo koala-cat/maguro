@@ -23,6 +23,7 @@
       :map-legends="legends"
       :map-overlays="overlays"
       :map-structures="structures"
+      :map-configure-visible="true"
       @set="setMapType"
       @save="saveOverlays">
       <maguro-toolkit>
@@ -126,8 +127,7 @@
             projectStructureCategoryId: 1001,
             categoryName: '猫'
           }
-        ],
-        listVisible: true
+        ]
       },
       mounted () {
         for (const item of this.legends) {

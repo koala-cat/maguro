@@ -1,6 +1,6 @@
 <template>
   <mu-h-box
-    v-show="baseMapVisible"
+    v-show="visible"
     class="mode">
     <div
       v-for="type in mapTypes"
@@ -21,8 +21,8 @@
       mapTypes () {
         return mapTypes
       },
-      baseMapVisible () {
-        return this.baiduMap.baseMapVisible
+      visible () {
+        return this.baiduMap.configureVisible
       },
       mode () {
         return this.baiduMap.mapType

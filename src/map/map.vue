@@ -6,6 +6,7 @@
       :invisible="!baseMapVisible"
       style="top: 40px;" />
     <mode />
+    <scale />
     <slot />
   </div>
 </template>
@@ -24,11 +25,13 @@
 
   import { startDrawing } from './overlay/operate/drawing-overlay'
 
-  import Mode from './mode/mode.vue'
+  import Mode from './configure/mode.vue'
+  import Scale from './configure/scale.vue'
 
   export default {
     components: {
-      Mode
+      Mode,
+      Scale
     },
     provide () {
       return {
@@ -56,6 +59,10 @@
       mapStructures: {
         type: Array,
         default: () => ([])
+      },
+      mapConfigureVisible: {
+        type: Boolean,
+        default: true
       }
     },
     data () {
@@ -87,6 +94,9 @@
     computed: {
       baseMapVisible () {
         return this.mapType !== 'graphic'
+      },
+      configureVisible () {
+        return this.baseMapVisible && this.mapConfigureVisible
       }
     },
     watch: {
@@ -110,7 +120,6 @@
       this.map.setCurrentCity('北京')
       this.map.enableScrollWheelZoom(true)
       this.map.setNormalMapDisplay(this.baseMapVisible)
-
       this.init()
     },
     methods: {
