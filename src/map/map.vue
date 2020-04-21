@@ -13,14 +13,14 @@
   import BMap from 'BMap'
   import cloneDeep from 'lodash.clonedeep'
   import debounce from 'lodash.debounce'
+  import { notify } from 'mussel'
+  import { modes, defaultScaleMap } from '../constants'
 
   import MapMixin from './map'
   import CustomSvg from '../map/overlay/overlay-svg'
   import { addOverlay } from '../map/overlay/operate/add-overlay'
+  import { getSaveData } from '../map/overlay/operate/save-overlay'
   import { selectOverlay } from '../map/overlay/operate/select-overlay'
-
-  // import { notify } from 'mussel'
-  // import { getCreateOverlays, getUpdateOverlays } from './calc/overlay'
 
   import { startDrawing } from './overlay/operate/drawing-overlay'
 
@@ -37,9 +37,9 @@
     },
     mixins: [MapMixin],
     props: {
-      baseMapVisible: {
-        type: Boolean,
-        default: true
+      mapType: {
+        type: String,
+        default: 'normal'
       },
       mapEvents: {
         type: Object,
@@ -73,7 +73,6 @@
         specialOverlays: {},
         polylineCenters: {},
         polylinePointIds: {},
-        activeMode: 'normal',
         activeOverlay: null,
         activeLegend: null,
         markerOverlays: [],
@@ -81,15 +80,28 @@
         markerPositions: [],
         id: -1,
         parentId: -1,
-        view: true
+        view: true,
+        scaleMap: defaultScaleMap
+      }
+    },
+    computed: {
+      baseMapVisible () {
+        return this.mapType !== 'graphic'
       }
     },
     watch: {
       mapOverlays () {
         this.overlays = cloneDeep(this.mapOverlays)
-        // 比较一下events
         this.bindOverlayEvents()
         this.initOverlays()
+      },
+      baseMapVisible (val) {
+        this.map.setNormalMapDisplay(this.baseMapVisible)
+      },
+      mapType (val) {
+        if (modes[val]) {
+          this.map.setMapType(modes[val])
+        }
       }
     },
     mounted () {
@@ -97,15 +109,14 @@
       this.map.centerAndZoom(new BMap.Point(116.404, 39.915), 13)
       this.map.setCurrentCity('北京')
       this.map.enableScrollWheelZoom(true)
+      this.map.setNormalMapDisplay(this.baseMapVisible)
 
       this.init()
     },
     methods: {
-      // setMapType (val, mode) {
-      //   this.activeMode = val
-      //   this.map.setMapType(mode)
-      //   this.$emit('setMapType', val)
-      // }
+      setMapType (val) {
+        this.$emit('set', val)
+      },
       switchOverlayWindow (key) {
         this.activeLegend = null
         this[key] = !this[key]
@@ -116,13 +127,18 @@
       // removeLegend (legend) {
       //   this.$emit('removeLegend', legend)
       // },
-      selectLegend (val, style = {}) {
+      selectLegend (legend) {
         if (this.overlayListVisible) {
           this.overlayListVisible = false
         }
 
-        this.activeLegend = val
-        startDrawing(this.$data)
+        this.activeLegend = legend
+        if (legend.value !== 'scale') {
+          startDrawing(this.$data)
+        }
+      },
+      setOverlayScale (key, value) {
+        this.$emit('setOverlayScale', key, value)
       },
       updateOverlay: debounce(function (key, value) {
         this.activeOverlay.update(key, value)
@@ -144,23 +160,14 @@
         const viewPort = this.map.getViewport(points)
         this.map.centerAndZoom(viewPort.center, viewPort.zoom)
       },
-      // saveOverlays () {
-      //   const result = {}
-
-      //   result.creates = getCreateOverlays(this.overlays, this.polylineCenters)
-      //   if (Object.keys(this.updateOverlays).length === 0 &&
-      //     this.removeOverlays.length === 0 && !result.creates) {
-      //     notify('info', '没有需要修改的信息。')
-      //     return
-      //   }
-      //   if (this.removeOverlays.length > 0) {
-      //     result.removes = this.removeOverlays
-      //   }
-      //   if (Object.keys(this.updateOverlays).length > 0) {
-      //     result.updates = getUpdateOverlays(this.updateOverlays)
-      //   }
-      //   this.$emit('save', result)
-      // }
+      saveOverlays () {
+        const result = getSaveData(this.$data)
+        if (result) {
+          this.$emit('save', result)
+        } else {
+          notify('info', '没有需要修改的信息。')
+        }
+      },
       drawSvg (point, options) {
         const overlay = new CustomSvg(point, options)
         return overlay

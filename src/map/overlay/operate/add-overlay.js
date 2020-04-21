@@ -30,7 +30,7 @@ function addOverlay (data, options) {
   }
   overlay.enableEditing()
   overlay.drag()
-  options.activeOverlay = overlay
+  options.activeOverlay = selectedOverlays[0]
   return overlay
 }
 

@@ -1,18 +1,20 @@
 import BMap from 'BMap'
+import clonedeep from 'lodash.clonedeep'
+
+import CustomSpecial from './overlay/overlay-special'
 
 import { showOverlays } from './calc/clusterer'
-// import { getOverlaySettings } from './setting'
+import { getSpecialAttachPolyline } from './calc/overlay'
+import { getOverlaySettings, setOverlaySettings } from './overlay/setting'
+import { getLegend, getLegendType } from './overlay/legend'
+
+import { drawOverlay } from './overlay/operate/draw-overlay'
 import { initDrawing, breakDrawing } from './overlay/operate/drawing-overlay'
 import { deselectOverlays } from './overlay/operate/deselect-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
-import { getLegend, getLegendType } from './overlay/legend'
+import { addOverlay } from './overlay/operate/add-overlay'
 
 export default {
-  watch: {
-    baseMapVisible (val) {
-      this.map.setNormalMapDisplay(val)
-    }
-  },
   methods: {
     init () {
       this.bindMapEvents()
@@ -22,7 +24,7 @@ export default {
     },
     bindMapEvents () {
       this.map.addEventListener('zoomend', () => {
-        // showOverlays(this.map, this.overlays, this.specialOverlays)
+        showOverlays(this.$data)
       })
 
       this.map.addEventListener('click', (e) => {
@@ -51,25 +53,27 @@ export default {
     },
     bindOverlayEvents () {
       const click = (e, overlay) => {
-        // 点击覆盖物方法
         selectOverlay(e, overlay, this.$data)
       }
 
-      this.events.click = click
+      if (!this.events.click) {
+        this.events.click = click
+      }
     },
     initOverlays () {
       if (this.overlays.length === 0) return
 
+      const overlays = clonedeep(this.overlays)
       const wholePoints = []
-      const overlays = []
 
       this.clearOverlays()
+      this.overlays = []
       this.specialOverlays = {}
 
-      for (const oly of this.overlays) {
+      for (const oly of overlays) {
         const legend = getLegend(this.legends, oly)
         const type = oly.type = getLegendType(legend)
-        const { id, projectGeoKey, points = [] } = oly
+        const { id, projectGeoKey, points } = oly
         const mPoints = []
 
         if (projectGeoKey && points) {
@@ -82,52 +86,56 @@ export default {
             mPoints.push(p)
             if (oly.visible) wholePoints.push(p)
           })
-
           if (type.includes('special')) {
             const key = oly.parentId > 0 ? oly.parentId : oly.id
-            if (!this.specialOverlays[key]) this.specialOverlays[key] = []
             oly.points = mPoints
+
+            if (!this.specialOverlays[key]) this.specialOverlays[key] = []
             this.specialOverlays[key].push(oly)
+
             continue
           }
 
-          const overlay = this.draw.overlay(oly, mPoints, this.events) // 加覆盖物到地图
+          this.$data.settings = {
+            ...getOverlaySettings(oly),
+            type
+          }
+          const overlay = drawOverlay(oly, mPoints, this.$data)
           overlay.hide()
-          overlays.push(overlay)
-          this.map.addOverlay(overlay)
+          setOverlaySettings(overlay, this.$data.settings)
+          addOverlay(overlay, this.$data)
+          deselectOverlays(this.$data)
         } catch {
           continue
         }
       }
-      this.overlays.splice(0, this.overlays.length, ...overlays)
       this.initSpecialOverlays()
 
       if (this.view) {
         const viewPort = this.map.getViewport(wholePoints)
         this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-      } else {
-        showOverlays(this.map, this.overlays, this.specialOverlays)
       }
+      showOverlays(this.$data)
     },
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
         const specials = this.specialOverlays[key]
         specials.sort((a, b) => a.invented * 1 - b.invented * 1)
+        this.$data.settings = {
+          ...getOverlaySettings(specials[0]),
+          type: specials[0].type
+        }
 
-        // const overlay = specials[specials.length - 1]
-        // const type = overlay.type
-        // const options = {
-        //   ...getOverlaySettings(overlay),
-        //   type
-        // }
-
-        // 加特殊元件到地图上
-        // this.draw.special(overlay.points, options, null, (olys) => {
-        //   for (let i = 0; i < olys.length; i++) {
-        //     olys[i].id = specials[i].id
-        //     olys[i].hide()
-        //   }
-        // })
+        const overlay = specials[specials.length - 1]
+        const polyline = getSpecialAttachPolyline(overlay, this.overlays)
+        const special = new CustomSpecial(null, polyline, this.$data)
+        const newSpecials = special.drawSpecial(overlay.points)
+        newSpecials.map((oly, i) => {
+          oly.id = specials[i].id
+          oly.hide()
+        })
+        this.specialOverlays[key] = newSpecials
+        deselectOverlays(this.$data)
       }
     },
     clearOverlays () {

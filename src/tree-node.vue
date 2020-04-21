@@ -35,7 +35,7 @@
   </mu-v-box>
 </template>
 <script>
-  import { collapseCircleSvg, expandCircleSvg } from './assets/svg-icons'
+  import svg from './assets/svg-icons'
 
   export default {
     name: 'TreeNode',
@@ -80,7 +80,7 @@
         return this.node.expanded
       },
       svg () {
-        return this.expanded ? collapseCircleSvg : expandCircleSvg
+        return this.expanded ? svg.collapseCircle : svg.expandCircle
       },
       subNodes () {
         return this.node.subNodes || []

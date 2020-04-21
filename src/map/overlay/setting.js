@@ -1,4 +1,8 @@
-function defaultSettings () {
+function defaultSettings (type) {
+  let strokeWeight = 2
+  if (['polyline', 'special'].includes(type)) {
+    strokeWeight = 5
+  }
   return {
     orgId: null,
     orgName: '',
@@ -17,7 +21,7 @@ function defaultSettings () {
     fillOpacity: 0.5,
     strokeStyle: 'solid',
     strokeColor: '#457bd8',
-    strokeWeight: 2,
+    strokeWeight,
     level: 1,
     invented: false,
     isLocked: false,
@@ -89,7 +93,7 @@ function settingsToStyle (options, type) {
 }
 
 export {
-  defaultStyle,
+  defaultSettings,
   getOverlaySettings,
   setOverlaySettings,
   settingsToStyle

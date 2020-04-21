@@ -15,7 +15,7 @@ import { deleteOverlays, deleteSelectedOverlays, deleteAnchorOverlays } from './
 
 import { addEvents } from './event'
 import { getLegend } from './legend'
-import { defaultStyle, getOverlaySettings, setOverlaySettings } from './setting'
+import { defaultSettings, getOverlaySettings, setOverlaySettings } from './setting'
 
 class CustomSpecial {
   constructor (point, polyline, options) {
@@ -27,22 +27,19 @@ class CustomSpecial {
   draw () {
     const {
       map,
-      activeLegend,
+      activeLegend: legend,
       markerOverlays,
       markerPoints,
       markerPositions,
       settings
     } = this.options
     Object.assign(
-      this.options,
+      settings,
       {
-        settings: {
-          ...defaultStyle(),
-          type: activeLegend?.value || '',
-          iconUrl: activeLegend.iconUrl,
-          projectMapLegendId: activeLegend.id
-        },
-        isSymbol: true
+        ...defaultSettings(legend.type),
+        type: legend?.value || '',
+        iconUrl: legend.iconUrl,
+        projectMapLegendId: legend.id
       }
     )
 

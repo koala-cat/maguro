@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { getPolylineIncludeSpecials } from '../calc/overlay'
 
-import { updatePolyline } from './operate/update-overlay'
+import { updatePolyline, onLineupdate } from './operate/update-overlay'
 import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
@@ -15,8 +15,14 @@ class Polyline extends BMap.Polyline {
   enableEditing () {
     const { overlays } = this.options
     if (getPolylineIncludeSpecials(this, overlays).length === 0) {
+      this.addEventListener('lineupdate', onLineupdate)
       super.enableEditing()
     }
+  }
+
+  disableEditing () {
+    this.removeEventListener('lineupdate', onLineupdate)
+    super.disableEditing()
   }
 
   drag () {

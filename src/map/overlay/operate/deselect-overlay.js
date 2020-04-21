@@ -10,7 +10,7 @@ function deselectOverlays (options) {
 function deselectLegend (options) {
   setTimeout(() => {
     let legend = null
-    const activeType = options.activeLegend.type
+    const activeType = options.activeLegend?.type || null
     if (activeType) {
       legend = tools.find(item => item.value === activeType)
     }

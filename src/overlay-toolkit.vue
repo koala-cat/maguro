@@ -10,33 +10,66 @@
         <mu-list-item
           v-for="tool in tools"
           :key="tool.value"
-          :label="tool.label"
+          :title="tool.label"
           :class="{ active: activeToolType === tool.value }"
-          @click.native="onSelectTool($event, tool)"
-        />
+          @click.native="onSelectTool($event, tool)">
+          <mu-icon
+            :svg="getPath(tool.value)"
+            style="fill: #ffffff;" />
+        </mu-list-item>
       </mu-v-box>
     </mu-v-box>
     <mu-h-box
       v-show="subTools.length > 0"
       ref="tool"
-      flex-wrap>
-      <a
-        v-for="(tool, index) in subTools"
-        :key="index"
-        :style="getLegendStyle(tool)">
-        <span
-          v-if="tool.value === 'create'"
-          @click="uploadLegend">+</span>
-        <img
-          v-else
-          :src="tool.iconUrl"
-          @click="onSelect(tool)">
-        <span
-          v-if="!tool.disabled"
-          class="icon ipm-icon-error-circle"
-          style="position: absolute; top: 0; right: -6px; color: #f5222d; line-height: 0;"
-          @click.stop="removeLegend(tool)" />
-      </a>
+      flex-wrap
+      :style="style">
+      <mu-h-box v-if="activeToolType==='scale'">
+        <mu-form
+          layout="flow"
+          label-width="40px"
+          label-align="right"
+          :cellpadding="false">
+          <mu-form-field
+            v-for="tool in subTools"
+            :key="tool.type"
+            :label="isUploadPolylineField(tool) ? tool.label : ''"
+            align-items="center"
+            size="33%"
+            style="font-size: 12px;">
+            <mu-icon
+              v-show="!isUploadPolylineField(tool)"
+              :svg="getPath(tool.value)"
+              style="width: 40px; font-size: 18px; fill: #ffffff;" />
+            <mu-combo-box
+              v-model="scaleMap[tool.value]"
+              :options="scaleSpecs"
+              :clearable="false"
+              :popup-render-to-body="false"
+              popup-height="154px"
+              @change="onComboBoxSelect(tool.value)" />
+          </mu-form-field>
+        </mu-form>
+      </mu-h-box>
+      <mu-h-box v-else>
+        <a
+          v-for="tool in subTools"
+          :key="tool.id"
+          :style="getLegendStyle(tool)">
+          <span
+            v-if="tool.value === 'create'"
+            @click="uploadLegend">+</span>
+          <img
+            v-else
+            :src="tool.iconUrl"
+            @click="onSelect(tool)">
+          <span
+            v-if="!tool.disabled"
+            class="icon ipm-icon-error-circle"
+            style="position: absolute; top: 0; right: -6px; color: #f5222d; line-height: 0;"
+            @click.stop="removeLegend(tool)" />
+        </a>
+      </mu-h-box>
       <input
         ref="fileSelector"
         type="file"
@@ -46,7 +79,8 @@
   </mu-v-box>
 </template>
 <script>
-  import { tools } from './constants'
+  import { tools, scaleSpecs } from './constants'
+  import svg from './assets/svg-icons'
 
   export default {
     inject: ['baiduMap'],
@@ -57,21 +91,39 @@
       tools () {
         return tools
       },
+      scaleSpecs () {
+        const map = []
+        scaleSpecs.map(item => {
+          map.push({ value: item, label: item })
+        })
+        return map
+      },
+      scaleMap () {
+        return this.baiduMap.scaleMap
+      },
       activeTool () {
         return this.baiduMap.activeLegend
       },
       activeToolType () {
         return this.activeTool?.type || this.activeTool?.value || null
       },
+      style () {
+        return this.activeToolType === 'scale'
+          ? 'width: 408px; padding: 8px 0; overflow: visible;'
+          : ''
+      },
       subTools () {
         const subTools = []
         if (this.activeTool) {
           const value = this.activeTool.type || this.activeTool.value
-          const filters = this.legends.filter(
+          let filters = this.legends.filter(
             item => item.type === value && !item.isRemoved
           )
           if (value === 'label') {
             subTools.splice(0)
+          } else if (value === 'scale') {
+            filters = tools.filter(item => item.isOverlay)
+            subTools.push({ value: 'uploadPolyline', type: 'uploadPolyline', label: '线路' }, ...filters)
           } else {
             subTools.push(...filters)
           }
@@ -85,8 +137,15 @@
           ? 'border: 1px solid #1890ff'
           : ''
       },
+      getPath (icon) {
+        return svg[icon]
+      },
+      isUploadPolylineField (tool) {
+        return tool.type === 'uploadPolyline'
+      },
       onSelectTool (e, tool) {
-        const height = e.target.getBoundingClientRect().height
+        const el = document.querySelector('.mu-list-item')
+        const height = el.getBoundingClientRect().height
         const value = tool.value
         const idx = tools.findIndex(item => item.value === value)
         if (value !== 'label') {
@@ -96,14 +155,21 @@
             e.target.scrollIntoView()
           }
           setTimeout(() => {
+            let subToolsHeight = 0
+            if (value === 'scale') {
+              subToolsHeight = this.$refs.tool.$el.clientHeight - height
+            }
             const scrollTop = this.$refs.overlayToolkit.$el.scrollTop
-            this.$refs.tool.$el.style.top = `${48 + idx * height - scrollTop}px`
+            this.$refs.tool.$el.style.top = `${48 + idx * height - subToolsHeight - scrollTop}px`
           }, 10)
         }
         this.onSelect(tool)
       },
       onSelect (legend) {
         this.baiduMap.selectLegend(legend)
+      },
+      onComboBoxSelect (key) {
+        this.baiduMap.setOverlayScale(key, this.scaleMap[key])
       },
       removeLegend (legend) {
         this.baiduMap.removeLegend(legend)
@@ -119,6 +185,13 @@
 </script>
 
 <style scoped>
+  .mu-form-field {
+    font-size: $fontSize;
+    color: $fontColorWhite !important;
+    & > label {
+      font-size: $fontSize;
+    }
+  }
   .overlay-toolkit {
     position: absolute !important;
     top: 40px;
@@ -150,6 +223,7 @@
       padding: 4px;
       margin: 0 0 8px 8px;
       background: $fontColorWhite;
+      cursor: pointer;
       & img {
         width: 100%;
         height: 100%;
@@ -161,7 +235,7 @@
     padding: 0 6px;
     width: 40px;
     line-height: 40px;
-    font-size: $fontSize;
+    font-size: 20px;
     color: $fontColorWhite !important;
     &:hover {
       cursor: pointer;

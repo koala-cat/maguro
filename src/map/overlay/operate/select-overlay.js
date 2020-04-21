@@ -1,3 +1,4 @@
+import BMap from 'BMap'
 import CustomSpecial from '../overlay-special'
 
 import { isOverlayInFrame } from '../../calc/geo.js'

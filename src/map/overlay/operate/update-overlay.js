@@ -1,3 +1,5 @@
+import BMap from 'BMap'
+
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 
 import { addOverlay } from './add-overlay'
@@ -11,6 +13,7 @@ const ignoreFields = [
   'projectStructureId',
   'remark'
 ]
+let lineUpdate = null
 
 function showOverlay (key, value, options) {
   const { overlays, activeOverlay: overlay } = options
@@ -53,6 +56,7 @@ function updateOverlay (key, value, options, overlay) {
   const { id, name, projectGeoKey, invented } = overlay
 
   overlay[key] = value
+  lineUpdate = key
 
   if (id < 0) return
   if (invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
@@ -74,6 +78,7 @@ function updateOverlay (key, value, options, overlay) {
   } else {
     overlay[key] = value
   }
+  lineUpdate = null
 
   Object.assign(
     updateOverlays[id],
@@ -175,25 +180,18 @@ function updateSpecial (key, value, options) {
   updateOverlay(key, value, options)
 }
 
-function onLineupdate (overlay, options) {
-  const { editable, lineupdate } = options
+function onLineupdate (e) {
+  const overlay = e instanceof BMap.Overlay ? e : e.target
 
-  const update = (e) => {
-    if (!lineupdate) {
-      let points = null
-      try {
-        points = [overlay.getCenter()]
-        updateOverlay('width', overlay.getRadius(), options)
-      } catch {
-        points = overlay.getPath()
-      }
-      updateOverlay('points', points, options)
+  if (!lineUpdate) {
+    let points = null
+    try {
+      points = [overlay.getCenter()]
+      updateOverlay('width', overlay.getRadius(), overlay.options)
+    } catch {
+      points = overlay.getPath()
     }
-  }
-  if (editable) {
-    overlay.addEventListener('lineupdate', update)
-  } else {
-    overlay.removeEventListener('lineupdate', update)
+    updateOverlay('points', points, overlay.options)
   }
 }
 

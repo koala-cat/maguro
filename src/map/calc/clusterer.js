@@ -1,3 +1,4 @@
+import { scaleSpecs, zoomSpecs } from '../../constants'
 import { calcOnePixelToPoint } from './point'
 import { calcPixelDistance, distanceToPointAndPixel } from './distance'
 import { getSpecialAttachPolyline } from './overlay'
@@ -80,7 +81,8 @@ function showSpecialOverlay (map, overlays, specialOverlays) {
   }
 }
 
-function showOverlays (map, overlays, specialOverlays) {
+function clustererOverlays (options) { // 覆盖物聚合
+  const { map, overlays, specialOverlays } = options
   const zoom = map.getZoom()
   const area = {}
 
@@ -141,6 +143,34 @@ function zoomSpecialOverlayPixel (map, overlay) {
   }
 }
 
+function showOverlays (options) {
+  const { map, overlays, scalcMap } = options
+  const zoom = map.getZoom()
+  const zoomMap = {}
+  console.log(scalcMap)
+  for (const overlayType in scalcMap) {
+    const scale = scalcMap[overlayType]
+    const idx = scaleSpecs.indexOf(scale)
+    zoomMap[overlayType] = zoomSpecs[idx]
+  }
+  console.log(zoomMap)
+  overlays.map(oly => {
+    let { type, projectGeoKey } = oly
+    if (type.includes('special')) {
+      type = 'special'
+    }
+    if (type === 'polyline') {
+      type = projectGeoKey ? 'uploadPolyline' : type
+    }
+    if (zoomMap[type] >= zoom) {
+      oly.show()
+    } else {
+      oly.hide()
+    }
+  })
+}
+
 export {
+  clustererOverlays,
   showOverlays
 }

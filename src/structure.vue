@@ -48,7 +48,7 @@
 <script>
   import debounce from 'lodash.debounce'
 
-  import { triangleDownSvg, triangleRightSvg } from './assets/svg-icons'
+  import svg from './assets/svg-icons'
 
   import TreeNode from './tree-node.vue'
 
@@ -84,7 +84,7 @@
     },
     methods: {
       getPath () {
-        return this.expanded ? triangleDownSvg : triangleRightSvg
+        return this.expanded ? svg.triangleDown : svg.triangleRight
       },
       getFilterStructures () {
         const map = {}

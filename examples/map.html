@@ -18,11 +18,12 @@
     <h2>Map Example</h2>
     <hr>
     <maguro
-      :base-map-visible="true"
+      :map-type="mapType"
       :map-events="events"
       :map-legends="legends"
       :map-overlays="overlays"
       :map-structures="structures"
+      @set="setMapType"
       @save="saveOverlays">
       <maguro-toolkit>
         <mu-button
@@ -45,6 +46,7 @@
     var app = new Vue({
       el: '#app',
       data: {
+        mapType: 'normal',
         events: {},
         legends: [
           {
@@ -154,16 +156,20 @@
 
         this.overlays.push(
           {
-            id: 102,
+            id: 101,
             name: '线',
             points: [
               {
-                longitude: 111.08588591379404,
-                latitude: 29.119196829827867
+                longitude: 116.26415179820656,
+                latitude: 39.898395808412296
               },
               {
-                longitude: 111.15588591379404,
-                latitude: 29.129196829827867
+                longitude: 116.37137354387752,
+                latitude: 39.92938716179153
+              },
+              {
+                longitude: 116.37137354387752,
+                latitude: 39.92938716179153
               }
             ],
             projectMapLegendId: 1013,
@@ -171,16 +177,76 @@
             disabled: false
           },
           {
-            id: 101,
+            id: 102,
             name: '圆形',
-            width: 280,
+            width: 1314,
             points: [
               {
-                longitude: 111.05588591379404,
-                latitude: 29.119196829827867
+                longitude: 116.42944001204249,
+                latitude: 39.911679547833955
               }
             ],
             projectMapLegendId: 1016,
+            visible: true,
+            disabled: false
+          },
+          {
+            id: 103,
+            name: '双平行',
+            width: 32,
+            points: [
+              {
+                longitude: 116.29924445865056,
+                latitude: 39.90887396318737
+              },
+              {
+                longitude: 116.3057481905428,
+                latitude: 39.910755702144506
+              }
+            ],
+            parentId: 105,
+            parentLineId: 101,
+            projectMapLegendId: 1019,
+            visible: true,
+            disabled: false
+          },
+          {
+            id: 104,
+            name: '双平行',
+            width: 32,
+            points: [
+              {
+                longitude: 116.29941442530402,
+                latitude: 39.9082865185046
+              },
+              {
+                longitude: 116.30591815719626,
+                latitude: 39.91016825746174
+              }
+            ],
+            parentId: 105,
+            parentLineId: 101,
+            projectMapLegendId: 1019,
+            visible: true,
+            disabled: false
+          },
+          {
+            id: 105,
+            name: '双平行',
+            width: 32,
+            points: [
+              {
+                longitude: 116.29932944197729,
+                latitude: 39.908580240845986
+              },
+              {
+                longitude: 116.30583317386953,
+                latitude: 39.910461979803124
+              }
+            ],
+            parentId: -1,
+            parentLineId: 101,
+            projectMapLegendId: 1019,
             visible: true,
             disabled: false
           }
@@ -190,6 +256,9 @@
         onUploadPolyline () {
           // 要提供drawuploadline
           console.log('upload')
+        },
+        setMapType (val) {
+          this.mapType = val
         },
         saveOverlays (result) {
           console.log(result)

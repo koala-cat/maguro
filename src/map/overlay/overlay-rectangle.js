@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { calcRectAllPoints } from '../calc/point'
 
-import { updateRectangle } from './operate/update-overlay'
+import { updateRectangle, onLineupdate } from './operate/update-overlay'
 import { deleteOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
@@ -41,9 +41,11 @@ class Rectangle extends BMap.Polygon {
       map.addOverlay(marker)
     }
     markerOverlays.push(...markers)
+    this.addEventListener('lineupdate', onLineupdate)
   }
 
   disableEditing () {
+    this.removeEventListener('lineupdate', onLineupdate)
     deleteAnchorOverlays(this.options)
   }
 

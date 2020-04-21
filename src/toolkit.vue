@@ -19,7 +19,7 @@
   </mu-h-box>
 </template>
 <script>
-  import { zoomUpSvg, zoomDownSvg } from './assets/svg-icons'
+  import svg from './assets/svg-icons'
 
   export default {
     inject: ['baiduMap'],
@@ -31,7 +31,7 @@
     },
     computed: {
       screenIcon () {
-        return this.fullScreen ? zoomDownSvg : zoomUpSvg
+        return this.fullScreen ? svg.zoomDown : svg.zoomUp
       }
     },
     mounted () {
@@ -94,18 +94,18 @@
     padding: 4px 8px;
     background: $bgColorLight;
     z-index: 100;
-  }
-  button {
-    color: $fontColorWhite !important;
-    font-size: $fontSize !important;
-    &[icon-only] {
-      font-size: 18px !important;
-    }
-    &:hover {
-      background: $bgColorDark !important;
-    }
-    &[disabled] {
-      color: $fontColorGrey !important;
+    & button {
+      color: $fontColorWhite !important;
+      font-size: $fontSize !important;
+      &[icon-only] {
+        font-size: 18px !important;
+      }
+      &:hover {
+        background: $bgColorDark !important;
+      }
+      &[disabled] {
+        color: $fontColorGrey !important;
+      }
     }
   }
 </style>

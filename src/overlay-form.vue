@@ -231,7 +231,7 @@
   import { legendSpecs, fontSpecs, strokeSpecs } from './constants'
   import { fixedNumber } from './map/calc/data'
 
-  import { dashedSvg, solidSvg, triangleDownSvg, triangleRightSvg } from './assets/svg-icons'
+  import svg from './assets/svg-icons'
 
   import ColorPicker from './color-picker.vue'
   import StructureTree from './structure.vue'
@@ -262,7 +262,7 @@
     },
     computed: {
       triangle () {
-        return this.expanded ? triangleDownSvg : triangleRightSvg
+        return this.expanded ? svg.triangleDown : svg.triangleRight
       },
       legends () {
         return this.baiduMap.legends
@@ -422,11 +422,11 @@
     },
     methods: {
       getPath (icon) {
-        const svg = {
-          dashed: dashedSvg,
-          solid: solidSvg
+        const data = {
+          dashed: svg.dashed,
+          solid: svg.solid
         }
-        return svg[icon] || icon
+        return data[icon] || icon
       },
       getComboOptions (data) {
         const map = []

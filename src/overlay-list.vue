@@ -101,7 +101,7 @@
   </mu-v-box>
 </template>
 <script>
-  import { listSvg } from './assets/svg-icons'
+  import svg from './assets/svg-icons'
 
   export default {
     inject: ['baiduMap'],
@@ -128,7 +128,7 @@
       return {
         showHiddenOverlay: false,
         showUnlinkOverlay: false,
-        listIcon: listSvg
+        listIcon: svg.list
       }
     },
     computed: {

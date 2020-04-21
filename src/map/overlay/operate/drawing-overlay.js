@@ -6,7 +6,7 @@ import { deleteAnchorOverlays } from './delete-overlay'
 import { deselectOverlays, deselectLegend } from './deselect-overlay'
 import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from './draw-overlay'
 import { frameSelectOverlays } from './select-overlay'
-import { defaultStyle, setOverlaySettings } from '../setting'
+import { defaultSettings, setOverlaySettings } from '../setting'
 
 function initDrawing (options) {
   if (!options.drawingManager) {
@@ -50,7 +50,7 @@ function startDrawing (options) {
   let type = null
   const { activeLegend: legend } = options
   const settings = {
-    ...defaultStyle(),
+    ...defaultSettings(legend.type),
     iconUrl: legend.iconUrl,
     svg: legend.svg,
     projectMapLegendId: legend.id
@@ -173,6 +173,7 @@ function drawingOverlay (settings = {}, options, callback) {
 
   function polylineComplete (line) {
     const points = line.getPath()
+    console.log(points)
     const newLine = drawPolyline(points, options)
     drawNewOverlay(line, newLine)
   }

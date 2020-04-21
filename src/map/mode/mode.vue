@@ -17,14 +17,6 @@
 
   export default {
     inject: ['baiduMap'],
-    data () {
-      return {
-        modes: {
-          normal: BMAP_NORMAL_MAP,
-          earth: BMAP_HYBRID_MAP
-        }
-      }
-    },
     computed: {
       mapTypes () {
         return mapTypes
@@ -33,12 +25,12 @@
         return this.baiduMap.baseMapVisible
       },
       mode () {
-        return this.baiduMap.activeMode
+        return this.baiduMap.mapType
       }
     },
     methods: {
       setMapType (val) {
-        this.baiduMap.setMapType(val, this.modes[val])
+        this.baiduMap.setMapType(val)
       }
     }
   }

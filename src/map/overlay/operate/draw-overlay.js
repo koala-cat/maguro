@@ -1,7 +1,7 @@
 import BMap from 'BMap'
 
 import { addEvents } from '../event'
-import { getLegend } from '../legend'
+import { getLegend, getLegendType } from '../legend'
 
 import Marker from '../overlay-marker'
 import CustomSvg from '../overlay-svg'
@@ -10,6 +10,29 @@ import Circle from '../overlay-circle'
 import Rectangle from '../overlay-rectangle'
 import Polygon from '../overlay-polygon'
 import Label from '../overlay-label'
+
+function drawOverlay (overlay, points, options) {
+  const { legends, settings } = options
+  const legend = getLegend(legends, overlay)
+  const type = getLegendType(legend)
+
+  let newOverlay = null
+  if (type === 'marker') {
+    Object.assign(settings, { iconUrl: legend.iconUrl })
+    newOverlay = drawMarker(points[0], options)
+  } else if (type === 'polyline') {
+    newOverlay = drawPolyline(points, options)
+  } else if (type === 'circle') {
+    newOverlay = drawCircle(points[0], overlay.width, options)
+  } else if (type === 'rectangle') {
+    newOverlay = drawRectangle(points, options)
+  } else if (type === 'polygon') {
+    newOverlay = drawPolygon(points, options)
+  } else if (type === 'label') {
+    newOverlay = drawLabel(points[0], options)
+  }
+  return newOverlay
+}
 
 function drawMarker (point, options) {
   const { legends, activeLegend, settings, isSymbol } = options
@@ -134,6 +157,7 @@ function setOverlay (overlay, options) {
 }
 
 export {
+  drawOverlay,
   drawMarker,
   drawSymbol,
   drawPolyline,
