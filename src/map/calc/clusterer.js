@@ -144,25 +144,24 @@ function zoomSpecialOverlayPixel (map, overlay) {
 }
 
 function showOverlays (options) {
-  const { map, overlays, scalcMap } = options
+  const { map, overlays, scaleMap } = options
   const zoom = map.getZoom()
   const zoomMap = {}
-  console.log(scalcMap)
-  for (const overlayType in scalcMap) {
-    const scale = scalcMap[overlayType]
+  for (const overlayType in scaleMap) {
+    const scale = scaleMap[overlayType]
     const idx = scaleSpecs.indexOf(scale)
     zoomMap[overlayType] = zoomSpecs[idx]
   }
-  console.log(zoomMap)
   overlays.map(oly => {
     let { type, projectGeoKey } = oly
     if (type.includes('special')) {
       type = 'special'
-    }
-    if (type === 'polyline') {
+    } else if (type === 'polyline') {
       type = projectGeoKey ? 'uploadPolyline' : type
+    } else if (['circle', 'rectangle', 'polygon'].includes(type)) {
+      type = 'polygon'
     }
-    if (zoomMap[type] >= zoom) {
+    if (zoom >= zoomMap[type]) {
       oly.show()
     } else {
       oly.hide()

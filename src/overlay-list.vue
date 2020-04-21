@@ -259,6 +259,7 @@
     & .grid {
       margin: 0 12px 12px;
       border: 1px solid #217091;
+      overflow: auto;
     }
     & .mu-bar {
       padding: 8px 12px;
