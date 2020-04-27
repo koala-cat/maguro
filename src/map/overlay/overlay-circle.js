@@ -25,7 +25,7 @@ class Circle extends BMap.Circle {
   }
 
   update (key, value) {
-    updateCircle(key, value, this.options)
+    updateCircle(key, value, this, this.options)
   }
 
   delete () {

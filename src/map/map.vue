@@ -168,11 +168,13 @@
       drawUploadLine (data) {
         drawUploadLine(data, this.$data)
       },
-      updateOverlay: debounce(function (key, value) {
+      updateOverlay: debounce(function (key, value, overlay) {
+        overlay = overlay || this.activeOverlay
+        console.log(overlay)
         try {
-          this.activeOverlay.update(key, value)
+          overlay.update(key, value)
         } catch {
-          updateOverlay(key, value, this.$data)
+          updateOverlay(key, value, this.$data, overlay)
         }
       }, 500),
       selectOverlay (overlay) {

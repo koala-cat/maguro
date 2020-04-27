@@ -22,6 +22,7 @@ class CustomSpecial {
     this.point = point
     this.polyline = polyline
     this.options = options
+    console.log(this.options.settings)
   }
 
   draw () {
@@ -34,9 +35,9 @@ class CustomSpecial {
       settings
     } = this.options
     Object.assign(
+      ...defaultSettings(legend.type),
       settings,
       {
-        ...defaultSettings(legend.type),
         type: legend?.value || '',
         iconUrl: legend.iconUrl,
         projectMapLegendId: legend.id
@@ -111,7 +112,7 @@ class CustomSpecial {
       {
         wPoint,
         wPixel,
-        parentId,
+        parentId: settings.parentId > 0 ? settings.parentId : parentId,
         parentLineId: this.polyline.id
       }
     )
@@ -294,7 +295,7 @@ class CustomSpecial {
             continue
           }
           if (key === 'points') {
-            updateSpecial(key, olys[i].getPath(), this.options)
+            updateSpecial(key, olys[i].getPath(), overlay, this.options)
           }
         }
       } else {

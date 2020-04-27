@@ -54,7 +54,7 @@ class Rectangle extends BMap.Polygon {
   }
 
   update (key, value) {
-    updateRectangle(key, value, this.options)
+    updateRectangle(key, value, this, this.options)
   }
 
   delete () {

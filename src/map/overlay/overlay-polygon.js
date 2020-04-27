@@ -25,7 +25,7 @@ class Polygon extends BMap.Polygon {
   }
 
   update (key, value) {
-    updatePolygon(key, value, this.options)
+    updatePolygon(key, value, this, this.options)
   }
 
   delete () {

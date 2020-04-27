@@ -52,16 +52,17 @@
             :key="item.id"
             :class="{active: item === overlay}"
             class="list-item"
-            align-items="center"
-            @click.native="onClickOverlay(item)">
+            align-items="center">
             <mu-flex-item
-              size="60px">
+              size="60px"
+              @click="onClickOverlay(item)">
               {{ i + 1 }}
             </mu-flex-item>
             <mu-flex-item
               size="auto"
               text-align="left"
-              style="width: 0;">
+              style="width: 0;"
+              @click="onClickOverlay(item)">
               <div
                 class="mu-text-ellipsis"
                 style="color: #fff;"
@@ -70,7 +71,8 @@
               </div>
               <div
                 class="mu-text-ellipsis"
-                :title="item.structureName">
+                :title="item.structureName"
+                @click="onClickOverlay(item)">
                 {{ item.structureName }}
               </div>
             </mu-flex-item>
@@ -85,15 +87,13 @@
               v-show="displayColumnVisible && item.type"
               size="60px">
               <mu-toggle
-                v-if="item.isCommand"
-                v-model="item.isDisplay"
-                @click.stop=""
-                @change="onChange(item, 'isDisplay')" />
+                v-if="item.isCommand === false"
+                v-model="item.isCommandDisplay"
+                @change="onChange(item, 'isCommandDisplay')" />
               <mu-toggle
                 v-else
-                v-model="item.isCommandDisplay"
-                @click.stop=""
-                @change="onChange(item, 'isCommandDisplay')" />
+                v-model="item.isDisplay"
+                @change="onChange(item, 'isDisplay')" />
             </mu-flex-item>
           </mu-h-box>
         </mu-v-box>
@@ -146,7 +146,7 @@
         const groupIds = []
         const result = []
         for (const oly of this.overlays) {
-          if (!oly.isCommand && !oly.isDisplay) continue
+          if (oly.isCommand === false && !oly.isDisplay) continue
 
           const {
             conditionDisplay,
@@ -218,8 +218,8 @@
           this.baiduMap.selectOverlay(oly)
         }
       },
-      onChange (item, key) {
-        this.baiduMap.updateOverlay(key, item[key])
+      onChange (overlay, key) {
+        this.baiduMap.updateOverlay(key, overlay[key], overlay)
       }
     }
   }

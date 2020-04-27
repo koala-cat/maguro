@@ -395,10 +395,12 @@
       },
       isDisplay: {
         get () {
-          return this.overlay.isCommand ? this.overlay.isDisplay : this.overlay.isCommandDisplay
+          const isCommand = this.overlay.isCommand
+          return isCommand === false ? this.overlay.isCommandDisplay : this.overlay.isDisplay
         },
         set (val) {
-          const key = this.overlay.isCommand ? 'isDisplay' : 'isCommandDisplay'
+          const isCommand = this.overlay.isCommand
+          const key = isCommand === false ? 'isCommandDisplay' : 'isDisplay'
           this.baiduMap.updateOverlay(key, val)
         }
       },

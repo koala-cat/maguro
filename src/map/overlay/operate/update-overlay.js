@@ -15,8 +15,8 @@ const ignoreFields = [
 ]
 let lineUpdate = null
 
-function showOverlay (key, value, options) {
-  const { overlays, activeOverlay: overlay } = options
+function showOverlay (key, value, overlay, options) {
+  const { overlays } = options
   const type = overlay.type
 
   let polylineVisible = true
@@ -39,6 +39,8 @@ function showOverlay (key, value, options) {
     data.push(...getPolylineIncludeSpecials(overlay, overlays))
   }
 
+  console.log(data)
+
   data.map(oly => {
     if (value && polylineVisible) {
       oly.show()
@@ -46,13 +48,12 @@ function showOverlay (key, value, options) {
       oly.hide()
       oly.disableEditing()
     }
-    updateOverlay(key, value, options, oly)
+    updateOverlay(key, value, oly, options)
   })
 }
 
-function updateOverlay (key, value, options, overlay) {
-  const { updateOverlays, polylinePointIds, activeOverlay } = options
-  overlay = overlay || activeOverlay
+function updateOverlay (key, value, overlay, options) {
+  const { updateOverlays, polylinePointIds } = options
   const { id, name, projectGeoKey, invented } = overlay
 
   overlay[key] = value
@@ -91,15 +92,12 @@ function updateOverlay (key, value, options, overlay) {
   )
 }
 
-function updateMarker (key, value, options) {
-  const { map, overlays, activeOverlay: overlay, settings } = options
-
+function updateMarker (key, value, overlay, options) {
+  const { map, overlays, settings } = options
   settings[key] = value
-  updateOverlay(key, value, options)
 
   if (ignoreFields.includes(key)) {
-    showOverlay(key, value, options)
-    return
+    showOverlay(key, value, overlay, options)
   }
 
   if (key !== 'projectMapLegendId' && overlay.svg) {
@@ -110,7 +108,6 @@ function updateMarker (key, value, options) {
     if (key === 'width') {
       overlay.setSize(value)
     }
-    return
   }
 
   if (['projectMapLegendId', 'width'].includes(key)) {
@@ -126,58 +123,55 @@ function updateMarker (key, value, options) {
       overlays.splice(index, 1, newOverlay)
     }
   }
+  updateOverlay(key, value, overlay, options)
 }
 
-function updatePolyline (key, value, options) {
-  const { activeOverlay: overlay, settings } = options
-
+function updatePolyline (key, value, overlay, options) {
+  const { settings } = options
   settings[key] = value
-  updateOverlay(key, value, options)
 
   if (ignoreFields.includes(key)) {
-    showOverlay(key, value, options)
-    return
+    showOverlay(key, value, overlay, options)
   }
 
   if (key !== 'points') {
     overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
   }
+
+  updateOverlay(key, value, overlay, options)
 }
 
-function updateCircle (key, value, options) {
-  updatePolyline(key, value, options)
+function updateCircle (key, value, overlay, options) {
+  updatePolyline(key, value, overlay, options)
 }
 
-function updateRectangle (key, value, options) {
-  updatePolyline(key, value, options)
+function updateRectangle (key, value, overlay, options) {
+  updatePolyline(key, value, overlay, options)
 }
 
-function updatePolygon (key, value, options) {
-  updatePolyline(key, value, options)
+function updatePolygon (key, value, overlay, options) {
+  updatePolyline(key, value, overlay, options)
 }
 
-function updateLabel (key, value, options) {
-  const { activeOverlay: overlay, settings } = options
-
+function updateLabel (key, value, overlay, options) {
+  const { settings } = options
   settings[key] = value
-  updateOverlay(key, value, options)
 
   if (key === 'name') {
     overlay.setContent(value, { key, value })
-    return
   }
 
   if (ignoreFields.includes(key)) {
-    showOverlay(key, value, options)
-    return
+    showOverlay(key, value, overlay, options)
   }
+  updateOverlay(key, value, options)
 
   const style = settingsToStyle({ [key]: value }, 'label')
   overlay.setStyle(style)
 }
 
-function updateSpecial (key, value, options) {
-  updateOverlay(key, value, options)
+function updateSpecial (key, value, overlay, options) {
+  updateOverlay(key, value, overlay, options)
 }
 
 function onLineupdate (e) {
@@ -204,6 +198,5 @@ export {
   updatePolygon,
   updateLabel,
   updateSpecial,
-  showOverlay,
   onLineupdate
 }

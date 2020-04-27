@@ -174,6 +174,7 @@ function drawingOverlay (settings = {}, options, callback) {
   function polylineComplete (line) {
     const points = line.getPath()
     const newLine = drawPolyline(points, options)
+    console.log(newLine)
     drawNewOverlay(line, newLine)
   }
 

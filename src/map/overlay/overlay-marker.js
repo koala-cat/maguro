@@ -33,7 +33,7 @@ class Marker extends BMap.Marker {
   }
 
   update (key, value) {
-    updateMarker(key, value, this.options)
+    updateMarker(key, value, this, this.options)
   }
 
   delete () {

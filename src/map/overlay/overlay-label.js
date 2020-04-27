@@ -26,7 +26,7 @@ class Label extends BMap.Label {
   }
 
   update (key, value) {
-    updateLabel(key, value, this.options)
+    updateLabel(key, value, this, this.options)
   }
 
   delete () {

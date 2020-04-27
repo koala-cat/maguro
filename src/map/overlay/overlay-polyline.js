@@ -32,7 +32,7 @@ class Polyline extends BMap.Polyline {
   }
 
   update (key, value) {
-    updatePolyline(key, value, this.options)
+    updatePolyline(key, value, this, this.options)
   }
 
   delete () {

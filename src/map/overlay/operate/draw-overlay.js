@@ -183,12 +183,10 @@ function drawUploadLine (data, options) {
     centers.push(item.center)
     mPoints.push(new BMap.Point(item.lng, item.lat))
   })
-  console.log(mPoints)
   drawPolyline(mPoints, options)
 }
 
 function drawHotspot (overlay, options) {
-  console.log(overlay.hotspotMark)
   const el = document.querySelector(`#${overlay.hotspotMark}`)
   const hotspot = new Hotspot(el)
   return setOverlay(hotspot, options)
