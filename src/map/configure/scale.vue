@@ -6,7 +6,8 @@
   </div>
 </template>
 <script>
-  import { scaleSpecs, zoomSpecs } from '../../constants'
+  import cloneDeep from 'lodash.clonedeep'
+  import { scaleSpecs } from '../../constants'
 
   export default {
     inject: ['baiduMap'],
@@ -18,9 +19,11 @@
         return this.baiduMap.configureVisible
       },
       activeScale () {
-        const zoom = this.map ? this.map.getZoom() : null
-        const idx = zoomSpecs.indexOf(zoom)
-        return `比例尺：${scaleSpecs[idx]}`
+        const scales = cloneDeep(scaleSpecs)
+        scales.push('500km', '1000km', '2000km', '5000km', '10000km')
+        scales.reverse()
+        const zoom = this.map ? this.map.getZoom() : 13
+        return `比例尺：${scales[zoom - 1]}`
       }
     }
   }

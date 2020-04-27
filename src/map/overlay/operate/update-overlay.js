@@ -2,7 +2,7 @@ import BMap from 'BMap'
 
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 
-import { addOverlay } from './add-overlay'
+import { addAndSelectOverlay } from './add-overlay'
 import { setOverlaySettings, settingsToStyle } from '../setting'
 
 const ignoreFields = [
@@ -122,7 +122,7 @@ function updateMarker (key, value, options) {
       const newOverlay = overlay.redraw(options)
       map.removeOverlay(overlay)
       setOverlaySettings(newOverlay, settings)
-      addOverlay(newOverlay, options)
+      addAndSelectOverlay(newOverlay, options)
       overlays.splice(index, 1, newOverlay)
     }
   }

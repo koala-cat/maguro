@@ -29,7 +29,6 @@ function multipleOverlays (e, overlay, options) {
   // const mac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
   const modKey = e?.ctrlKey || false
   const type = overlay.type
-
   if (!modKey) {
     deselectOverlays(options)
   }

@@ -7,6 +7,8 @@ class CustomSvg extends CustomOverlay {
     super()
     this.point = point
     this.options = options
+
+    this._errorCount = 16
   }
 
   initialize () {
@@ -71,8 +73,8 @@ class CustomSvg extends CustomOverlay {
     const entry = calcOnePixelToPoint(map)
     const { lng, lat } = this.point
 
-    const dLng = entry.lng * width / 2
-    const dLat = entry.lat * height / 2
+    const dLng = entry.lng * (width + this._errorCount) / 2
+    const dLat = entry.lat * (height + this._errorCount) / 2
     const sw = new BMap.Point(lng - dLng, lat - dLat)
     const ne = new BMap.Point(lng + dLng, lat + dLat)
     this.bounds = new BMap.Bounds(sw, ne)
@@ -81,18 +83,15 @@ class CustomSvg extends CustomOverlay {
   }
 
   setBounds () {
-    const precision = 0.1
     const { map } = this.options
     const sw = this.bounds.getSouthWest()
     const ne = this.bounds.getNorthEast()
-    const _sw = new BMap.Point(sw.lng + precision, sw.lat + precision)
-    const _ne = new BMap.Point(ne.lng - precision, ne.lat - precision)
 
-    const pixelSw = map.pointToOverlayPixel(_sw)
-    const pixelNe = map.pointToOverlayPixel(_ne)
+    const pixelSw = map.pointToOverlayPixel(sw)
+    const pixelNe = map.pointToOverlayPixel(ne)
 
-    const width = Math.abs(pixelNe.x - pixelSw.x)
-    const height = Math.abs(pixelNe.y - pixelSw.y)
+    const width = Math.abs(pixelNe.x - pixelSw.x - this._errorCount / 2)
+    const height = Math.abs(pixelNe.y - pixelSw.y - this._errorCount / 2)
     Object.assign(
       this.div.querySelector('svg').style,
       {

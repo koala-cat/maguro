@@ -15,16 +15,18 @@
   import cloneDeep from 'lodash.clonedeep'
   import debounce from 'lodash.debounce'
   import { notify } from 'mussel'
-  import { modes, defaultScaleMap } from '../constants'
+  import { modes } from '../constants'
+
+  import CustomSvg from '../map/overlay/overlay-svg'
+  import { getOverlaySettings } from '../map/overlay/setting.js'
+
+  import { drawUploadLine } from './overlay/operate/draw-overlay.js'
+  import { startDrawing } from './overlay/operate/drawing-overlay'
+  import { getSaveData } from './overlay/operate/save-overlay'
+  import { selectOverlay } from './overlay/operate/select-overlay'
+  import { updateOverlay } from './overlay/operate/update-overlay.js'
 
   import MapMixin from './map'
-  import CustomSvg from '../map/overlay/overlay-svg'
-  import { addOverlay } from '../map/overlay/operate/add-overlay'
-  import { getSaveData } from '../map/overlay/operate/save-overlay'
-  import { selectOverlay } from '../map/overlay/operate/select-overlay'
-
-  import { startDrawing } from './overlay/operate/drawing-overlay'
-
   import Mode from './configure/mode.vue'
   import Scale from './configure/scale.vue'
 
@@ -40,6 +42,10 @@
     },
     mixins: [MapMixin],
     props: {
+      mapZoomSettings: {
+        type: Object,
+        default: () => ({})
+      },
       mapType: {
         type: String,
         default: 'normal'
@@ -69,6 +75,7 @@
       return {
         map: null,
         drawingManager: null,
+        zoomSettings: {},
         events: this.mapEvents,
         legends: this.mapLegends,
         overlays: [],
@@ -87,8 +94,7 @@
         markerPositions: [],
         id: -1,
         parentId: -1,
-        view: true,
-        scaleMap: defaultScaleMap
+        view: true
       }
     },
     computed: {
@@ -100,6 +106,9 @@
       }
     },
     watch: {
+      mapZoomSettings (val) {
+        this.zoomSettings = val
+      },
       mapOverlays () {
         this.overlays = cloneDeep(this.mapOverlays)
         this.bindOverlayEvents()
@@ -123,19 +132,29 @@
       this.init()
     },
     methods: {
+      drawSvg (point, options) {
+        const overlay = new CustomSvg(point, options)
+        return overlay
+      },
       setMapType (val) {
-        this.$emit('set', val)
+        this.$emit('setMapMode', val)
+      },
+      setMapZoomSettings (key, value) {
+        this.$emit('setMapZoomSettings', key, value)
+      },
+      getOverlaySettings (overlay) {
+        return getOverlaySettings(overlay)
+      },
+      addLegend () {
+        this.$emit('addLegend')
+      },
+      removeLegend (legend) {
+        this.$emit('removeLegend', legend)
       },
       switchOverlayWindow (key) {
         this.activeLegend = null
         this[key] = !this[key]
       },
-      // addLegend (legend) {
-      //   this.$emit('addLegend', legend)
-      // },
-      // removeLegend (legend) {
-      //   this.$emit('removeLegend', legend)
-      // },
       selectLegend (legend) {
         if (this.overlayListVisible) {
           this.overlayListVisible = false
@@ -146,13 +165,22 @@
           startDrawing(this.$data)
         }
       },
-      setOverlayScale (key, value) {
-        this.$emit('setOverlayScale', key, value)
+      drawUploadLine (data) {
+        drawUploadLine(data, this.$data)
       },
       updateOverlay: debounce(function (key, value) {
-        this.activeOverlay.update(key, value)
+        try {
+          this.activeOverlay.update(key, value)
+        } catch {
+          updateOverlay(key, value, this.$data)
+        }
       }, 500),
       selectOverlay (overlay) {
+        if (!(overlay instanceof BMap.Overlay)) {
+          selectOverlay(null, overlay, this.$data)
+          return
+        }
+
         let points = null
         const type = overlay.type
 
@@ -176,13 +204,6 @@
         } else {
           notify('info', '没有需要修改的信息。')
         }
-      },
-      drawSvg (point, options) {
-        const overlay = new CustomSvg(point, options)
-        return overlay
-      },
-      addOverlay (overlay) {
-        addOverlay(overlay, this.$data)
       }
     }
   }

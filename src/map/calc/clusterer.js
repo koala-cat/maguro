@@ -144,11 +144,14 @@ function zoomSpecialOverlayPixel (map, overlay) {
 }
 
 function showOverlays (options) {
-  const { map, overlays, scaleMap } = options
+  const { map, mapType, overlays, zoomSettings } = options
   const zoom = map.getZoom()
   const zoomMap = {}
-  for (const overlayType in scaleMap) {
-    const scale = scaleMap[overlayType]
+
+  if (mapType === 'graphic') return
+
+  for (const overlayType in zoomSettings) {
+    const scale = zoomSettings[overlayType]
     const idx = scaleSpecs.indexOf(scale)
     zoomMap[overlayType] = zoomSpecs[idx]
   }

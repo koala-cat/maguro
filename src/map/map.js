@@ -5,7 +5,7 @@ import CustomSpecial from './overlay/overlay-special'
 
 import { showOverlays } from './calc/clusterer'
 import { getSpecialAttachPolyline } from './calc/overlay'
-import { getOverlaySettings, setOverlaySettings } from './overlay/setting'
+import { getOverlaySettings } from './overlay/setting'
 import { getLegend, getLegendType } from './overlay/legend'
 
 import { drawOverlay } from './overlay/operate/draw-overlay'
@@ -40,7 +40,7 @@ export default {
       document.addEventListener('keydown', (e) => {
         e = e || window.event
         const keyCode = e.keyCode || e.which || e.charCode
-        if (keyCode === 17) { // Delete 46
+        if (keyCode === 46) { // Delete 46
           overlays.map(oly => {
             oly.delete()
           })
@@ -67,55 +67,22 @@ export default {
       const wholePoints = []
 
       this.clearOverlays()
-      this.overlays = []
+      this.overlays.splice(0)
       this.specialOverlays = {}
 
       for (const oly of overlays) {
         const legend = getLegend(this.legends, oly)
-        const type = oly.type = getLegendType(legend)
-        const { id, projectGeoKey, points } = oly
-        const mPoints = []
-
-        if (projectGeoKey && points) {
-          this.polylinePointIds[id] = points.map(point => { return point.id })
-        }
-
-        try {
-          points.map(p => {
-            p = new BMap.Point(p.longitude, p.latitude)
-            mPoints.push(p)
-            if (oly.visible) wholePoints.push(p)
-          })
-          if (type.includes('special')) {
-            const key = oly.parentId > 0 ? oly.parentId : oly.id
-            oly.points = mPoints
-
-            if (!this.specialOverlays[key]) this.specialOverlays[key] = []
-            this.specialOverlays[key].push(oly)
-
-            continue
-          }
-
-          this.$data.settings = {
-            ...getOverlaySettings(oly),
-            type
-          }
-          const overlay = drawOverlay(oly, mPoints, this.$data)
-          overlay.hide()
-          setOverlaySettings(overlay, this.$data.settings)
-          addOverlay(overlay, this.$data)
-          deselectOverlays(this.$data)
-        } catch {
-          continue
-        }
+        oly.type = getLegendType(legend)
+        this.setOverlay(oly, wholePoints)
       }
       this.initSpecialOverlays()
 
-      if (this.view) {
+      if (this.view && this.mapType !== 'graphic') {
         const viewPort = this.map.getViewport(wholePoints)
         this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+      } else {
+        showOverlays(this.$data)
       }
-      showOverlays(this.$data)
     },
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
@@ -138,10 +105,46 @@ export default {
         deselectOverlays(this.$data)
       }
     },
+    setOverlay (oly, wholePoints) {
+      const { id, type = '', projectGeoKey, points } = oly
+      const mPoints = []
+
+      if (projectGeoKey && points) {
+        this.polylinePointIds[id] = points.map(point => { return point.id })
+      }
+
+      try {
+        points.map(p => {
+          p = new BMap.Point(p.longitude, p.latitude)
+          mPoints.push(p)
+          if (oly.visible) wholePoints.push(p)
+        })
+        if (type.includes('special')) {
+          const key = oly.parentId > 0 ? oly.parentId : oly.id
+          oly.points = mPoints
+
+          if (!this.specialOverlays[key]) this.specialOverlays[key] = []
+          this.specialOverlays[key].push(oly)
+
+          return
+        }
+
+        this.$data.settings = {
+          ...getOverlaySettings(oly),
+          type
+        }
+        const overlay = drawOverlay(oly, mPoints, this.$data)
+        if (this.mapType !== 'graphic') overlay.hide()
+
+        addOverlay(overlay, this.$data)
+      } catch (err) {
+        console.log(err)
+      }
+    },
     clearOverlays () {
       const overlays = this.map.getOverlays()
       overlays.map(oly => {
-        if (!(oly instanceof BMap.GroundOverlay)) {
+        if (oly.type) {
           this.map.removeOverlay(oly)
         }
       })

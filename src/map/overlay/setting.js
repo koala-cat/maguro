@@ -27,6 +27,8 @@ function defaultSettings (type) {
     isLocked: false,
     isDisplay: true,
     isCommandDisplay: true,
+    hotspotMark: '',
+    remark: '',
     visible: true,
     disabled: false
   }

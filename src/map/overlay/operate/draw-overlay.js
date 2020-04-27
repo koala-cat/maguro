@@ -2,6 +2,8 @@ import BMap from 'BMap'
 
 import { addEvents } from '../event'
 import { getLegend, getLegendType } from '../legend'
+import { defaultSettings, setOverlaySettings } from '../setting'
+import { addOverlay } from './add-overlay'
 
 import Marker from '../overlay-marker'
 import CustomSvg from '../overlay-svg'
@@ -10,6 +12,7 @@ import Circle from '../overlay-circle'
 import Rectangle from '../overlay-rectangle'
 import Polygon from '../overlay-polygon'
 import Label from '../overlay-label'
+import Hotspot from '../overlay-hotspot'
 
 function drawOverlay (overlay, points, options) {
   const { legends, settings } = options
@@ -17,20 +20,25 @@ function drawOverlay (overlay, points, options) {
   const type = getLegendType(legend)
 
   let newOverlay = null
-  if (type === 'marker') {
-    Object.assign(settings, { iconUrl: legend.iconUrl })
-    newOverlay = drawMarker(points[0], options)
-  } else if (type === 'polyline') {
-    newOverlay = drawPolyline(points, options)
-  } else if (type === 'circle') {
-    newOverlay = drawCircle(points[0], overlay.width, options)
-  } else if (type === 'rectangle') {
-    newOverlay = drawRectangle(points, options)
-  } else if (type === 'polygon') {
-    newOverlay = drawPolygon(points, options)
-  } else if (type === 'label') {
-    newOverlay = drawLabel(points[0], options)
+  if (!type) {
+    newOverlay = drawHotspot(overlay, options)
+  } else {
+    if (type === 'marker') {
+      Object.assign(settings, { iconUrl: legend.iconUrl })
+      newOverlay = drawMarker(points[0], options)
+    } else if (type === 'polyline') {
+      newOverlay = drawPolyline(points, options)
+    } else if (type === 'circle') {
+      newOverlay = drawCircle(points[0], overlay.width, options)
+    } else if (type === 'rectangle') {
+      newOverlay = drawRectangle(points, options)
+    } else if (type === 'polygon') {
+      newOverlay = drawPolygon(points, options)
+    } else if (type === 'label') {
+      newOverlay = drawLabel(points[0], options)
+    }
   }
+  setOverlaySettings(newOverlay, settings)
   return newOverlay
 }
 
@@ -148,6 +156,44 @@ function drawLabel (point, options) {
   return setOverlay(label, options)
 }
 
+function drawUploadLine (data, options) {
+  const centers = []
+  const legend = options.legends.find(item => item.value === 'solid')
+
+  Object.assign(
+    options,
+    {
+      settings: {
+        ...defaultSettings(legend.type),
+        name: data.name,
+        projectMapLegendId: legend.id,
+        projectGeoKey: -1
+      },
+      callback: (oly) => {
+        setOverlaySettings(oly, options.settings)
+        oly.centers = centers
+        oly.type = legend.type
+        addOverlay(oly, options)
+      }
+    }
+  )
+
+  const mPoints = []
+  data.points.map(item => {
+    centers.push(item.center)
+    mPoints.push(new BMap.Point(item.lng, item.lat))
+  })
+  console.log(mPoints)
+  drawPolyline(mPoints, options)
+}
+
+function drawHotspot (overlay, options) {
+  console.log(overlay.hotspotMark)
+  const el = document.querySelector(`#${overlay.hotspotMark}`)
+  const hotspot = new Hotspot(el)
+  return setOverlay(hotspot, options)
+}
+
 function setOverlay (overlay, options) {
   const { events, callback } = options
 
@@ -164,5 +210,6 @@ export {
   drawCircle,
   drawRectangle,
   drawPolygon,
-  drawLabel
+  drawLabel,
+  drawUploadLine
 }

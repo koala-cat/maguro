@@ -10,7 +10,8 @@
         @click="onClickOverlayWindow" />
     </mu-icon-button>
     <mu-v-box
-      v-show="overlayListVisible">
+      v-show="overlayListVisible"
+      class="list">
       <mu-bar style="border-bottom: 1px solid #a5a5a5;">
         {{ title || '元件列表' }}
       </mu-bar>
@@ -81,7 +82,7 @@
               {{ item.orgName }}
             </mu-flex-item>
             <mu-flex-item
-              v-show="displayColumnVisible"
+              v-show="displayColumnVisible && item.type"
               size="60px">
               <mu-toggle
                 v-if="item.isCommand"
@@ -188,6 +189,13 @@
         ]
       }
     },
+    mounted () {
+      this.$nextTick(() => {
+        const el = document.querySelector('.overlay-toolkit > :first-child')
+        const listEl = document.querySelector('.overlay-list > :last-child')
+        Object.assign(listEl.style, { height: `${el.clientHeight + 52}px` })
+      })
+    },
     methods: {
       getDisplay (oly) {
         const display = oly.isCommand ? oly.isDisplay : oly.isCommandDisplay
@@ -245,7 +253,6 @@
   .overlay-list > :last-child {
     position: absolute !important;
     width: 300px;
-    height: 292px;
     top: 52px;
     left: 64px;
     background: $bgColorLight;

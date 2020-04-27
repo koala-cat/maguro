@@ -1,7 +1,7 @@
 import BMap from 'BMap'
 import BMapLib from 'BMapLib'
 
-import { addOverlay } from './add-overlay'
+import { addAndSelectOverlay } from './add-overlay'
 import { deleteAnchorOverlays } from './delete-overlay'
 import { deselectOverlays, deselectLegend } from './deselect-overlay'
 import { drawMarker, drawPolyline, drawCircle, drawRectangle, drawPolygon, drawLabel } from './draw-overlay'
@@ -87,7 +87,7 @@ function startDrawing (options) {
   } else if (type !== 'special') {
     deleteAnchorOverlays(options)
     drawingOverlay(settings, options, (newOverlay) => {
-      addOverlay(newOverlay, options)
+      addAndSelectOverlay(newOverlay, options)
     })
   }
 }
@@ -173,7 +173,6 @@ function drawingOverlay (settings = {}, options, callback) {
 
   function polylineComplete (line) {
     const points = line.getPath()
-    console.log(points)
     const newLine = drawPolyline(points, options)
     drawNewOverlay(line, newLine)
   }

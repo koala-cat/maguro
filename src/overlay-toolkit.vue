@@ -9,6 +9,7 @@
         size="auto">
         <mu-list-item
           v-for="tool in tools"
+          v-show="getVisible(tool)"
           :key="tool.value"
           :title="tool.label"
           :class="{ active: activeToolType === tool.value }"
@@ -22,7 +23,6 @@
     <mu-h-box
       v-show="subTools.length > 0"
       ref="tool"
-      flex-wrap
       :style="style">
       <mu-h-box v-if="activeToolType==='scale'">
         <mu-form
@@ -42,7 +42,7 @@
               :svg="getPath(tool.value)"
               style="width: 40px; font-size: 18px; fill: #ffffff;" />
             <mu-combo-box
-              v-model="scaleMap[tool.value]"
+              v-model="zoomSettings[tool.value]"
               :options="scaleSpecs"
               :clearable="false"
               :popup-render-to-body="false"
@@ -51,14 +51,15 @@
           </mu-form-field>
         </mu-form>
       </mu-h-box>
-      <mu-h-box v-else>
+      <mu-h-box
+        v-else
+        flex-wrap>
         <a
           v-for="tool in subTools"
           :key="tool.id"
-          :style="getLegendStyle(tool)">
-          <span
-            v-if="tool.value === 'create'"
-            @click="uploadLegend">+</span>
+          :style="getLegendStyle(tool)"
+          @click="uploadLegend(tool)">
+          <span v-if="tool.value === 'create'">+</span>
           <img
             v-else
             :src="tool.iconUrl"
@@ -70,11 +71,11 @@
             @click.stop="removeLegend(tool)" />
         </a>
       </mu-h-box>
-      <input
+      <!-- <input
         ref="fileSelector"
         type="file"
         accept=".png,.jpeg,.jpg,.svg"
-        style="display: none;">
+        style="display: none;"> -->
     </mu-h-box>
   </mu-v-box>
 </template>
@@ -85,6 +86,15 @@
   export default {
     inject: ['baiduMap'],
     computed: {
+      mapType () {
+        return this.baiduMap.mapType
+      },
+      graphicMode () {
+        return this.mapType === 'graphic'
+      },
+      hiddenToolkits () {
+        return ['special', 'scale']
+      },
       legends () {
         return this.baiduMap.legends
       },
@@ -98,8 +108,8 @@
         })
         return map
       },
-      scaleMap () {
-        return this.baiduMap.scaleMap
+      zoomSettings () {
+        return this.baiduMap.zoomSettings
       },
       activeTool () {
         return this.baiduMap.activeLegend
@@ -109,7 +119,7 @@
       },
       style () {
         return this.activeToolType === 'scale'
-          ? 'width: 408px; padding: 8px 0; overflow: visible;'
+          ? 'width: 432px; padding: 8px 0; overflow: visible;'
           : ''
       },
       subTools () {
@@ -132,6 +142,9 @@
       }
     },
     methods: {
+      getVisible (tool) {
+        return !this.graphicMode || (this.graphicMode && !this.hiddenToolkits.includes(tool.value))
+      },
       getLegendStyle (tool) {
         return this.activeTool === tool && tool.value !== 'create'
           ? 'border: 1px solid #1890ff'
@@ -169,16 +182,14 @@
         this.baiduMap.selectLegend(legend)
       },
       onComboBoxSelect (key) {
-        this.baiduMap.setOverlayScale(key, this.scaleMap[key])
+        this.baiduMap.setMapZoomSettings(key, this.zoomSettings[key])
       },
       removeLegend (legend) {
         this.baiduMap.removeLegend(legend)
       },
-      uploadLegend (legend) {
-        this.$refs.fileSelector.click()
-        this.$refs.fileSelector.addEventListener('change', (e) => {
-          this.baiduMap.addLegend(e)
-        })
+      uploadLegend (tool) {
+        if (tool.value !== 'create') return
+        this.baiduMap.addLegend()
       }
     }
   }

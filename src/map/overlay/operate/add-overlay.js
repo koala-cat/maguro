@@ -8,7 +8,6 @@ function addOverlay (data, options) {
     overlay = data
     data = [data]
   }
-
   deselectOverlays(options)
 
   for (const oly of data) {
@@ -26,14 +25,20 @@ function addOverlay (data, options) {
     if (oly.invented) overlay = oly
     map.addOverlay(oly)
     overlays.push(oly)
-    selectedOverlays.push(oly)
+    if (type) selectedOverlays.push(oly)
   }
+  return overlay
+}
+
+function addAndSelectOverlay (data, options) {
+  const overlay = addOverlay(data, options)
   overlay.enableEditing()
   overlay.drag()
-  options.activeOverlay = selectedOverlays[0]
+  options.activeOverlay = options.selectedOverlays[0]
   return overlay
 }
 
 export {
-  addOverlay
+  addOverlay,
+  addAndSelectOverlay
 }

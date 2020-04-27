@@ -14,7 +14,8 @@ class Polyline extends BMap.Polyline {
 
   enableEditing () {
     const { overlays } = this.options
-    if (getPolylineIncludeSpecials(this, overlays).length === 0) {
+    if (getPolylineIncludeSpecials(this, overlays).length === 0 &&
+      !this.projectGeoKey) {
       this.addEventListener('lineupdate', onLineupdate)
       super.enableEditing()
     }
@@ -26,6 +27,7 @@ class Polyline extends BMap.Polyline {
   }
 
   drag () {
+    if (this.projectGeoKey) return
     dragOverlay(this, this.options)
   }
 

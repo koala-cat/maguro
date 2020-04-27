@@ -181,12 +181,14 @@
             <mu-flex-item>px</mu-flex-item>
           </mu-form-field>
           <mu-form-field
+            v-show="lockVisible"
             label="锁定">
             <mu-toggle
               v-model="isLocked"
               :disabled="disabled" />
           </mu-form-field>
           <mu-form-field
+            v-show="displayVisible"
             label="显示">
             <mu-toggle v-model="isDisplay" />
           </mu-form-field>
@@ -293,13 +295,13 @@
         return ['polygon'].includes(type) || svgMarker
       },
       strokeFieldVisible () {
-        return !['marker', 'label'].includes(this.overlay.type)
+        return !['marker', 'label', 'hotspot'].includes(this.overlay.type)
       },
       fontFieldVisible () {
         return this.overlay.type === 'label'
       },
       lockVisible () {
-        return this.overlay.type !== 'hotSpot'
+        return this.overlay.type !== 'hotspot'
       },
       displayVisible () {
         return this.lockVisible
