@@ -188,7 +188,7 @@ function drawUploadLine (data, options) {
 
 function drawHotspot (overlay, options) {
   const el = document.querySelector(`#${overlay.hotspotMark}`)
-  const hotspot = new Hotspot(el)
+  const hotspot = new Hotspot(el, options)
   return setOverlay(hotspot, options)
 }
 

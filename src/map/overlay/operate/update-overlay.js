@@ -174,6 +174,11 @@ function updateSpecial (key, value, overlay, options) {
   updateOverlay(key, value, overlay, options)
 }
 
+function updateHotspot (key, value, overlay, options) {
+  console.log(options)
+  updateOverlay(key, value, overlay, options)
+}
+
 function onLineupdate (e) {
   const overlay = e instanceof BMap.Overlay ? e : e.target
 
@@ -198,5 +203,6 @@ export {
   updatePolygon,
   updateLabel,
   updateSpecial,
+  updateHotspot,
   onLineupdate
 }

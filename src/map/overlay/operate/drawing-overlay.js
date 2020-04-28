@@ -1,5 +1,6 @@
 import BMap from 'BMap'
 import BMapLib from 'BMapLib'
+import { notify } from 'mussel'
 
 import { addAndSelectOverlay } from './add-overlay'
 import { deleteAnchorOverlays } from './delete-overlay'
@@ -122,6 +123,7 @@ function drawingOverlay (settings = {}, options, callback) {
 
   if (type === 'label') {
     const click = (e) => {
+      console.log(2)
       e.stopPropagation()
 
       const label = drawLabel(e.point, options)

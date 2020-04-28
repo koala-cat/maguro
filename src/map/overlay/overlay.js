@@ -25,7 +25,7 @@ class CustomOverlay extends BMap.Overlay {
     }
     const newOverlay = this.draw(point, false, settings, events)
     this.options.newOverlay = newOverlay
-    updateMarker(key, value, this.options)
+    updateMarker(key, value, this, this.options)
   }
 
   delete () {

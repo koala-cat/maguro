@@ -1,18 +1,23 @@
 import BMap from 'BMap'
+import { notify } from 'mussel'
 import clonedeep from 'lodash.clonedeep'
+import debounce from 'lodash.debounce'
 
+import CustomSvg from '../map/overlay/overlay-svg'
 import CustomSpecial from './overlay/overlay-special'
 
 import { showOverlays } from './calc/clusterer'
+import { isPointInRect } from './calc/geo'
 import { getSpecialAttachPolyline } from './calc/overlay'
 import { getOverlaySettings } from './overlay/setting'
 import { getLegend, getLegendType } from './overlay/legend'
 
-import { drawOverlay } from './overlay/operate/draw-overlay'
-import { initDrawing, breakDrawing } from './overlay/operate/drawing-overlay'
+import { addOverlay } from './overlay/operate/add-overlay'
+import { drawOverlay, drawUploadLine } from './overlay/operate/draw-overlay'
+import { initDrawing, breakDrawing, startDrawing, endDrawing } from './overlay/operate/drawing-overlay'
 import { deselectOverlays } from './overlay/operate/deselect-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
-import { addOverlay } from './overlay/operate/add-overlay'
+import { getSaveData } from './overlay/operate/save-overlay'
 
 export default {
   methods: {
@@ -48,6 +53,13 @@ export default {
 
         if (keyCode === 27) { // Escape
           breakDrawing(this.$data)
+        }
+      })
+      document.addEventListener('mousedown', (e) => {
+        if (!e.point || !(this.areaRestriction instanceof BMap.Bounds)) return
+        if (!isPointInRect(e.point, this.areaRestriction)) {
+          endDrawing(this.$data)
+          notify('warning', '请在有效区域内绘制。')
         }
       })
     },
@@ -148,6 +160,89 @@ export default {
           this.map.removeOverlay(oly)
         }
       })
+    },
+    restoreToolkit () {
+      this.switchOverlayWindow('overlayListVisible')
+      this.overlayListVisible = false
+    },
+
+    drawSvg (point, options) {
+      const overlay = new CustomSvg(point, options)
+      return overlay
+    },
+    setMapType (val) {
+      this.$emit('setMapMode', val)
+    },
+    setMapZoomSettings (key, value) {
+      this.$emit('setMapZoomSettings', key, value, () => {
+        showOverlays(this.$data)
+      })
+    },
+    getOverlaySettings (overlay) {
+      return getOverlaySettings(overlay)
+    },
+    addLegend () {
+      this.$emit('addLegend')
+    },
+    removeLegend (legend) {
+      this.$emit('removeLegend', legend)
+    },
+    switchOverlayWindow (key) {
+      this.activeLegend = null
+      this[key] = !this[key]
+    },
+    selectLegend (legend) {
+      if (this.overlayListVisible) {
+        this.overlayListVisible = false
+      }
+
+      this.activeLegend = legend
+      if (legend.value !== 'scale') {
+        startDrawing(this.$data)
+      }
+    },
+    drawUploadLine (data) {
+      drawUploadLine(data, this.$data)
+    },
+    updateOverlay: debounce(function (key, value, overlay) {
+      overlay = overlay || this.activeOverlay
+      try {
+        overlay.update(key, value)
+      } catch (err) {
+        console.log(err)
+      }
+    }, 500),
+    selectOverlay (overlay) {
+      if (!(overlay instanceof BMap.Overlay)) {
+        selectOverlay(null, overlay, this.$data)
+        return
+      }
+
+      let points = null
+      const type = overlay.type
+
+      try {
+        points = overlay.getPath()
+      } catch {
+        points = [overlay.getPosition()]
+      }
+
+      if (type.includes('special')) {
+        overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
+      }
+      selectOverlay(null, overlay, this.$data)
+      const viewPort = this.map.getViewport(points)
+      this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+    },
+    saveOverlays () {
+      const result = getSaveData(this.$data)
+      if (result) {
+        this.$emit('save', result, () => {
+          notify('success', '保存成功。')
+        })
+      } else {
+        notify('info', '没有需要修改的信息。')
+      }
     }
   }
 }

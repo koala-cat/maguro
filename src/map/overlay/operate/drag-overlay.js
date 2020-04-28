@@ -3,11 +3,16 @@ import cloneDeep from 'lodash.clonedeep'
 import { notify } from 'mussel'
 
 import { calcRectAllPoints } from '../../calc/point'
+import { isPointInRect } from '../../calc/geo'
 import { calcMarkerOnLinePosition } from '../../calc/position'
 import { getPolylineIncludeSpecials, getSpecialAttachPolyline } from '../../calc/overlay'
 
 let startPoint = null
 let startPixel = null
+let movePixel = null
+let movePoint = null
+let mapEl = null
+let mapRect = null
 
 function dragOverlay (overlay, options, callback) {
   if (overlay.type.includes('rectangle')) {
@@ -19,6 +24,8 @@ function dragOverlay (overlay, options, callback) {
     return
   }
   if (overlay.bindEvent) return
+  mapEl = document.querySelector('#map')
+  mapRect = mapEl.getBoundingClientRect()
 
   const start = (e) => {
     dragStart(e, options)
@@ -42,20 +49,29 @@ function dragOverlay (overlay, options, callback) {
 
 function dragStart (e, options) {
   const { map } = options
+  const { top, left } = mapRect
   try {
     e.domEvent.stopPropagation()
   } catch {
     e.stopPropagation()
   }
-  startPixel = { x: e.clientX, y: e.clientY }
-  startPoint = map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
+  const x = e.clientX - left
+  const y = e.clientY - top
+  startPixel = { x, y }
+  startPoint = map.pixelToPoint(new BMap.Pixel(x, y))
 }
 
 function dragMove (e, options) {
   e.stopPropagation()
-  const { map, overlays, selectedOverlays } = options
-  const movePixel = { x: e.clientX, y: e.clientY }
-  const movePoint = map.pixelToPoint(new BMap.Pixel(e.clientX, e.clientY))
+  const { map, areaRestriction, overlays, selectedOverlays } = options
+  const { top, left } = mapRect
+  const x = e.clientX - left
+  const y = e.clientY - top
+
+  movePixel = { x, y }
+  movePoint = map.pixelToPoint(new BMap.Pixel(x, y))
+
+  if (!isInAreaRestriction(movePoint, areaRestriction)) return
 
   const dx = movePixel.x - startPixel.x
   const dy = movePixel.y - startPixel.y
@@ -63,6 +79,7 @@ function dragMove (e, options) {
   const dlat = movePoint.lat - startPoint.lat
 
   if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return
+
   for (let i = 0; i < selectedOverlays.length; i++) {
     const oly = selectedOverlays[i]
     const type = oly.type
@@ -74,12 +91,10 @@ function dragMove (e, options) {
     if (['marker', 'label'].includes(type)) {
       const point = oly.getPosition()
       const mPoint = getPoint(point, dlng, dlat)
-
       oly.setPosition(mPoint)
     } else if (['circle'].includes(type)) {
       const point = oly.getCenter()
       const mPoint = getPoint(point, dlng, dlat)
-
       oly.setCenter(new BMap.Point(mPoint.lng, mPoint.lat))
     } else {
       setPath(oly, dlng, dlat)
@@ -201,11 +216,18 @@ function getPoint (point, dlng, dlat) {
 function setPath (oly, dlng, dlat) {
   const points = oly.getPath()
   const newPoints = []
-  points.map(point => {
+  for (const point of points) {
     const mPoint = getPoint(point, dlng, dlat)
     newPoints.push(new BMap.Point(mPoint.lng, mPoint.lat))
-  })
+  }
   oly.setPath(newPoints)
+}
+
+function isInAreaRestriction (point, areaRestriction) {
+  if (areaRestriction instanceof BMap.Bounds) {
+    return isPointInRect(point, areaRestriction)
+  }
+  return true
 }
 
 export {

@@ -55,14 +55,14 @@
             align-items="center">
             <mu-flex-item
               size="60px"
-              @click="onClickOverlay(item)">
+              @click.native="onClickOverlay(item)">
               {{ i + 1 }}
             </mu-flex-item>
             <mu-flex-item
               size="auto"
               text-align="left"
               style="width: 0;"
-              @click="onClickOverlay(item)">
+              @click.native="onClickOverlay(item)">
               <div
                 class="mu-text-ellipsis"
                 style="color: #fff;"
@@ -71,8 +71,7 @@
               </div>
               <div
                 class="mu-text-ellipsis"
-                :title="item.structureName"
-                @click="onClickOverlay(item)">
+                :title="item.structureName">
                 {{ item.structureName }}
               </div>
             </mu-flex-item>
@@ -80,7 +79,8 @@
               v-show="sourceColumnVisible"
               size="80px"
               class="mu-text-ellipsis"
-              :title="item.orgName">
+              :title="item.orgName"
+              @click.native="onClickOverlay(item)">
               {{ item.orgName }}
             </mu-flex-item>
             <mu-flex-item
@@ -133,6 +133,9 @@
       }
     },
     computed: {
+      mapType () {
+        return this.baiduMap.mapType
+      },
       overlays () {
         return this.baiduMap.overlays
       },
@@ -189,11 +192,14 @@
         ]
       }
     },
+    watch: {
+      mapType () {
+        this.setListHeight()
+      }
+    },
     mounted () {
       this.$nextTick(() => {
-        const el = document.querySelector('.overlay-toolkit > :first-child')
-        const listEl = document.querySelector('.overlay-list > :last-child')
-        Object.assign(listEl.style, { height: `${el.clientHeight + 52}px` })
+        this.setListHeight()
       })
     },
     methods: {
@@ -205,6 +211,11 @@
             ? !oly.projectStructureId
             : true
         return { conditionDisplay, conditionStructure }
+      },
+      setListHeight () {
+        const el = document.querySelector('.overlay-toolkit > :first-child')
+        const listEl = document.querySelector('.overlay-list > :last-child')
+        Object.assign(listEl.style, { height: `${el.clientHeight + 52}px` })
       },
       onClickOverlayWindow () {
         this.baiduMap.switchOverlayWindow('overlayListVisible')

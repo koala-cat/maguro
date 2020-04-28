@@ -1,6 +1,9 @@
+import { updateHotspot } from '../overlay/operate/update-overlay'
+
 class Hotspot {
-  constructor (el) {
+  constructor (el, options) {
     this.el = el
+    this.options = options
   }
 
   enableEditing () {
@@ -21,6 +24,10 @@ class Hotspot {
 
   drag () {
     return false
+  }
+
+  update (key, value) {
+    updateHotspot(key, value, this, this.options)
   }
 
   delete () {
