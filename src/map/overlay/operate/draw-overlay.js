@@ -21,6 +21,7 @@ function drawOverlay (overlay, points, options) {
 
   let newOverlay = null
   if (!type) {
+    Object.assign(settings, { type: 'hotspot' })
     newOverlay = drawHotspot(overlay, options)
   } else {
     if (type === 'marker') {

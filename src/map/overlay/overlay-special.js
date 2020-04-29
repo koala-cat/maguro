@@ -15,7 +15,7 @@ import { deleteOverlays, deleteSelectedOverlays, deleteAnchorOverlays } from './
 
 import { addEvents } from './event'
 import { getLegend } from './legend'
-import { defaultSettings, getOverlaySettings, setOverlaySettings } from './setting'
+import { getOverlaySettings, setOverlaySettings } from './setting'
 
 class CustomSpecial {
   constructor (point, polyline, options) {
@@ -34,8 +34,7 @@ class CustomSpecial {
       markerPositions,
       settings
     } = this.options
-    Object.assign(
-      ...defaultSettings(legend.type),
+    this.options.settings = Object.assign(
       settings,
       {
         type: legend?.value || '',

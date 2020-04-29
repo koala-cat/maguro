@@ -2,7 +2,7 @@ import { deselectOverlays } from './deselect-overlay'
 
 function addOverlay (data, options) {
   let overlay = null
-  const { map, overlays, selectedOverlays, polylineCenters } = options
+  const { map, overlays, polylineCenters } = options
 
   if (!Array.isArray(data)) {
     overlay = data
@@ -25,15 +25,15 @@ function addOverlay (data, options) {
     if (oly.invented) overlay = oly
     map.addOverlay(oly)
     overlays.push(oly)
-    if (type) selectedOverlays.push(oly)
   }
-  return overlay
+  return { selectedOverlays: data, overlay }
 }
 
 function addAndSelectOverlay (data, options) {
-  const overlay = addOverlay(data, options)
+  const { selectedOverlays, overlay } = addOverlay(data, options)
   overlay.enableEditing()
   overlay.drag()
+  options.selectedOverlays.push(...selectedOverlays)
   options.activeOverlay = options.selectedOverlays[0]
   return overlay
 }

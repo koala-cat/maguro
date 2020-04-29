@@ -242,7 +242,7 @@
   }
   .overlay-list > :first-child {
     position: absolute;
-    top: 52px;
+    top: 56px;
     left: 16px;
     width: 40px;
     height: 40px;
@@ -264,7 +264,7 @@
   .overlay-list > :last-child {
     position: absolute !important;
     width: 300px;
-    top: 52px;
+    top: 56px;
     left: 64px;
     background: $bgColorLight;
     & * {

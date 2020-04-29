@@ -213,11 +213,6 @@ export default {
       }
     }, 500),
     selectOverlay (overlay) {
-      if (!(overlay instanceof BMap.Overlay)) {
-        selectOverlay(null, overlay, this.$data)
-        return
-      }
-
       let points = null
       const type = overlay.type
 
@@ -230,9 +225,9 @@ export default {
       if (type.includes('special')) {
         overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
       }
-      selectOverlay(null, overlay, this.$data)
       const viewPort = this.map.getViewport(points)
       this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+      selectOverlay(null, overlay, this.$data)
     },
     saveOverlays () {
       const result = getSaveData(this.$data)

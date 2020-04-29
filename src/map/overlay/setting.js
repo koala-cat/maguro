@@ -29,6 +29,7 @@ function defaultSettings (type) {
     isCommandDisplay: true,
     hotspotMark: '',
     remark: '',
+    structureName: '',
     visible: true,
     disabled: false
   }

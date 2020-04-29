@@ -291,6 +291,7 @@
       },
       fillFieldVisible () {
         const type = this.overlayType
+        console.log(this.overlay)
         const svgMarker = type === 'marker' && !(this.overlay instanceof BMap.Marker)
         return ['polygon'].includes(type) || svgMarker
       },
@@ -477,8 +478,8 @@
 
   .overlay-form {
     width: 280px;
-    top: 72px;
-    right: 32px;
+    top: 56px;
+    right: 16px;
     bottom: 108px;
     overflow: auto;
     z-index: 10;

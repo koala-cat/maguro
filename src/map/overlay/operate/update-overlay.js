@@ -39,8 +39,6 @@ function showOverlay (key, value, overlay, options) {
     data.push(...getPolylineIncludeSpecials(overlay, overlays))
   }
 
-  console.log(data)
-
   data.map(oly => {
     if (value && polylineVisible) {
       oly.show()
@@ -53,11 +51,16 @@ function showOverlay (key, value, overlay, options) {
 }
 
 function updateOverlay (key, value, overlay, options) {
-  const { updateOverlays, polylinePointIds } = options
+  const { structures, updateOverlays, polylinePointIds } = options
   const { id, name, projectGeoKey, invented } = overlay
 
-  overlay[key] = value
   lineUpdate = key
+  overlay[key] = value
+  if (key === 'projectStructureId') {
+    const structureId = overlay.projectStructureId
+    const structure = structures.find(item => item.id === structureId)
+    overlay.structureName = structureId ? structure.name : '未关联'
+  }
 
   if (id < 0) return
   if (invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
@@ -98,9 +101,7 @@ function updateMarker (key, value, overlay, options) {
 
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay, options)
-  }
-
-  if (key !== 'projectMapLegendId' && overlay.svg) {
+  } else if (key !== 'projectMapLegendId' && overlay.svg) {
     const style = settingsToStyle({ [key]: value })
     for (const s in style) {
       overlay.setStyle(s, style[s])
@@ -108,9 +109,7 @@ function updateMarker (key, value, overlay, options) {
     if (key === 'width') {
       overlay.setSize(value)
     }
-  }
-
-  if (['projectMapLegendId', 'width'].includes(key)) {
+  } else if (['projectMapLegendId', 'width'].includes(key)) {
     const index = overlays.findIndex(item => item.id === overlay.id)
     if (index > -1) {
       overlay.disableEditing()
@@ -132,9 +131,7 @@ function updatePolyline (key, value, overlay, options) {
 
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay, options)
-  }
-
-  if (key !== 'points') {
+  } else if (key !== 'points') {
     overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
   }
 

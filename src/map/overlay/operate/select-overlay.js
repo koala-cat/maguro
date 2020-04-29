@@ -2,6 +2,7 @@ import CustomSpecial from '../overlay-special'
 
 import { isOverlayInFrame } from '../../calc/geo.js'
 import { getPolylineIncludeSpecials } from '../../calc/overlay'
+import { defaultSettings } from '../setting'
 
 import { deselectOverlays } from './deselect-overlay'
 
@@ -15,6 +16,7 @@ function selectOverlay (e, overlay, options) {
     return
   }
   if (activeLegendType === 'special' && type === 'polyline' && e) {
+    options.settings = defaultSettings(activeLegendType)
     const special = new CustomSpecial(e.point, overlay, options)
     special.draw()
   } else {
@@ -41,7 +43,7 @@ function multipleOverlays (e, overlay, options) {
 
   options.activeOverlay = modKey ? activeOverlay || selectedOverlays[0] : selectedOverlays[0]
 
-  if (!overlay.disabled) {
+  if (!overlay.disabled && overlay.isVisible()) {
     overlay.enableEditing()
     overlay.drag()
   }

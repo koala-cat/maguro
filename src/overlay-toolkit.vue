@@ -127,7 +127,7 @@
         if (this.activeTool) {
           const value = this.activeTool.type || this.activeTool.value
           let filters = this.legends.filter(
-            item => item.type === value && !item.isRemoved
+            item => item.type === value && !item.isRemoved && item.isCommand !== false
           )
           if (value === 'label') {
             subTools.splice(0)

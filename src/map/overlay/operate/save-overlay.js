@@ -15,7 +15,10 @@ function getSaveData (options) {
     return
   }
 
-  data.removes = removeOverlays
+  data.removes = removeOverlays.reduce((arr, item) => {
+    if (item > 0) arr.push(item)
+    return arr
+  }, [])
 
   for (const key in updateOverlays) {
     if (updateOverlays[key].fillOpacity) {
