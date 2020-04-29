@@ -63,13 +63,5 @@ module.exports = {
     }
   ],
   scaleSpecs: ['20m', '50m', '100m', '200m', '500m', '1km', '2km', '5km', '10km', '20km', '25km', '50km', '100km', '200km'],
-  defaultMapZoomSettings: {
-    uploadPolyline: '100km',
-    marker: '2km',
-    polyline: '2km',
-    polygon: '2km',
-    special: '2km',
-    label: '2km'
-  },
   zoomSpecs: [19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6]
 }

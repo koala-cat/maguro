@@ -33,7 +33,6 @@ function getSaveData (options) {
 function getCreates (options) {
   const { overlays, polylineCenters } = options
   const result = []
-  const specialMap = {}
 
   for (let oly of overlays) {
     const points = getPoints(oly)
@@ -47,21 +46,18 @@ function getCreates (options) {
       return arr
     }, [])
     if (oly.id < 0) {
-      if (oly.parentId !== -1) {
-        if (!specialMap[oly.parentId]) {
-          specialMap[oly.parentId] = {
-            name: '特殊元件父节点',
-            parentId: -1,
-            projectMapLegendId: oly.projectMapLegendId
-          }
-          result.push(specialMap[oly.parentId])
+      if (oly.invented) {
+        oly = {
+          id: oly.id,
+          name: '特殊元件父节点',
+          parentId: -1,
+          projectMapLegendId: oly.projectMapLegendId,
+          points: oly.points,
+          width: oly.width,
+          parentLineId: oly.parentLineId
         }
-        if (oly.invented) {
-          specialMap[oly.parentId].points = oly.points
-          specialMap[oly.parentId].width = oly.width
-          specialMap[oly.parentId].parentLineId = oly.parentLineId
-          continue
-        }
+        result.push(oly)
+        continue
       }
       oly = getOverlaySettings(oly)
       oly.opacity = oly.fillOpacity

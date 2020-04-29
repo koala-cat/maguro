@@ -83,7 +83,7 @@
         markerOverlays: [],
         markerPoints: [],
         markerPositions: [],
-        id: -1,
+        id: -2,
         parentId: -1,
         view: true
       }
@@ -101,6 +101,7 @@
         this.areaRestriction = val
       },
       mapZoomSettings (val) {
+        console.log(val)
         this.zoomSettings = val
       },
       mapOverlays () {

@@ -25,7 +25,7 @@ class CustomSpecial {
     console.log(this.options.settings)
   }
 
-  draw () {
+  draw (callback) {
     const {
       map,
       activeLegend: legend,
@@ -70,12 +70,12 @@ class CustomSpecial {
 
     this.options.settings.width = 32
     this.options.parentId--
-    this.drawSpecial(this.polyline)
+    this.drawSpecial(this.polyline, callback)
   }
 
   drawSpecial (data, callback) {
     // data -- points or polylineOverlay
-    const {
+    let {
       map,
       legends,
       specialOverlays,
@@ -85,6 +85,7 @@ class CustomSpecial {
       settings
     } = this.options
     let newPoints = []
+    parentId = settings.parentId > 0 ? settings.parentId : parentId
 
     if (data instanceof BMap.Polyline) {
       const points = data.getPath()
@@ -111,7 +112,7 @@ class CustomSpecial {
       {
         wPoint,
         wPixel,
-        parentId: settings.parentId > 0 ? settings.parentId : parentId,
+        parentId,
         parentLineId: this.polyline.id
       }
     )
@@ -123,10 +124,12 @@ class CustomSpecial {
       overlays = this.drawSpecialRect(newPoints)
     }
     specialOverlays[parentId] = overlays
+    console.log(specialOverlays)
     deleteAnchorOverlays(this.options)
     deleteSelectedOverlays(this.options)
     deselectLegend(this.options)
     addAndSelectOverlay(overlays, this.options)
+    console.log(this.options.overlays)
 
     if (callback) callback(overlays)
     return overlays

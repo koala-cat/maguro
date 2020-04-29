@@ -19,6 +19,7 @@
     <hr>
     <maguro
       :map-type="mapType"
+      :map-zoom-settings="mapZoomSettings"
       :map-events="events"
       :map-legends="legends"
       :map-overlays="overlays"
@@ -48,6 +49,7 @@
       el: '#app',
       data: {
         mapType: 'normal',
+        mapZoomSettings: {},
         events: {},
         legends: [
           {
@@ -146,6 +148,15 @@
           } catch (err) {
             console.log(err)
           }
+        }
+
+        this.mapZoomSettings = {
+          uploadPolyline: '100km',
+          marker: '2km',
+          polyline: '2km',
+          polygon: '2km',
+          special: '2km',
+          label: '2km'
         }
 
         this.events = {
