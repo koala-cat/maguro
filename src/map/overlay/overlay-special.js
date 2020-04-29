@@ -10,7 +10,7 @@ import { addAndSelectOverlay } from './operate/add-overlay'
 import { deselectLegend } from './operate/deselect-overlay'
 import { drawSymbol } from './operate/draw-overlay'
 import { dragOverlay } from './operate/drag-overlay'
-import { updateSpecial } from './operate/update-overlay'
+import { updatePolyline, updateSpecial } from './operate/update-overlay'
 import { deleteOverlays, deleteSelectedOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 
 import { addEvents } from './event'
@@ -214,7 +214,10 @@ class CustomSpecial {
       this.delete(overlay)
     }
     overlay.update = (key, value) => {
-      updateSpecial(key, value, this.options, overlay)
+      const specials = this.options.specialOverlays[overlay.parentId]
+      specials.map(oly => {
+        updatePolyline(key, value, oly, this.options)
+      })
     }
   }
 

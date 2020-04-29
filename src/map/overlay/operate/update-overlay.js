@@ -52,7 +52,7 @@ function showOverlay (key, value, overlay, options) {
 
 function updateOverlay (key, value, overlay, options) {
   const { structures, updateOverlays, polylinePointIds } = options
-  const { id, name, projectGeoKey, invented } = overlay
+  const { id, name, projectGeoKey } = overlay
 
   lineUpdate = key
   overlay[key] = value
@@ -63,7 +63,6 @@ function updateOverlay (key, value, overlay, options) {
   }
 
   if (id < 0) return
-  if (invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
 
   if (!updateOverlays[id]) updateOverlays[id] = {}
 
@@ -128,7 +127,8 @@ function updateMarker (key, value, overlay, options) {
 function updatePolyline (key, value, overlay, options) {
   const { settings } = options
   settings[key] = value
-
+  console.log(overlay.invented)
+  if (overlay.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay, options)
   } else if (key !== 'points') {

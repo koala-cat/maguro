@@ -67,7 +67,6 @@ function getCreates (options) {
       oly.opacity = oly.fillOpacity
       result.push(oly)
 
-      delete oly.id
       delete oly.orgId
       delete oly.orgName
       delete oly.fillOpacity

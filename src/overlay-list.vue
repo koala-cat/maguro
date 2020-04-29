@@ -215,7 +215,7 @@
       setListHeight () {
         const el = document.querySelector('.overlay-toolkit > :first-child')
         const listEl = document.querySelector('.overlay-list > :last-child')
-        Object.assign(listEl.style, { height: `${el.clientHeight + 52}px` })
+        Object.assign(listEl.style, { height: `${el.clientHeight + 48}px` })
       },
       onClickOverlayWindow () {
         this.baiduMap.switchOverlayWindow('overlayListVisible')
