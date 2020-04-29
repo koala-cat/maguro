@@ -161,7 +161,6 @@
             result.push(oly)
           }
         }
-        console.log(result)
         return result
       },
       headers () {

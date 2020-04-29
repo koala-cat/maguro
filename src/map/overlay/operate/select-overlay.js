@@ -41,7 +41,6 @@ function multipleOverlays (e, overlay, options) {
   }
 
   if (type.includes('special')) {
-    console.log(specialOverlays[overlay.parentId])
     selectedOverlays.push(...specialOverlays[overlay.parentId])
   } else {
     selectedOverlays.push(overlay)

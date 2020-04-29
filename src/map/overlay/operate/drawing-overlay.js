@@ -123,7 +123,6 @@ function drawingOverlay (settings = {}, options, callback) {
 
   if (type === 'label') {
     const click = (e) => {
-      console.log(2)
       e.stopPropagation()
 
       const label = drawLabel(e.point, options)
@@ -176,7 +175,6 @@ function drawingOverlay (settings = {}, options, callback) {
   function polylineComplete (line) {
     const points = line.getPath()
     const newLine = drawPolyline(points, options)
-    console.log(newLine)
     drawNewOverlay(line, newLine)
   }
 

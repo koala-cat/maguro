@@ -127,7 +127,6 @@ function updateMarker (key, value, overlay, options) {
 function updatePolyline (key, value, overlay, options) {
   const { settings } = options
   settings[key] = value
-  console.log(overlay.invented)
   if (overlay.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay, options)
@@ -172,7 +171,6 @@ function updateSpecial (key, value, overlay, options) {
 }
 
 function updateHotspot (key, value, overlay, options) {
-  console.log(options)
   updateOverlay(key, value, overlay, options)
 }
 

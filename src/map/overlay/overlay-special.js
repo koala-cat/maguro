@@ -22,7 +22,6 @@ class CustomSpecial {
     this.point = point
     this.polyline = polyline
     this.options = options
-    console.log(this.options.settings)
   }
 
   draw (callback) {
@@ -124,12 +123,10 @@ class CustomSpecial {
       overlays = this.drawSpecialRect(newPoints)
     }
     specialOverlays[parentId] = overlays
-    console.log(specialOverlays)
     deleteAnchorOverlays(this.options)
     deleteSelectedOverlays(this.options)
     deselectLegend(this.options)
     addAndSelectOverlay(overlays, this.options)
-    console.log(this.options.overlays)
 
     if (callback) callback(overlays)
     return overlays

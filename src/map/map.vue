@@ -101,7 +101,6 @@
         this.areaRestriction = val
       },
       mapZoomSettings (val) {
-        console.log(val)
         this.zoomSettings = val
       },
       mapOverlays () {
