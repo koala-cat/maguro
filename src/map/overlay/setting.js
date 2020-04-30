@@ -10,6 +10,7 @@ function defaultSettings (type) {
     name: '元件名称',
     type: null,
     width: 0,
+    height: null,
     points: [],
     projectMapLegendId: null,
     parentId: -1,

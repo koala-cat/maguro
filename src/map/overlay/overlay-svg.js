@@ -13,7 +13,7 @@ class CustomSvg extends CustomOverlay {
 
   initialize () {
     const {
-      fill,
+      fillColor: fill,
       fillOpacity: opacity,
       svg,
       width,
@@ -27,9 +27,9 @@ class CustomSvg extends CustomOverlay {
         ${svg.innerHTML}
       </svg>
     `
-    const svgDoc = this.div.querySelector('svg')
+    const svgEl = this.div.querySelector(`.${this.class}`)
     Object.assign(
-      svgDoc.style,
+      svgEl.style,
       {
         display: 'inherit',
         width: `${width}px`,
@@ -47,14 +47,26 @@ class CustomSvg extends CustomOverlay {
       }
     )
     this.options.map.getPanes().labelPane.appendChild(this.div)
-    this.getBounds()
+    if (this.class && this.class.includes('vtk')) {
+      this.getBounds()
+    }
     return this.div
   }
 
   draw () {
-    super.setPosition(this.point)
     if (this.class && this.class.includes('vtk')) {
       this.setBounds()
+    } else {
+      const width = this.width || this.options.settings.width
+      const height = this.height
+      Object.assign(
+        this.options.settings,
+        {
+          width,
+          height
+        }
+      )
+      super.setPosition(this.point)
     }
   }
 
@@ -93,7 +105,7 @@ class CustomSvg extends CustomOverlay {
     const width = Math.abs(pixelNe.x - pixelSw.x - this._errorCount / 2)
     const height = Math.abs(pixelNe.y - pixelSw.y - this._errorCount / 2)
     Object.assign(
-      this.div.querySelector('svg').style,
+      this.div.querySelector(`.${this.class}`).style,
       {
         width: `${width}px`,
         height: `${height}px`
@@ -102,8 +114,8 @@ class CustomSvg extends CustomOverlay {
     Object.assign(
       this.options.settings,
       {
-        width: `${width}px`,
-        height: `${height}px`
+        width,
+        height
       }
     )
     this.setTransform()

@@ -44,6 +44,10 @@
         type: Object,
         default: () => ({})
       },
+      mapOverlayEvents: {
+        type: Object,
+        default: () => ({})
+      },
       mapLegends: {
         type: Array,
         default: () => ([])
@@ -67,7 +71,7 @@
         drawingManager: null,
         areaRestriction: null,
         zoomSettings: {},
-        events: this.mapEvents,
+        overlayEvents: this.mapOverlayEvents,
         legends: this.mapLegends,
         overlays: [],
         structures: this.mapStructures,

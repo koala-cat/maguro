@@ -21,6 +21,7 @@
       :map-type="mapType"
       :map-zoom-settings="mapZoomSettings"
       :map-events="events"
+      :map-overlay-events="overlayEvents"
       :map-legends="legends"
       :map-overlays="overlays"
       :map-structures="structures"
@@ -51,6 +52,7 @@
         mapType: 'normal',
         mapZoomSettings: {},
         events: {},
+        overlayEvents: {},
         legends: [
           {
             id: 1008,
@@ -159,10 +161,14 @@
           label: '2km'
         }
 
-        this.events = {
+        this.overlayEvents = {
           mouseover: (e, overlay) => {
             console.log('mouseover')
           }
+        }
+
+        this.events = {
+          mousemove: (e) => {}
         }
 
         this.overlays.push(

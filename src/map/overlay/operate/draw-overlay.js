@@ -188,13 +188,14 @@ function drawUploadLine (data, options) {
 }
 
 function drawHotspot (overlay, options) {
+  if (!overlay.hotspotMark) return
   const el = document.querySelector(`#${overlay.hotspotMark}`)
   const hotspot = new Hotspot(el, options)
   return setOverlay(hotspot, options)
 }
 
 function setOverlay (overlay, options) {
-  const { events, callback } = options
+  const { overlayEvents: events, callback } = options
 
   addEvents(events, overlay)
   if (callback) callback(overlay)

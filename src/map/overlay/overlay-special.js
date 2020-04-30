@@ -133,7 +133,7 @@ class CustomSpecial {
   }
 
   drawSpecialLine (points, wTail = 0) { // 双平行线、三平行线
-    const { events, settings } = this.options
+    const { overlayEvents: events, settings } = this.options
     const { count, wPoint, wPixel } = settings
     const { lineSL, lineSR } = calcSpecialPoints(points, wPoint, wTail)
     const overlays = []
@@ -153,7 +153,7 @@ class CustomSpecial {
   }
 
   drawSpecialRect (points) {
-    const { events, settings } = this.options
+    const { overlayEvents: events, settings } = this.options
     const { wPoint, wPixel, wTail } = settings
     const { lineSL, lineSR, lineTail } = calcSpecialPoints(points, wPoint, wTail)
     const tailL1 = [lineTail[0], lineSL[0]]

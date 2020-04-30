@@ -16,7 +16,7 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   update (key, value) {
-    const { events, activeLegend: legend } = this.options
+    const { overlayEvents: events, activeLegend: legend } = this.options
     const point = this.getPosition()
     const settings = {
       ...getOverlaySettings(this),

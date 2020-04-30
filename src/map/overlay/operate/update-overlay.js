@@ -53,7 +53,6 @@ function showOverlay (key, value, overlay, options) {
 function updateOverlay (key, value, overlay, options) {
   const { structures, updateOverlays, polylinePointIds } = options
   const { id, name, projectGeoKey } = overlay
-
   lineUpdate = key
   overlay[key] = value
   if (key === 'projectStructureId') {
@@ -160,7 +159,7 @@ function updateLabel (key, value, overlay, options) {
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay, options)
   }
-  updateOverlay(key, value, options)
+  updateOverlay(key, value, overlay, options)
 
   const style = settingsToStyle({ [key]: value }, 'label')
   overlay.setStyle(style)
@@ -181,11 +180,11 @@ function onLineupdate (e) {
     let points = null
     try {
       points = [overlay.getCenter()]
-      updateOverlay('width', overlay.getRadius(), overlay.options)
+      updateOverlay('width', overlay.getRadius(), overlay, overlay.options)
     } catch {
       points = overlay.getPath()
     }
-    updateOverlay('points', points, overlay.options)
+    updateOverlay('points', points, overlay, overlay.options)
   }
 }
 

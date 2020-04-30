@@ -68,8 +68,8 @@ export default {
         selectOverlay(e, overlay, this.$data)
       }
 
-      if (!this.events.click) {
-        this.events.click = click
+      if (!this.overlayEvents.click) {
+        this.overlayEvents.click = click
       }
     },
     initOverlays () {
@@ -150,7 +150,7 @@ export default {
 
         addOverlay(overlay, this.$data)
       } catch (err) {
-        console.log(err)
+        console.log('initSpecial' + err)
       }
     },
     clearOverlays () {
@@ -209,13 +209,16 @@ export default {
       try {
         overlay.update(key, value)
       } catch (err) {
-        console.log(err)
+        console.log('update' + err)
       }
     }, 500),
     selectOverlay (overlay) {
       let points = null
       const type = overlay.type
-
+      if (type === 'hotspot') {
+        selectOverlay(null, overlay, this.$data)
+        return
+      }
       try {
         points = overlay.getPath()
       } catch {

@@ -6,6 +6,10 @@ class Hotspot {
     this.options = options
   }
 
+  isVisible () {
+    return true
+  }
+
   enableEditing () {
     this.el.classList.add('active')
   }

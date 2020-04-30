@@ -84,7 +84,7 @@
               {{ item.orgName }}
             </mu-flex-item>
             <mu-flex-item
-              v-show="displayColumnVisible && item.type"
+              v-show="displayColumnVisible && item.type !== 'hotspot'"
               size="60px">
               <mu-toggle
                 v-if="item.isCommand === false"

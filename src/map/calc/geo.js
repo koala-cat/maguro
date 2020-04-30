@@ -7,7 +7,7 @@ function isOverlayInFrame (overlay, rectOverlay) {
   let result = false
   let parentId = null
 
-  if (!overlay.disabled) {
+  if (!overlay.disabled && type !== 'hotspot') {
     if (type === 'marker' || type === 'label') {
       const point = [overlay.getPosition()]
       result = isPointInRect(point, bounds)
