@@ -30,7 +30,8 @@ function defaultSettings (type) {
     isCommandDisplay: true,
     hotspotMark: '',
     remark: '',
-    structureName: '',
+    structureName: '未关联',
+    isCommand: null,
     visible: true,
     disabled: false
   }

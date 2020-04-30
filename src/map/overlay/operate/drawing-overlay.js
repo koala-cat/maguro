@@ -1,6 +1,5 @@
 import BMap from 'BMap'
 import BMapLib from 'BMapLib'
-import { notify } from 'mussel'
 
 import { addAndSelectOverlay } from './add-overlay'
 import { deleteAnchorOverlays } from './delete-overlay'
@@ -49,9 +48,11 @@ function breakDrawing (options) {
 
 function startDrawing (options) {
   let type = null
-  const { activeLegend: legend } = options
+  const { currentOrg, activeLegend: legend } = options
   const settings = {
     ...defaultSettings(legend.type),
+    orgId: currentOrg.id,
+    orgName: currentOrg.shortName,
     iconUrl: legend.iconUrl,
     svg: legend.svg,
     projectMapLegendId: legend.id

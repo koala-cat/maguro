@@ -90,6 +90,10 @@
         const map = {}
         this.filterStructures = []
         for (const item of this.structures) {
+          if (this.baiduMap.mapType !== 'graphic' &&
+            this.overlay.orgId !== item.orgId) {
+            continue
+          }
           if (!item.name.includes(this.searchKey)) {
             continue
           }

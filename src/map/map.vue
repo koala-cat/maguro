@@ -31,6 +31,10 @@
     },
     mixins: [MapMixin],
     props: {
+      mapCurrentOrg: {
+        type: Object,
+        default: () => ({})
+      },
       mapType: {
         type: String,
         default: 'normal'
@@ -67,6 +71,7 @@
     },
     data () {
       return {
+        currentOrg: this.mapCurrentOrg,
         map: null,
         drawingManager: null,
         areaRestriction: null,

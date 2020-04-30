@@ -90,8 +90,12 @@ export default {
       this.initSpecialOverlays()
 
       if (this.view && this.mapType !== 'graphic') {
+        const zoom = this.map.getZoom()
         const viewPort = this.map.getViewport(wholePoints)
         this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+        if (zoom === viewPort.zoom) {
+          showOverlays(this.$data)
+        }
       } else {
         showOverlays(this.$data)
       }

@@ -217,9 +217,9 @@
       },
       onClickOverlay (oly) {
         const display =
-          oly.isCommand
-            ? oly.isDisplay
-            : oly.isCommandDisplay
+          oly.isCommand === false
+            ? oly.isCommandDisplay
+            : oly.isDisplay
         if (display) {
           this.baiduMap.selectOverlay(oly)
         }

@@ -144,19 +144,24 @@ function zoomSpecialOverlayPixel (map, overlay) {
 }
 
 function showOverlays (options) {
-  const { map, mapType, overlays, zoomSettings } = options
+  const { map, overlays, zoomSettings } = options
   const zoom = map.getZoom()
   const zoomMap = {}
-
-  if (mapType === 'graphic') return
-
   for (const overlayType in zoomSettings) {
     const scale = zoomSettings[overlayType]
     const idx = scaleSpecs.indexOf(scale)
     zoomMap[overlayType] = zoomSpecs[idx]
   }
-  overlays.map(oly => {
-    let { type, projectGeoKey } = oly
+
+  for (const oly of overlays) {
+    let { type, projectGeoKey, isCommand, isDisplay, isCommandDisplay } = oly
+    const display = isCommand === false ? isCommandDisplay : isDisplay
+
+    if (!display) {
+      oly.hide()
+      continue
+    }
+
     if (type.includes('special')) {
       type = 'special'
     } else if (type === 'polyline') {
@@ -164,12 +169,13 @@ function showOverlays (options) {
     } else if (['circle', 'rectangle', 'polygon'].includes(type)) {
       type = 'polygon'
     }
+
     if (zoom >= zoomMap[type]) {
       oly.show()
     } else {
       oly.hide()
     }
-  })
+  }
 }
 
 export {

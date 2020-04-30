@@ -36,7 +36,7 @@
             :label="isUploadPolylineField(tool) ? tool.label : ''"
             align-items="center"
             size="33%"
-            style="font-size: 12px;">
+            style="font-size: 12px; color: #ffffff;">
             <mu-icon
               v-show="!isUploadPolylineField(tool)"
               :svg="getPath(tool.value)"
@@ -175,6 +175,9 @@
             const scrollTop = this.$refs.overlayToolkit.$el.scrollTop
             this.$refs.tool.$el.style.top = `${48 + idx * height - subToolsHeight - scrollTop}px`
           }, 10)
+        } else {
+          const legend = this.legends.find(item => item.type === value)
+          tool.id = legend?.id || null
         }
         this.onSelect(tool)
       },
