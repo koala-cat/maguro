@@ -117,6 +117,12 @@
         this.bindOverlayEvents()
         this.initOverlays()
       },
+      mapEvents: {
+        handler () {
+          this.bindMapEvents()
+        },
+        deep: true
+      },
       baseMapVisible (val) {
         this.map.setNormalMapDisplay(this.baseMapVisible)
       },
