@@ -157,7 +157,6 @@ function showOverlays (options) {
     let { type, projectGeoKey, isCommand, isDisplay, isCommandDisplay } = oly
     const display = isCommand === false ? isCommandDisplay : isDisplay
 
-    console.log(display)
     if (!display) {
       oly.hide()
       continue

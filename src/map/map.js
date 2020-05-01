@@ -52,7 +52,6 @@ export default {
       for (const key of eventKeys) {
         const item = this.mapEvents[key]
         if (mapKeys.includes(key)) {
-          console.log(item)
           if (!item.isMerge) {
             this.map.addEventListener(key, (e) => {
               item.event(e)
@@ -60,8 +59,6 @@ export default {
           } else {
             this.map.addEventListener(key, (e) => {
               if (defaultEvents[key]) defaultEvents[key].event(e)
-              console.log(123123)
-              console.log(item)
               item.event(e)
             })
           }
@@ -71,10 +68,6 @@ export default {
           defaultEvents[key].event(e)
         })
       }
-
-      // this.map.addEventListener('zoomend', () => {
-      //   showOverlays(this.$data)
-      // })
     },
     bindDocumentEvents () {
       const overlays = this.selectedOverlays
