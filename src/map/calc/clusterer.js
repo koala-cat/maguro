@@ -175,8 +175,7 @@ function showOverlays (options) {
     } else {
       oly.hide()
     }
-
-    // zoomSpecialOverlayPixel(map, oly)
+    zoomSpecialOverlayPixel(map, oly)
   }
 }
 

@@ -50,8 +50,8 @@ export default {
       const eventKeys = [...defaultKeys, ...mapKeys]
 
       for (const key of eventKeys) {
-        const item = this.mapEvents[key]
         if (mapKeys.includes(key)) {
+          const item = this.mapEvents[key]
           if (!item.isMerge) {
             this.map.addEventListener(key, (e) => {
               item.event(e)
@@ -59,7 +59,11 @@ export default {
           } else {
             this.map.addEventListener(key, (e) => {
               if (defaultEvents[key]) defaultEvents[key].event(e)
-              item.event(e)
+              try {
+                item.event(e)
+              } catch (err) {
+                console.log(err)
+              }
             })
           }
           continue
@@ -125,6 +129,7 @@ export default {
         if (zoom === viewPort.zoom) {
           showOverlays(this.$data)
         }
+        // this.view = !this.view
       } else {
         showOverlays(this.$data)
       }
@@ -261,9 +266,10 @@ export default {
       if (type.includes('special')) {
         overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
       }
+      selectOverlay(null, overlay, this.$data)
+
       const viewPort = this.map.getViewport(points)
       this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-      selectOverlay(null, overlay, this.$data)
     },
     saveOverlays () {
       const result = getSaveData(this.$data)
