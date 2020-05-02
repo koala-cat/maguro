@@ -135,7 +135,7 @@ function dragEnd (e, options) {
     }
     oly.update('points', points)
     specials.map(item => {
-      item.update('points', item.getPath())
+      item.update('points', item.getPath(), null)
     })
   })
 }

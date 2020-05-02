@@ -113,7 +113,8 @@
         this.zoomSettings = val
       },
       mapOverlays () {
-        this.overlays = cloneDeep(this.mapOverlays)
+        const overlays = cloneDeep(this.mapOverlays)
+        this.overlays.splice(0, this.overlays.length, ...overlays)
         this.bindOverlayEvents()
         this.initOverlays()
       },

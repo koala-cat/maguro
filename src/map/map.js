@@ -107,7 +107,6 @@ export default {
     },
     initOverlays () {
       if (this.overlays.length === 0) return
-
       const overlays = clonedeep(this.overlays)
       const wholePoints = []
 
@@ -120,8 +119,9 @@ export default {
         oly.type = getLegendType(legend)
         this.setOverlay(oly, wholePoints)
       }
+      console.log(222222)
+      console.log(this.overlays)
       this.initSpecialOverlays()
-
       if (this.view && this.mapType !== 'graphic') {
         const zoom = this.map.getZoom()
         const viewPort = this.map.getViewport(wholePoints)
@@ -129,7 +129,7 @@ export default {
         if (zoom === viewPort.zoom) {
           showOverlays(this.$data)
         }
-        // this.view = !this.view
+        this.view = !this.view
       } else {
         showOverlays(this.$data)
       }
@@ -279,6 +279,8 @@ export default {
       const result = getSaveData(this.$data)
       if (result) {
         this.$emit('save', result, () => {
+          this.$data.updateOverlays = {}
+          this.$data.removeOverlays = []
           notify('success', '保存成功。')
         })
       } else {

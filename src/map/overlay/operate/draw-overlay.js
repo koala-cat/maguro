@@ -171,12 +171,6 @@ function drawUploadLine (data, options) {
         name: data.name,
         projectMapLegendId: legend.id,
         projectGeoKey: -1
-      },
-      callback: (oly) => {
-        setOverlaySettings(oly, options.settings)
-        oly.centers = centers
-        oly.type = legend.type
-        addOverlay(oly, options)
       }
     }
   )
@@ -186,7 +180,11 @@ function drawUploadLine (data, options) {
     centers.push(item.center)
     mPoints.push(new BMap.Point(item.lng, item.lat))
   })
-  drawPolyline(mPoints, options)
+  const overlay = drawPolyline(mPoints, options)
+  setOverlaySettings(overlay, options.settings)
+  overlay.centers = centers
+  overlay.type = legend.type
+  addOverlay(overlay, options)
 }
 
 function drawHotspot (overlay, options) {

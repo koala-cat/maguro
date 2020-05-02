@@ -198,7 +198,6 @@ class CustomSpecial {
   extend (events, overlay) {
     overlay.options = this.options
     if (events) {
-      console.log(overlay)
       addEvents(events, overlay)
       overlay.enableEditing = () => {
         this.enableEditing(overlay)
@@ -209,8 +208,13 @@ class CustomSpecial {
       overlay.drag = () => {
         this.drag(overlay)
       }
+      overlay.update = (key, value, oly = overlay) => {
+        this.update(key, value, oly)
+      }
+      this.overlay = overlay
+    } else {
       overlay.update = (key, value) => {
-        this.update(key, value, overlay)
+        updatePolyline(key, value, overlay, this.options)
       }
     }
     overlay.delete = () => {
@@ -272,6 +276,11 @@ class CustomSpecial {
   }
 
   update (key, value, overlay) {
+    if (key === 'points' && !overlay) {
+      updatePolyline(key, value, this.overlay, this.options)
+      return
+    }
+
     const { selectedOverlays, specialOverlays, removeOverlays, activeOverlay, settings } = this.options
     const specials = cloneDeep(selectedOverlays)
     const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1]
