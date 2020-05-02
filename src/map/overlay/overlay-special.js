@@ -70,7 +70,7 @@ class CustomSpecial {
 
     this.options.settings.width = 32
     this.options.parentId--
-    this.drawSpecial(this.polyline, callback)
+    return this.drawSpecial(this.polyline, callback)
   }
 
   drawSpecial (data, callback) {
@@ -78,14 +78,13 @@ class CustomSpecial {
     let {
       map,
       legends,
-      specialOverlays,
       markerPoints,
       markerPositions,
       parentId,
       settings
     } = this.options
     let newPoints = []
-    parentId = settings.parentId > 0 ? settings.parentId : parentId
+    parentId = settings.parentId !== -1 ? settings.parentId : parentId
 
     if (data instanceof BMap.Polyline) {
       const points = data.getPath()
@@ -124,7 +123,6 @@ class CustomSpecial {
       settings.wTail = type.includes('AngularRect') ? wPoint : 0
       overlays = this.drawSpecialRect(newPoints)
     }
-    specialOverlays[parentId] = overlays
     deleteAnchorOverlays(this.options)
     deleteSelectedOverlays(this.options)
     deselectLegend(this.options)
@@ -274,7 +272,7 @@ class CustomSpecial {
   }
 
   update (key, value, overlay) {
-    const { selectedOverlays, removeOverlays, settings } = this.options
+    const { selectedOverlays, specialOverlays, removeOverlays, activeOverlay, settings } = this.options
     const specials = cloneDeep(selectedOverlays)
     const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1]
     const width = key === 'width' ? parseFloat(value) < 10 ? 10 : parseFloat(value) : overlay.width
@@ -315,9 +313,9 @@ class CustomSpecial {
           }
         })
       }
-
-      selectedOverlays.splice(0, selectedOverlays.length, ...olys)
       this.options.activeOverlay = olys[0]
+      specialOverlays[activeOverlay.parentId] = olys
+      selectedOverlays.splice(0, selectedOverlays.length, ...olys)
     })
   }
 

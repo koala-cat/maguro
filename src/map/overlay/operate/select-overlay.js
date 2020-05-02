@@ -7,7 +7,7 @@ import { defaultSettings } from '../setting'
 import { deselectOverlays } from './deselect-overlay'
 
 function selectOverlay (e, overlay, options) {
-  const { selectedOverlays, activeOverlay, activeLegend } = options
+  const { selectedOverlays, specialOverlays, activeOverlay, activeLegend } = options
   const type = overlay.type
   const activeLegendType = activeLegend?.type || ''
 
@@ -23,6 +23,7 @@ function selectOverlay (e, overlay, options) {
       overlays.map(oly => {
         if (!oly.invented) oly.parentId = parentOverlay.id
       })
+      specialOverlays[parentOverlay.id] = overlays
     })
   } else {
     multipleOverlays(e, overlay, options)
