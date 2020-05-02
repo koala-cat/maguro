@@ -27,7 +27,6 @@ class Polyline extends BMap.Polyline {
   }
 
   drag () {
-    if (this.projectGeoKey) return
     dragOverlay(this, this.options)
   }
 
