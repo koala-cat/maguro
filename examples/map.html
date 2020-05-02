@@ -175,7 +175,10 @@
         }
 
         this.events = {
-          mousemove: (e) => {}
+          mousemove: {
+            event: (e) => {},
+            isMerge: false
+          }
         }
 
         this.overlays.push(

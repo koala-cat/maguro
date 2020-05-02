@@ -1,5 +1,6 @@
 import BMap from 'BMap'
 import { notify } from 'mussel'
+import cloneDeep from 'lodash.clonedeep'
 
 import { distanceToPointAndPixel } from '../calc/distance'
 import { calcSpecialPoints } from '../calc/point'
@@ -36,7 +37,7 @@ class CustomSpecial {
     this.options.settings = Object.assign(
       settings,
       {
-        type: legend?.value || '',
+        type: legend.value,
         iconUrl: legend.iconUrl,
         projectMapLegendId: legend.id
       }
@@ -102,17 +103,18 @@ class CustomSpecial {
     }
 
     const { projectMapLegendId, width } = settings
-    const type = getLegend(legends, projectMapLegendId)?.value || ''
+    const legend = getLegend(legends, projectMapLegendId)
+    const type = legend?.value || ''
     const { wPoint, wPixel } = distanceToPointAndPixel(map, width)
     let overlays = []
-
     Object.assign(
       settings,
       {
         wPoint,
         wPixel,
         parentId,
-        parentLineId: this.polyline.id
+        parentLineId: this.polyline.id,
+        iconUrl: legend?.iconUrl || ''
       }
     )
     if (type.includes('Line')) {
@@ -142,7 +144,6 @@ class CustomSpecial {
     if (count === 3) {
       overlays.push(this.drawPolyline(points, { ...settings, strokeStyle: 'dashed' }))
     }
-
     overlays.push(this.drawPolyline(points, {
       ...settings,
       invented: true,
@@ -199,6 +200,7 @@ class CustomSpecial {
   extend (events, overlay) {
     overlay.options = this.options
     if (events) {
+      console.log(overlay)
       addEvents(events, overlay)
       overlay.enableEditing = () => {
         this.enableEditing(overlay)
@@ -209,15 +211,12 @@ class CustomSpecial {
       overlay.drag = () => {
         this.drag(overlay)
       }
+      overlay.update = (key, value) => {
+        this.update(key, value, overlay)
+      }
     }
     overlay.delete = () => {
       this.delete(overlay)
-    }
-    overlay.update = (key, value) => {
-      const specials = this.options.specialOverlays[overlay.parentId]
-      specials.map(oly => {
-        updatePolyline(key, value, oly, this.options)
-      })
     }
   }
 
@@ -275,42 +274,49 @@ class CustomSpecial {
   }
 
   update (key, value, overlay) {
-    const { selectedOverlays, selectedOverlays: specials, removeOverlays, settings } = this.options
-    const polyline = value || specials[specials.length - 1]
-
-    const width = key === 'width' && value < 10 ? 10 : overlay.width
+    const { selectedOverlays, removeOverlays, settings } = this.options
+    const specials = cloneDeep(selectedOverlays)
+    const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1]
+    const width = key === 'width' ? parseFloat(value) < 10 ? 10 : parseFloat(value) : overlay.width
     Object.assign(
       settings,
       {
-        ...getOverlaySettings(specials[0]),
+        ...getOverlaySettings(selectedOverlays[0]),
         width
       }
     )
+
+    if (!['projectMapLegendId', 'points', 'width'].includes(key)) {
+      selectedOverlays.map(oly => {
+        updatePolyline(key, value, oly, this.options)
+      })
+      return
+    }
 
     this.drawSpecial(polyline, (olys) => {
       specials.sort((a, b) => a.invented * 1 - b.invented * 1)
       if (key !== 'projectMapLegendId') {
         for (let i = 0; i < olys.length; i++) {
-          olys[i].id = specials[i].id
+          const oly = olys[i]
+          oly.id = specials[i].id
           if (key === 'width') {
-            updateSpecial(key, width, this.options)
+            updateSpecial(key, width, oly, this.options)
             continue
           }
           if (key === 'points') {
-            updateSpecial(key, olys[i].getPath(), overlay, this.options)
+            updateSpecial(key, oly.getPath(), oly, this.options)
           }
         }
       } else {
-        const ids = specials.reduce((arr, item) => {
-          if (item.id > 0) {
-            arr.push(item.id)
+        selectedOverlays.map(item => {
+          const id = item.id
+          if (item.id > 0 && removeOverlays.includes(id)) {
+            removeOverlays.push(id)
           }
-          return arr
-        }, [])
-        removeOverlays.push(...ids)
+        })
       }
 
-      selectedOverlays.push(...olys)
+      selectedOverlays.splice(0, selectedOverlays.length, ...olys)
       this.options.activeOverlay = olys[0]
     })
   }

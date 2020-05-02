@@ -23,7 +23,7 @@ function deleteOverlays (overlay) {
     overlays.splice(idx, 1)
     overlay.disableEditing()
     map.removeOverlay(overlay)
-    if (overlay.id) {
+    if (overlay.id && removeOverlays.includes(overlay.id)) {
       removeOverlays.push(parseInt(overlay.id))
     }
     deleteAnchorOverlays(overlay.options)

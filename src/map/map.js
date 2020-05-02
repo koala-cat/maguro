@@ -244,10 +244,14 @@ export default {
     },
     updateOverlay: debounce(function (key, value, overlay) {
       overlay = overlay || this.activeOverlay
+      if (overlay.type && overlay.type.includes('specia')) {
+        const specials = this.specialOverlays[overlay.parentId]
+        overlay = specials.find(oly => oly.invented)
+      }
       try {
         overlay.update(key, value)
       } catch (err) {
-        console.log('update' + err)
+        console.log(err)
       }
     }, 500),
     selectOverlay (overlay) {

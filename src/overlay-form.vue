@@ -43,7 +43,7 @@
               :disabled="disabled" />
           </mu-form-field>
           <mu-form-field
-            v-show="overlay.type==='special'"
+            v-show="overlayType==='special'"
             label="路宽"
             align-items="center">
             <mu-editor
