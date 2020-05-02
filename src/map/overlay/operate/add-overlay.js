@@ -8,7 +8,6 @@ function addOverlay (data, options) {
     overlay = data
     data = [data]
   }
-  deselectOverlays(options)
 
   for (const oly of data) {
     const type = oly.type
@@ -30,6 +29,7 @@ function addOverlay (data, options) {
 }
 
 function addAndSelectOverlay (data, options) {
+  deselectOverlays(options)
   const { selectedOverlays, overlay } = addOverlay(data, options)
   overlay.enableEditing()
   overlay.drag()

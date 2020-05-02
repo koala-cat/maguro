@@ -119,8 +119,6 @@ export default {
         oly.type = getLegendType(legend)
         this.setOverlay(oly, wholePoints)
       }
-      console.log(222222)
-      console.log(this.overlays)
       this.initSpecialOverlays()
       if (this.view && this.mapType !== 'graphic') {
         const zoom = this.map.getZoom()

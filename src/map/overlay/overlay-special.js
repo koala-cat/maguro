@@ -7,7 +7,7 @@ import { calcSpecialPoints } from '../calc/point'
 import { calcMarkerOnLinePosition } from '../calc/position'
 import { getSpecialAttachPolyline } from '../calc/overlay'
 
-import { addAndSelectOverlay } from './operate/add-overlay'
+import { addOverlay } from './operate/add-overlay'
 import { deselectLegend } from './operate/deselect-overlay'
 import { drawSymbol } from './operate/draw-overlay'
 import { dragOverlay } from './operate/drag-overlay'
@@ -100,7 +100,6 @@ class CustomSpecial {
     } else {
       newPoints = data
     }
-
     const { projectMapLegendId, width } = settings
     const legend = getLegend(legends, projectMapLegendId)
     const type = legend?.value || ''
@@ -124,9 +123,9 @@ class CustomSpecial {
       overlays = this.drawSpecialRect(newPoints)
     }
     deleteAnchorOverlays(this.options)
-    deleteSelectedOverlays(this.options)
+    // deleteSelectedOverlays(this.options)
     deselectLegend(this.options)
-    addAndSelectOverlay(overlays, this.options)
+    addOverlay(overlays, this.options)
 
     if (callback) callback(overlays)
     return overlays
@@ -217,7 +216,18 @@ class CustomSpecial {
         updatePolyline(key, value, overlay, this.options)
       }
     }
-    overlay.delete = () => {
+    overlay.delete = (isRemove) => {
+      const { map, overlays } = this.options
+      if (isRemove === false) {
+        const idx = overlays.findIndex(item => item.id === overlay.id)
+        if (idx > -1) {
+          overlays.splice(idx, 1)
+          overlay.disableEditing()
+          map.removeOverlay(overlay)
+          deleteAnchorOverlays(overlay.options)
+        }
+        return
+      }
       this.delete(overlay)
     }
   }
@@ -281,14 +291,15 @@ class CustomSpecial {
       return
     }
 
-    const { selectedOverlays, specialOverlays, removeOverlays, activeOverlay, settings } = this.options
+    const { selectedOverlays, specialOverlays, removeOverlays, settings } = this.options
     const specials = cloneDeep(selectedOverlays)
-    const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1]
+    const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1].getPath()
     const width = key === 'width' ? parseFloat(value) < 10 ? 10 : parseFloat(value) : overlay.width
     Object.assign(
       settings,
       {
         ...getOverlaySettings(selectedOverlays[0]),
+        [key]: value,
         width
       }
     )
@@ -301,8 +312,12 @@ class CustomSpecial {
     }
 
     this.drawSpecial(polyline, (olys) => {
-      specials.sort((a, b) => a.invented * 1 - b.invented * 1)
+      const parentOverlay = olys[olys.length - 1]
       if (key !== 'projectMapLegendId') {
+        specials.sort((a, b) => a.invented * 1 - b.invented * 1)
+        selectedOverlays.map(o1 => {
+
+        })
         for (let i = 0; i < olys.length; i++) {
           const oly = olys[i]
           oly.id = specials[i].id
@@ -314,17 +329,29 @@ class CustomSpecial {
             updateSpecial(key, oly.getPath(), oly, this.options)
           }
         }
+        deleteSelectedOverlays(this.options, false)
       } else {
+        olys.sort((a, b) => b.invented * 1 - a.invented * 1)
+        olys.map(o => {
+          this.options.id--
+          o.id = this.options.id
+          o.parentId = parentOverlay.id
+        })
         selectedOverlays.map(item => {
           const id = item.id
-          if (item.id > 0 && removeOverlays.includes(id)) {
+          if (item.id > 0 && !removeOverlays.includes(id)) {
             removeOverlays.push(id)
           }
         })
+        deleteSelectedOverlays(this.options)
       }
-      this.options.activeOverlay = olys[0]
-      specialOverlays[activeOverlay.parentId] = olys
+      parentOverlay.enableEditing()
+      parentOverlay.drag()
+
+      olys.sort((a, b) => a.invented * 1 - b.invented * 1)
+      specialOverlays[parentOverlay.parentId] = olys
       selectedOverlays.splice(0, selectedOverlays.length, ...olys)
+      this.options.activeOverlay = olys[0]
     })
   }
 

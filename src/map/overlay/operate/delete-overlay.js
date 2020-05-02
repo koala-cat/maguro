@@ -23,21 +23,21 @@ function deleteOverlays (overlay) {
     overlays.splice(idx, 1)
     overlay.disableEditing()
     map.removeOverlay(overlay)
-    if (overlay.id && removeOverlays.includes(overlay.id)) {
+    if (overlay.id && !removeOverlays.includes(overlay.id)) {
       removeOverlays.push(parseInt(overlay.id))
     }
     deleteAnchorOverlays(overlay.options)
   }
 }
 
-function deleteSelectedOverlays (options) {
+function deleteSelectedOverlays (options, isRemove = true) {
   const { overlays, selectedOverlays } = options
   for (const oly of selectedOverlays) {
     if (oly.isLocked || oly.disabled) continue
 
     const idx = overlays.findIndex(item => item.id === oly.id)
     if (idx > -1) {
-      oly.delete()
+      oly.delete(isRemove)
     }
   }
   selectedOverlays.splice(0)

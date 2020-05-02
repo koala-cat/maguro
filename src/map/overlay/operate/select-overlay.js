@@ -21,9 +21,13 @@ function selectOverlay (e, overlay, options) {
     special.draw((overlays) => {
       const parentOverlay = overlays.find(oly => oly.invented)
       overlays.map(oly => {
-        if (!oly.invented) oly.parentId = parentOverlay.id
+        oly.parentId = parentOverlay.id
       })
+      parentOverlay.enableEditing()
+      parentOverlay.drag()
+      options.activeOverlay = overlays[0]
       specialOverlays[parentOverlay.id] = overlays
+      selectedOverlays.push(...overlays)
     })
   } else {
     multipleOverlays(e, overlay, options)

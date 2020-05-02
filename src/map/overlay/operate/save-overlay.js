@@ -21,6 +21,7 @@ function getSaveData (options) {
   }, [])
 
   for (const key in updateOverlays) {
+    if (data.removes.includes(parseInt(key))) continue
     if (updateOverlays[key].fillOpacity) {
       updateOverlays[key].opacity = updateOverlays[key].fillOpacity
       delete updateOverlays[key].fillOpacity
