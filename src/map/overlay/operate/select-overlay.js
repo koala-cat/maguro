@@ -16,8 +16,8 @@ function selectOverlay (e, overlay, options) {
     return
   }
   if (activeLegendType === 'special' && type === 'polyline' && e) {
-    options.settings = defaultSettings(activeLegendType)
-    const special = new CustomSpecial(e.point, overlay, options)
+    const settings = defaultSettings(activeLegendType)
+    const special = new CustomSpecial(e.point, overlay, settings, options)
     special.draw((overlays) => {
       const parentOverlay = overlays.find(oly => oly.invented)
       overlays.map(oly => {

@@ -5,11 +5,12 @@ import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Label extends BMap.Label {
-  constructor (point, options) {
-    super(options.settings.name, {
+  constructor (point, settings, options) {
+    super(settings.name, {
       position: point,
       offset: new BMap.Size(-30, -12)
     })
+    this.settings = settings
     this.options = options
   }
 
@@ -26,7 +27,7 @@ class Label extends BMap.Label {
   }
 
   update (key, value) {
-    updateLabel(key, value, this, this.options)
+    updateLabel(key, value, this)
   }
 
   delete () {

@@ -14,52 +14,53 @@ import Polygon from '../overlay-polygon'
 import Label from '../overlay-label'
 import Hotspot from '../overlay-hotspot'
 
-function drawOverlay (overlay, points, options) {
-  const { legends, settings } = options
+function drawOverlay (overlay, points, settings, options) {
+  const { legends } = options
   const legend = getLegend(legends, overlay)
   const type = getLegendType(legend)
 
   let newOverlay = null
   if (!type) {
     Object.assign(settings, { type: 'hotspot' })
-    newOverlay = drawHotspot(overlay, options)
+    newOverlay = drawHotspot(overlay, settings, options)
   } else {
     if (type === 'marker') {
       Object.assign(settings, { iconUrl: legend.iconUrl })
-      newOverlay = drawMarker(points[0], options)
+      newOverlay = drawMarker(points[0], settings, options)
     } else if (type === 'polyline') {
-      newOverlay = drawPolyline(points, options)
+      newOverlay = drawPolyline(points, settings, options)
+      console.log(newOverlay)
     } else if (type === 'circle') {
-      newOverlay = drawCircle(points[0], overlay.width, options)
+      newOverlay = drawCircle(points[0], overlay.width, settings, options)
     } else if (type === 'rectangle') {
-      newOverlay = drawRectangle(points, options)
+      newOverlay = drawRectangle(points, settings, options)
     } else if (type === 'polygon') {
-      newOverlay = drawPolygon(points, options)
+      newOverlay = drawPolygon(points, settings, options)
     } else if (type === 'label') {
-      newOverlay = drawLabel(points[0], options)
+      newOverlay = drawLabel(points[0], settings, options)
     }
   }
   setOverlaySettings(newOverlay, settings)
   return newOverlay
 }
 
-function drawMarker (point, options) {
-  const { legends, activeLegend, settings, isSymbol } = options
+function drawMarker (point, settings, options) {
+  const { legends, activeLegend, isSymbol } = options
   const { projectMapLegendId: legendId } = settings
   const legend = legendId ? getLegend(legends, legendId) : activeLegend
   const { svg } = legend
   let marker = null
   Object.assign(settings, { svg, iconUrl: legend.iconUrl })
   if (svg) {
-    marker = drawSvg(point, options)
+    marker = drawSvg(point, settings, options)
   } else {
     const icon = isSymbol ? drawSymbol(settings) : drawIcon(settings)
     options.icon = icon
-    marker = new Marker(point, options)
+    marker = new Marker(point, settings, options)
   }
-  marker.redraw = function (_options) {
+  marker.redraw = function (_settings) {
     const mPoint = this.getPosition()
-    return drawMarker(mPoint, _options)
+    return drawMarker(mPoint, _settings, options)
   }
 
   return setOverlay(marker, options)
@@ -105,33 +106,32 @@ function drawSymbol (settings) {
   })
 }
 
-function drawSvg (point, options) {
-  const svg = new CustomSvg(point, options)
+function drawSvg (point, settings, options) {
+  const svg = new CustomSvg(point, settings, options)
   return svg
 }
 
-function drawPolyline (points, options) {
-  const polyline = new Polyline(points, options)
+function drawPolyline (points, settings, options) {
+  const polyline = new Polyline(points, settings, options)
   return setOverlay(polyline, options)
 }
 
-function drawCircle (center, radius, options) {
-  const circle = new Circle(center, radius, options)
+function drawCircle (center, radius, settings, options) {
+  const circle = new Circle(center, radius, settings, options)
   return setOverlay(circle, options)
 }
 
-function drawRectangle (points, options) {
-  const rectangle = new Rectangle(points, options)
+function drawRectangle (points, settings, options) {
+  const rectangle = new Rectangle(points, settings, options)
   return setOverlay(rectangle, options)
 }
 
-function drawPolygon (points, options) {
-  const polygon = new Polygon(points, options)
+function drawPolygon (points, settings, options) {
+  const polygon = new Polygon(points, settings, options)
   return setOverlay(polygon, options)
 }
 
-function drawLabel (point, options) {
-  const { settings } = options
+function drawLabel (point, settings, options) {
   if (!settings.id || settings.id < 0) {
     Object.assign(
       settings,
@@ -144,8 +144,8 @@ function drawLabel (point, options) {
   }
 
   const style = {
-    color: options.settings.strokeColor,
-    fontSize: `${options.settings.width}px`,
+    color: settings.strokeColor,
+    fontSize: `${settings.width}px`,
     lineHeight: '20px',
     textAlign: 'center',
     padding: '0 10px',
@@ -154,7 +154,7 @@ function drawLabel (point, options) {
     borderStyle: 'solid',
     borderColor: 'rgba(0, 0, 0, 0)'
   }
-  const label = new Label(point, options)
+  const label = new Label(point, settings, options)
   label.setStyle(style)
   return setOverlay(label, options)
 }
@@ -163,17 +163,12 @@ function drawUploadLine (data, options) {
   const centers = []
   const legend = options.legends.find(item => item.value === 'solid')
 
-  Object.assign(
-    options,
-    {
-      settings: {
-        ...defaultSettings(legend.type),
-        name: data.name,
-        projectMapLegendId: legend.id,
-        projectGeoKey: -1
-      }
-    }
-  )
+  const settings = {
+    ...defaultSettings(legend.type),
+    name: data.name,
+    projectMapLegendId: legend.id,
+    projectGeoKey: -1
+  }
 
   const mPoints = []
   data.points.map(item => {
@@ -181,7 +176,7 @@ function drawUploadLine (data, options) {
     mPoints.push(new BMap.Point(item.lng, item.lat))
   })
   const overlay = drawPolyline(mPoints, options)
-  setOverlaySettings(overlay, options.settings)
+  setOverlaySettings(overlay, settings)
   overlay.centers = centers
   overlay.type = legend.type
   addOverlay(overlay, options)

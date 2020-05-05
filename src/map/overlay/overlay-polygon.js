@@ -5,8 +5,9 @@ import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Polygon extends BMap.Polygon {
-  constructor (points, options) {
-    super(points, options.settings)
+  constructor (points, settings, options) {
+    super(points, settings)
+    this.settings = settings
     this.options = options
   }
 
@@ -25,7 +26,7 @@ class Polygon extends BMap.Polygon {
   }
 
   update (key, value) {
-    updatePolygon(key, value, this, this.options)
+    updatePolygon(key, value, this)
   }
 
   delete () {

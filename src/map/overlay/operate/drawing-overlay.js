@@ -39,7 +39,7 @@ function breakDrawing (options) {
   const { map, overlays } = options
   map.getOverlays().map(oly => {
     const overlay = overlays.find(item => item.id === oly.id)
-    if (!overlay && !(oly instanceof BMap.GroundOverlay)) {
+    if (!overlay && (oly instanceof BMap.Polygon || oly instanceof BMap.Polyline)) {
       map.removeOverlay(oly)
     }
   })
@@ -118,7 +118,6 @@ function drawingOverlay (settings = {}, options, callback) {
   let type = activeLegend.type === 'polyline' ? activeLegend.type : activeLegend.value || activeLegend.type
   type = type === 'select' ? 'rectangle' : type
 
-  Object.assign(options, { settings })
   drawingManager[`${type}Options`] = settings
   drawingManager.open()
 
@@ -126,7 +125,7 @@ function drawingOverlay (settings = {}, options, callback) {
     const click = (e) => {
       e.stopPropagation()
 
-      const label = drawLabel(e.point, options)
+      const label = drawLabel(e.point, settings, options)
       drawingManager._mask.removeEventListener('click', click)
       drawNewOverlay(label, label)
     }
@@ -149,50 +148,49 @@ function drawingOverlay (settings = {}, options, callback) {
 
   function drawNewOverlay (overlay, newOverlay) {
     map.removeOverlay(overlay)
-    setOverlaySettings(newOverlay, options.settings)
+    console.log(settings)
+    setOverlaySettings(newOverlay, settings)
     endDrawing(options)
     if (callback) callback(newOverlay)
   }
 
   function markerComplete (e, marker) {
     const { point } = marker
+    options.isSymbol = false
     Object.assign(
-      options,
+      settings,
       {
-        settings: {
-          ...settings,
-          width: 16,
-          fillColor: '#333',
-          fillOpacity: 1
-        },
-        isSymbol: false
+        width: 16,
+        height: null,
+        fillColor: '#333',
+        fillOpacity: 1
       }
     )
 
-    const newMarker = drawMarker(point, options)
+    const newMarker = drawMarker(point, settings, options)
     drawNewOverlay(marker, newMarker)
   }
 
   function polylineComplete (line) {
     const points = line.getPath()
-    const newLine = drawPolyline(points, options)
+    const newLine = drawPolyline(points, settings, options)
     drawNewOverlay(line, newLine)
   }
 
   function circleComplete (circle) {
     const center = circle.getCenter()
     const radius = circle.getRadius()
-    const newCircle = drawCircle(center, radius, options)
+    const newCircle = drawCircle(center, radius, settings, options)
     drawNewOverlay(circle, newCircle)
   }
 
   function rectangleComplete (rectangle) {
-    const newRectangle = drawRectangle(rectangle.getPath(), options)
+    const newRectangle = drawRectangle(rectangle.getPath(), settings, options)
     drawNewOverlay(rectangle, newRectangle)
   }
 
   function polygonComplete (polygon) {
-    const newPolygon = drawPolygon(polygon.getPath(), options)
+    const newPolygon = drawPolygon(polygon.getPath(), settings, options)
     drawNewOverlay(polygon, newPolygon)
   }
 }

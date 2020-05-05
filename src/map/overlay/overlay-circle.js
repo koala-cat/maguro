@@ -5,8 +5,9 @@ import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Circle extends BMap.Circle {
-  constructor (center, radius, options) {
-    super(center, radius, options.settings)
+  constructor (center, radius, settings, options) {
+    super(center, radius, settings)
+    this.settings = settings
     this.options = options
   }
 
@@ -25,7 +26,7 @@ class Circle extends BMap.Circle {
   }
 
   update (key, value) {
-    updateCircle(key, value, this, this.options)
+    updateCircle(key, value, this)
   }
 
   delete () {

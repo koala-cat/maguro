@@ -19,9 +19,10 @@ import { getLegend } from './legend'
 import { getOverlaySettings, setOverlaySettings } from './setting'
 
 class CustomSpecial {
-  constructor (point, polyline, options) {
+  constructor (point, polyline, settings, options) {
     this.point = point
     this.polyline = polyline
+    this.settings = settings
     this.options = options
   }
 
@@ -31,11 +32,10 @@ class CustomSpecial {
       activeLegend: legend,
       markerOverlays,
       markerPoints,
-      markerPositions,
-      settings
+      markerPositions
     } = this.options
-    this.options.settings = Object.assign(
-      settings,
+    Object.assign(
+      this.settings,
       {
         type: legend.value,
         iconUrl: legend.iconUrl,
@@ -53,7 +53,7 @@ class CustomSpecial {
     const idx = calcMarkerOnLinePosition(this.point, this.polyline)
 
     if (idx > -1) {
-      const icon = drawSymbol({ ...settings, fillOpacity: 1 })
+      const icon = drawSymbol({ ...this.settings, fillOpacity: 1 })
       const marker = new BMap.Marker(this.point, {
         icon: icon
       })
@@ -68,7 +68,7 @@ class CustomSpecial {
 
     if (markerPoints.length < 2) return
 
-    this.options.settings.width = 32
+    this.settings.width = 32
     this.options.parentId--
     return this.drawSpecial(this.polyline, callback)
   }
@@ -80,11 +80,10 @@ class CustomSpecial {
       legends,
       markerPoints,
       markerPositions,
-      parentId,
-      settings
+      parentId
     } = this.options
     let newPoints = []
-    parentId = settings.parentId !== -1 ? settings.parentId : parentId
+    parentId = this.settings.parentId !== -1 ? this.settings.parentId : parentId
 
     if (data instanceof BMap.Polyline) {
       const points = data.getPath()
@@ -100,13 +99,13 @@ class CustomSpecial {
     } else {
       newPoints = data
     }
-    const { projectMapLegendId, width } = settings
+    const { projectMapLegendId, width } = this.settings
     const legend = getLegend(legends, projectMapLegendId)
     const type = legend?.value || ''
     const { wPoint, wPixel } = distanceToPointAndPixel(map, width)
     let overlays = []
     Object.assign(
-      settings,
+      this.settings,
       {
         wPoint,
         wPixel,
@@ -116,10 +115,10 @@ class CustomSpecial {
       }
     )
     if (type.includes('Line')) {
-      settings.count = type.includes('DoubleLine') ? 2 : 3
+      this.settings.count = type.includes('DoubleLine') ? 2 : 3
       overlays = this.drawSpecialLine(newPoints)
     } else {
-      settings.wTail = type.includes('AngularRect') ? wPoint : 0
+      this.settings.wTail = type.includes('AngularRect') ? wPoint : 0
       overlays = this.drawSpecialRect(newPoints)
     }
     deleteAnchorOverlays(this.options)
@@ -132,17 +131,17 @@ class CustomSpecial {
   }
 
   drawSpecialLine (points, wTail = 0) { // 双平行线、三平行线
-    const { overlayEvents: events, settings } = this.options
-    const { count, wPoint, wPixel } = settings
+    const { overlayEvents: events } = this.options
+    const { count, wPoint, wPixel } = this.settings
     const { lineSL, lineSR } = calcSpecialPoints(points, wPoint, wTail)
     const overlays = []
-    overlays.push(this.drawPolyline(lineSL, settings))
-    overlays.push(this.drawPolyline(lineSR, settings))
+    overlays.push(this.drawPolyline(lineSL, this.settings))
+    overlays.push(this.drawPolyline(lineSR, this.settings))
     if (count === 3) {
-      overlays.push(this.drawPolyline(points, { ...settings, strokeStyle: 'dashed' }))
+      overlays.push(this.drawPolyline(points, { ...this.settings, strokeStyle: 'dashed' }))
     }
     overlays.push(this.drawPolyline(points, {
-      ...settings,
+      ...this.settings,
       invented: true,
       strokeColor: 'rgba(0, 0, 0, 0)',
       strokeWeight: Math.ceil(wPixel) * 2
@@ -151,8 +150,8 @@ class CustomSpecial {
   }
 
   drawSpecialRect (points) {
-    const { overlayEvents: events, settings } = this.options
-    const { wPoint, wPixel, wTail } = settings
+    const { overlayEvents: events } = this.options
+    const { wPoint, wPixel, wTail } = this.settings
     const { lineSL, lineSR, lineTail } = calcSpecialPoints(points, wPoint, wTail)
     const tailL1 = [lineTail[0], lineSL[0]]
     const tailL2 = [lineTail[1], lineSR[0]]
@@ -160,19 +159,19 @@ class CustomSpecial {
     const tailR2 = [lineTail[3], lineSR[lineSR.length - 1]]
     const overlays = []
 
-    Object.assign(settings, { fillOpacity: 0.00001 })
+    Object.assign(this.settings, { fillOpacity: 0.00001 })
 
     lineSR.reverse()
-    overlays.push(this.drawRectangle(lineSL.concat(lineSR), settings))
+    overlays.push(this.drawRectangle(lineSL.concat(lineSR), this.settings))
 
     if (wTail !== 0) {
-      overlays.push(this.drawPolyline(tailL1, settings))
-      overlays.push(this.drawPolyline(tailL2, settings))
-      overlays.push(this.drawPolyline(tailR1, settings))
-      overlays.push(this.drawPolyline(tailR2, settings))
+      overlays.push(this.drawPolyline(tailL1, this.settings))
+      overlays.push(this.drawPolyline(tailL2, this.settings))
+      overlays.push(this.drawPolyline(tailR1, this.settings))
+      overlays.push(this.drawPolyline(tailR2, this.settings))
     }
     overlays.push(this.drawPolyline(points, {
-      ...settings,
+      ...this.settings,
       invented: true,
       strokeColor: 'rgba(0, 0, 0, 0)',
       strokeWeight: Math.ceil(wPixel) * 2
@@ -196,6 +195,7 @@ class CustomSpecial {
 
   extend (events, overlay) {
     overlay.options = this.options
+    overlay.settings = this.settings
     if (events) {
       addEvents(events, overlay)
       overlay.enableEditing = () => {
@@ -238,10 +238,9 @@ class CustomSpecial {
       overlays,
       markerOverlays,
       markerPoints,
-      markerPositions,
-      settings
+      markerPositions
     } = this.options
-    const { sizeWidth = 10, sizeHeight = 10 } = settings
+    const { sizeWidth = 10, sizeHeight = 10 } = this.settings
 
     let points = null
     const markers = []
@@ -287,16 +286,16 @@ class CustomSpecial {
 
   update (key, value, overlay) {
     if (key === 'points' && !overlay) {
-      updatePolyline(key, value, this.overlay, this.options)
+      updatePolyline(key, value, this.overlay)
       return
     }
 
-    const { selectedOverlays, specialOverlays, removeOverlays, settings } = this.options
+    const { selectedOverlays, specialOverlays, removeOverlays } = this.options
     const specials = cloneDeep(selectedOverlays)
     const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1].getPath()
     const width = key === 'width' ? parseFloat(value) < 10 ? 10 : parseFloat(value) : overlay.width
     Object.assign(
-      settings,
+      this.settings,
       {
         ...getOverlaySettings(selectedOverlays[0]),
         [key]: value,
@@ -322,11 +321,11 @@ class CustomSpecial {
           const oly = olys[i]
           oly.id = specials[i].id
           if (key === 'width') {
-            updateSpecial(key, width, oly, this.options)
+            updateSpecial(key, width, oly)
             continue
           }
           if (key === 'points') {
-            updateSpecial(key, oly.getPath(), oly, this.options)
+            updateSpecial(key, oly.getPath(), oly)
           }
         }
         deleteSelectedOverlays(this.options, false)

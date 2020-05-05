@@ -49,28 +49,28 @@ export default {
       const mapKeys = Object.keys(this.mapEvents)
       const eventKeys = [...defaultKeys, ...mapKeys]
 
+      this.unbindMapEvents()
+
       for (const key of eventKeys) {
         if (mapKeys.includes(key)) {
           const item = this.mapEvents[key]
-          if (!item.isMerge) {
-            this.map.addEventListener(key, (e) => {
-              item.event(e)
-            })
-          } else {
-            this.map.addEventListener(key, (e) => {
+          if (item.isMerge) {
+            this.events[key].event = (e) => {
               if (defaultEvents[key]) defaultEvents[key].event(e)
-              try {
-                item.event(e)
-              } catch (err) {
-                console.log(err)
-              }
-            })
+              item.event(e)
+            }
           }
           continue
         }
-        this.map.addEventListener(key, (e) => {
-          defaultEvents[key].event(e)
-        })
+        this.events[key] = defaultEvents[key]
+      }
+      for (const key in this.events) {
+        this.map.addEventListener(key, this.events[key].event)
+      }
+    },
+    unbindMapEvents () {
+      for (const key in this.events) {
+        this.map.removeEventListener(key, this.events[key].event)
       }
     },
     bindDocumentEvents () {
@@ -135,15 +135,15 @@ export default {
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
         const specials = this.specialOverlays[key]
-        specials.sort((a, b) => a.invented * 1 - b.invented * 1)
-        this.$data.settings = {
+        const settings = {
           ...getOverlaySettings(specials[0]),
           type: specials[0].type
         }
+        specials.sort((a, b) => a.invented * 1 - b.invented * 1)
 
         const overlay = specials[specials.length - 1]
         const polyline = getSpecialAttachPolyline(overlay, this.overlays)
-        const special = new CustomSpecial(null, polyline, this.$data)
+        const special = new CustomSpecial(null, polyline, settings, this.$data)
         const newSpecials = special.drawSpecial(overlay.points)
         newSpecials.map((oly, i) => {
           oly.id = specials[i].id
@@ -177,16 +177,16 @@ export default {
           return
         }
 
-        this.$data.settings = {
+        const settings = {
           ...getOverlaySettings(oly),
           type
         }
-        const overlay = drawOverlay(oly, mPoints, this.$data)
+        const overlay = drawOverlay(oly, mPoints, settings, this.$data)
         if (this.mapType !== 'graphic') overlay.hide()
 
         addOverlay(overlay, this.$data)
       } catch (err) {
-        console.log('initSpecial' + err)
+        console.log('initOverlay' + err)
       }
     },
     clearOverlays () {
@@ -279,6 +279,9 @@ export default {
         this.$emit('save', result, () => {
           this.$data.updateOverlays = {}
           this.$data.removeOverlays = []
+          if (this.activeOverlay) {
+            this.activeOverlay.enableEditing()
+          }
           notify('success', '保存成功。')
         })
       } else {

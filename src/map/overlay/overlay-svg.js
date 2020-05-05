@@ -3,9 +3,10 @@ import CustomOverlay from './overlay'
 import { calcOnePixelToPoint } from '../calc/point'
 
 class CustomSvg extends CustomOverlay {
-  constructor (point, options) {
+  constructor (point, settings, options) {
     super()
     this.point = point
+    this.settings = settings
     this.options = options
 
     this._errorCount = 16
@@ -18,7 +19,7 @@ class CustomSvg extends CustomOverlay {
       svg,
       width,
       height
-    } = this.options.settings
+    } = this.settings
     const viewBox = svg.getAttribute('viewBox')
     this.class = svg.getAttribute('class')
 
@@ -57,10 +58,10 @@ class CustomSvg extends CustomOverlay {
     if (this.class && this.class.includes('vtk')) {
       this.setBounds()
     } else {
-      const width = this.width || this.options.settings.width
+      const width = this.width || this.settings.width
       const height = this.height
       Object.assign(
-        this.options.settings,
+        this.settings,
         {
           width,
           height
@@ -112,7 +113,7 @@ class CustomSvg extends CustomOverlay {
       }
     )
     Object.assign(
-      this.options.settings,
+      this.settings,
       {
         width,
         height

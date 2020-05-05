@@ -7,8 +7,9 @@ import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Polyline extends BMap.Polyline {
-  constructor (points, options) {
-    super(points, options.settings)
+  constructor (points, settings, options) {
+    super(points, settings)
+    this.settings = settings
     this.options = options
   }
 
@@ -31,7 +32,7 @@ class Polyline extends BMap.Polyline {
   }
 
   update (key, value) {
-    updatePolyline(key, value, this, this.options)
+    updatePolyline(key, value, this)
   }
 
   delete () {

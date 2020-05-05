@@ -5,8 +5,9 @@ import { deleteOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Marker extends BMap.Marker {
-  constructor (point, options) {
+  constructor (point, settings, options) {
     super(point, { icon: options.icon })
+    this.settings = settings
     this.options = options
   }
 
@@ -33,7 +34,7 @@ class Marker extends BMap.Marker {
   }
 
   update (key, value) {
-    updateMarker(key, value, this, this.options)
+    updateMarker(key, value, this)
   }
 
   delete () {

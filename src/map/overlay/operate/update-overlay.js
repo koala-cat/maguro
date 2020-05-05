@@ -15,8 +15,8 @@ const ignoreFields = [
 ]
 let lineUpdate = null
 
-function showOverlay (key, value, overlay, options) {
-  const { overlays } = options
+function showOverlay (key, value, overlay) {
+  const { overlays } = overlay.options
   const type = overlay.type
 
   let polylineVisible = true
@@ -46,12 +46,12 @@ function showOverlay (key, value, overlay, options) {
       oly.hide()
       oly.disableEditing()
     }
-    updateOverlay(key, value, oly, options)
+    updateOverlay(key, value, oly)
   })
 }
 
-function updateOverlay (key, value, overlay, options) {
-  const { structures, updateOverlays, polylinePointIds } = options
+function updateOverlay (key, value, overlay) {
+  const { structures, updateOverlays, polylinePointIds } = overlay.options
   const { id, name, projectGeoKey } = overlay
   lineUpdate = key
   overlay[key] = value
@@ -93,12 +93,14 @@ function updateOverlay (key, value, overlay, options) {
   )
 }
 
-function updateMarker (key, value, overlay, options) {
-  const { map, overlays, settings } = options
+function updateMarker (key, value, overlay) {
+  const { settings, options } = overlay
+  const { map, overlays } = options
+  let newOverlay = overlay
   settings[key] = value
 
   if (ignoreFields.includes(key)) {
-    showOverlay(key, value, overlay, options)
+    showOverlay(key, value, overlay)
   } else if (key !== 'projectMapLegendId' && overlay.svg) {
     const style = settingsToStyle({ [key]: value })
     for (const s in style) {
@@ -111,45 +113,46 @@ function updateMarker (key, value, overlay, options) {
     const index = overlays.findIndex(item => item.id === overlay.id)
     if (index > -1) {
       overlay.disableEditing()
-      overlay.delete()
 
-      const newOverlay = overlay.redraw(options)
+      newOverlay = overlay.redraw(settings)
       map.removeOverlay(overlay)
       setOverlaySettings(newOverlay, settings)
       addAndSelectOverlay(newOverlay, options)
+      const newIndex = overlays.findIndex(item => item === newOverlay)
+      if (newIndex > -1) overlays.splice(newIndex, 1)
       overlays.splice(index, 1, newOverlay)
     }
   }
-  updateOverlay(key, value, overlay, options)
+  updateOverlay(key, value, newOverlay)
 }
 
-function updatePolyline (key, value, overlay, options) {
-  const { settings } = options
+function updatePolyline (key, value, overlay) {
+  const { settings } = overlay
   settings[key] = value
   if (overlay.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
   if (ignoreFields.includes(key)) {
-    showOverlay(key, value, overlay, options)
+    showOverlay(key, value, overlay)
   } else if (key !== 'points') {
     overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
   }
 
-  updateOverlay(key, value, overlay, options)
+  updateOverlay(key, value, overlay)
 }
 
-function updateCircle (key, value, overlay, options) {
-  updatePolyline(key, value, overlay, options)
+function updateCircle (key, value, overlay) {
+  updatePolyline(key, value, overlay)
 }
 
-function updateRectangle (key, value, overlay, options) {
-  updatePolyline(key, value, overlay, options)
+function updateRectangle (key, value, overlay) {
+  updatePolyline(key, value, overlay)
 }
 
-function updatePolygon (key, value, overlay, options) {
-  updatePolyline(key, value, overlay, options)
+function updatePolygon (key, value, overlay) {
+  updatePolyline(key, value, overlay)
 }
 
-function updateLabel (key, value, overlay, options) {
-  const { settings } = options
+function updateLabel (key, value, overlay) {
+  const { settings } = overlay
   settings[key] = value
 
   if (key === 'name') {
@@ -157,20 +160,20 @@ function updateLabel (key, value, overlay, options) {
   }
 
   if (ignoreFields.includes(key)) {
-    showOverlay(key, value, overlay, options)
+    showOverlay(key, value, overlay)
   }
-  updateOverlay(key, value, overlay, options)
+  updateOverlay(key, value, overlay)
 
   const style = settingsToStyle({ [key]: value }, 'label')
   overlay.setStyle(style)
 }
 
-function updateSpecial (key, value, overlay, options) {
-  updateOverlay(key, value, overlay, options)
+function updateSpecial (key, value, overlay) {
+  updateOverlay(key, value, overlay)
 }
 
-function updateHotspot (key, value, overlay, options) {
-  updateOverlay(key, value, overlay, options)
+function updateHotspot (key, value, overlay) {
+  updateOverlay(key, value, overlay)
 }
 
 function onLineupdate (e) {
@@ -180,11 +183,11 @@ function onLineupdate (e) {
     let points = null
     try {
       points = [overlay.getCenter()]
-      updateOverlay('width', overlay.getRadius(), overlay, overlay.options)
+      updateOverlay('width', overlay.getRadius(), overlay)
     } catch {
       points = overlay.getPath()
     }
-    updateOverlay('points', points, overlay, overlay.options)
+    updateOverlay('points', points, overlay)
   }
 }
 

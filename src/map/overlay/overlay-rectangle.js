@@ -7,17 +7,18 @@ import { deleteOverlays, deleteAnchorOverlays } from './operate/delete-overlay'
 import { dragOverlay } from './operate/drag-overlay'
 
 class Rectangle extends BMap.Polygon {
-  constructor (points, options) {
-    super(points, options.settings)
+  constructor (points, settings, options) {
+    super(points, settings)
+    this.settings = settings
     this.options = options
   }
 
   enableEditing () {
-    const { map, markerOverlays, settings } = this.options
+    const { map, markerOverlays } = this.options
     const mPoints = this.getPath()
     const points = calcRectAllPoints(mPoints[0], mPoints[2], 6)
 
-    const { sizeWidth = 10, sizeHeight = 10 } = settings
+    const { sizeWidth = 10, sizeHeight = 10 } = this.settings
     const markers = []
     const moveIcon = new BMap.Icon(
       'assets/images/bullet.jpg',
@@ -54,7 +55,7 @@ class Rectangle extends BMap.Polygon {
   }
 
   update (key, value) {
-    updateRectangle(key, value, this, this.options)
+    updateRectangle(key, value, this)
   }
 
   delete () {

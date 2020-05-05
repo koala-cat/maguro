@@ -25,7 +25,7 @@ class CustomOverlay extends BMap.Overlay {
     }
     const newOverlay = this.draw(point, false, settings, events)
     this.options.newOverlay = newOverlay
-    updateMarker(key, value, this, this.options)
+    updateMarker(key, value, this)
   }
 
   delete () {
@@ -51,13 +51,13 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   setSize (value) {
-    this.options.settings.width = value
+    this.settings.width = value
     this.setTransform()
   }
 
   setTransform () {
-    const { map, settings } = this.options
-    const { offsetX: x = 0, offsetY: y = 0, width, height } = settings
+    const { map } = this.options
+    const { offsetX: x = 0, offsetY: y = 0, width, height } = this.settings
     const offset = {
       x: x - parseFloat(width) / 2,
       y: height ? y - parseFloat(height) / 2 : y - parseFloat(width) / 2

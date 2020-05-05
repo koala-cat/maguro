@@ -76,6 +76,7 @@
         drawingManager: null,
         areaRestriction: null,
         zoomSettings: {},
+        events: {},
         overlayEvents: this.mapOverlayEvents,
         legends: this.mapLegends,
         overlays: [],
