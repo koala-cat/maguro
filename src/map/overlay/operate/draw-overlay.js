@@ -175,7 +175,7 @@ function drawUploadLine (data, options) {
     centers.push(item.center)
     mPoints.push(new BMap.Point(item.lng, item.lat))
   })
-  const overlay = drawPolyline(mPoints, options)
+  const overlay = drawPolyline(mPoints, settings, options)
   setOverlaySettings(overlay, settings)
   overlay.centers = centers
   overlay.type = legend.type

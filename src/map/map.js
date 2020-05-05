@@ -14,7 +14,7 @@ import { getLegend, getLegendType } from './overlay/legend'
 
 import { addOverlay } from './overlay/operate/add-overlay'
 import { drawOverlay, drawUploadLine } from './overlay/operate/draw-overlay'
-import { initDrawing, breakDrawing, startDrawing, endDrawing } from './overlay/operate/drawing-overlay'
+import { initDrawing, breakDrawing, startDrawing } from './overlay/operate/drawing-overlay'
 import { deselectOverlays } from './overlay/operate/deselect-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
 import { getSaveData } from './overlay/operate/save-overlay'
@@ -59,6 +59,8 @@ export default {
               if (defaultEvents[key]) defaultEvents[key].event(e)
               item.event(e)
             }
+          } else {
+            this.events[key] = item
           }
           continue
         }
@@ -91,7 +93,7 @@ export default {
       document.addEventListener('mousedown', (e) => {
         if (!e.point || !(this.areaRestriction instanceof BMap.Bounds)) return
         if (!isPointInRect(e.point, this.areaRestriction)) {
-          endDrawing(this.$data)
+          breakDrawing(this.$data)
           notify('warning', '请在有效区域内绘制。')
         }
       })
@@ -202,8 +204,8 @@ export default {
       this.overlayListVisible = false
     },
 
-    drawSvg (point, options) {
-      const overlay = new CustomSvg(point, options)
+    drawSvg (point, settings, options) {
+      const overlay = new CustomSvg(point, settings, options)
       return overlay
     },
     setMapType (val) {
