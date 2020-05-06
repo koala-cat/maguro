@@ -148,7 +148,6 @@ function drawingOverlay (settings = {}, options, callback) {
 
   function drawNewOverlay (overlay, newOverlay) {
     map.removeOverlay(overlay)
-    console.log(settings)
     setOverlaySettings(newOverlay, settings)
     endDrawing(options)
     if (callback) callback(newOverlay)

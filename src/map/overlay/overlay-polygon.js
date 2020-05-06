@@ -11,13 +11,17 @@ class Polygon extends BMap.Polygon {
     this.options = options
   }
 
+  lineupdate (e) {
+    onLineupdate(e, this.options)
+  }
+
   enableEditing () {
-    this.addEventListener('lineupdate', onLineupdate)
+    this.addEventListener('lineupdate', this.lineupdate)
     super.enableEditing()
   }
 
   disableEditing () {
-    this.removeEventListener('lineupdate', onLineupdate)
+    this.removeEventListener('lineupdate', this.lineupdate)
     super.disableEditing()
   }
 

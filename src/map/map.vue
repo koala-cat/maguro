@@ -93,6 +93,11 @@
         markerOverlays: [],
         markerPoints: [],
         markerPositions: [],
+        adsorbData: {
+          point: null,
+          polylineOverlay: null,
+          cursorOverlay: null
+        },
         id: -2,
         parentId: -1,
         view: true
@@ -104,6 +109,10 @@
       },
       configureVisible () {
         return this.baseMapVisible && this.mapConfigureVisible
+      },
+      polylineOverlays () {
+        const polylineOverlays = this.overlays.filter(oly => oly instanceof BMap.Ployline)
+        return polylineOverlays
       }
     },
     watch: {

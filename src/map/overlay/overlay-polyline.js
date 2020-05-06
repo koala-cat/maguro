@@ -13,17 +13,21 @@ class Polyline extends BMap.Polyline {
     this.options = options
   }
 
+  lineupdate (e) {
+    onLineupdate(e, this.options)
+  }
+
   enableEditing () {
     const { overlays } = this.options
     if (getPolylineIncludeSpecials(this, overlays).length === 0 &&
       !this.projectGeoKey) {
-      this.addEventListener('lineupdate', onLineupdate)
+      this.addEventListener('lineupdate', this.lineupdate)
       super.enableEditing()
     }
   }
 
   disableEditing () {
-    this.removeEventListener('lineupdate', onLineupdate)
+    this.removeEventListener('lineupdate', this.lineupdate)
     super.disableEditing()
   }
 

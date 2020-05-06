@@ -1,9 +1,9 @@
 import BMap from 'BMap'
 
-import { getOverlaySettings } from './setting'
-import { updateMarker } from './operate/update-overlay'
-import { deleteOverlays } from './operate/delete-overlay'
-import { dragOverlay } from './operate/drag-overlay'
+import { getOverlaySettings } from '../setting'
+import { updateMarker } from '../operate/update-overlay'
+import { deleteOverlays } from '../operate/delete-overlay'
+import { dragOverlay } from '../operate/drag-overlay'
 
 class CustomOverlay extends BMap.Overlay {
   constructor () {

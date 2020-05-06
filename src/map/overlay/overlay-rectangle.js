@@ -13,6 +13,10 @@ class Rectangle extends BMap.Polygon {
     this.options = options
   }
 
+  lineupdate (e) {
+    onLineupdate(e, this.options)
+  }
+
   enableEditing () {
     const { map, markerOverlays } = this.options
     const mPoints = this.getPath()
@@ -42,11 +46,11 @@ class Rectangle extends BMap.Polygon {
       map.addOverlay(marker)
     }
     markerOverlays.push(...markers)
-    this.addEventListener('lineupdate', onLineupdate)
+    this.addEventListener('lineupdate', this.lineupdate)
   }
 
   disableEditing () {
-    this.removeEventListener('lineupdate', onLineupdate)
+    this.removeEventListener('lineupdate', this.lineupdate)
     deleteAnchorOverlays(this.options)
   }
 

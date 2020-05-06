@@ -1,6 +1,6 @@
 import BMap from 'BMap'
 import CustomOverlay from './overlay'
-import { calcOnePixelToPoint } from '../calc/point'
+import { calcOnePixelToPoint } from '../../calc/point'
 
 class CustomSvg extends CustomOverlay {
   constructor (point, settings, options) {

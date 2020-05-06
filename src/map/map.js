@@ -3,8 +3,9 @@ import { notify } from 'mussel'
 import clonedeep from 'lodash.clonedeep'
 import debounce from 'lodash.debounce'
 
-import CustomSvg from '../map/overlay/overlay-svg'
-import CustomSpecial from './overlay/overlay-special'
+import CustomSvg from './overlay/custom/overlay-svg'
+import CustomSpecial from './overlay/custom/overlay-special'
+import CustomCursor from './overlay/custom/overlay-cursor'
 
 import { showOverlays } from './calc/clusterer'
 import { isPointInRect } from './calc/geo'
@@ -24,27 +25,12 @@ export default {
     init () {
       this.bindMapEvents()
       this.bindDocumentEvents()
+      this.adsorbData.cursorOverlay = this.drawCursor()
 
       initDrawing(this.$data)
     },
     bindMapEvents () {
-      const defaultEvents = {
-        click: {
-          event: (e) => {
-            if ((this.activeLegend && !this.activeLegend.type) || !this.activeLegend) {
-              if (!e.overlay) {
-                deselectOverlays(this.$data)
-              }
-            }
-          }
-        },
-        zoomend: {
-          event: () => {
-            showOverlays(this.$data)
-          }
-        }
-      }
-
+      const defaultEvents = this.getDefaultEvents()
       const defaultKeys = Object.keys(defaultEvents)
       const mapKeys = Object.keys(this.mapEvents)
       const eventKeys = [...defaultKeys, ...mapKeys]
@@ -119,7 +105,7 @@ export default {
       for (const oly of overlays) {
         const legend = getLegend(this.legends, oly)
         oly.type = getLegendType(legend)
-        this.setOverlay(oly, wholePoints)
+        this.drawOverlay(oly, wholePoints)
       }
       this.initSpecialOverlays()
       if (this.view && this.mapType !== 'graphic') {
@@ -155,7 +141,95 @@ export default {
         deselectOverlays(this.$data)
       }
     },
-    setOverlay (oly, wholePoints) {
+    switchOverlayWindow (key) {
+      this.activeLegend = null
+      this[key] = !this[key]
+    },
+    restoreToolkit () {
+      this.switchOverlayWindow('overlayListVisible')
+      this.overlayListVisible = false
+    },
+    setMapType (val) {
+      this.$emit('setMapMode', val)
+    },
+    setMapZoomSettings (key, value) {
+      this.$emit('setMapZoomSettings', key, value, () => {
+        showOverlays(this.$data)
+      })
+    },
+    addLegend () {
+      this.$emit('addLegend')
+    },
+    removeLegend (legend) {
+      this.$emit('removeLegend', legend)
+    },
+    selectLegend (legend) {
+      if (this.overlayListVisible) {
+        this.overlayListVisible = false
+      }
+
+      this.activeLegend = legend
+      if (legend.value !== 'scale') {
+        startDrawing(this.$data)
+      }
+    },
+    selectOverlay (overlay) {
+      let points = null
+      const type = overlay.type
+      if (type === 'hotspot') {
+        selectOverlay(null, overlay, this.$data)
+        return
+      }
+      try {
+        points = overlay.getPath()
+      } catch {
+        points = [overlay.getPosition()]
+      }
+
+      if (type.includes('special')) {
+        overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
+      }
+      selectOverlay(null, overlay, this.$data)
+
+      const viewPort = this.map.getViewport(points)
+      this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+    },
+    updateOverlay: debounce(function (key, value, overlay) {
+      overlay = overlay || this.activeOverlay
+      if (overlay.type && overlay.type.includes('specia')) {
+        const specials = this.specialOverlays[overlay.parentId]
+        overlay = specials.find(oly => oly.invented)
+      }
+      try {
+        overlay.update(key, value)
+      } catch (err) {
+        console.log(err)
+      }
+    }, 500),
+    saveOverlays () {
+      const result = getSaveData(this.$data)
+      if (result) {
+        this.$emit('save', result, () => {
+          this.$data.updateOverlays = {}
+          this.$data.removeOverlays = []
+          if (this.activeOverlay) {
+            this.activeOverlay.enableEditing()
+          }
+          notify('success', '保存成功。')
+        })
+      } else {
+        notify('info', '没有需要修改的信息。')
+      }
+    },
+    clearOverlays () {
+      const overlays = this.map.getOverlays()
+      overlays.map(oly => {
+        if (oly.type) {
+          this.map.removeOverlay(oly)
+        }
+      })
+    },
+    drawOverlay (oly, wholePoints) {
       const { id, type = '', projectGeoKey, points } = oly
       const mPoints = []
 
@@ -191,103 +265,59 @@ export default {
         console.log('initOverlay' + err)
       }
     },
-    clearOverlays () {
-      const overlays = this.map.getOverlays()
-      overlays.map(oly => {
-        if (oly.type) {
-          this.map.removeOverlay(oly)
-        }
-      })
+    drawUploadLine (data) {
+      drawUploadLine(data, this.$data)
     },
-    restoreToolkit () {
-      this.switchOverlayWindow('overlayListVisible')
-      this.overlayListVisible = false
-    },
-
     drawSvg (point, settings, options) {
       const overlay = new CustomSvg(point, settings, options)
       return overlay
     },
-    setMapType (val) {
-      this.$emit('setMapMode', val)
-    },
-    setMapZoomSettings (key, value) {
-      this.$emit('setMapZoomSettings', key, value, () => {
-        showOverlays(this.$data)
-      })
+    drawCursor (point) {
+      const settings = {
+        width: 32,
+        innerBgColor: 'rgb(69, 123, 216)',
+        outerBgColor: 'rgba(68, 123, 216, 0.2)'
+      }
+      const overlay = new CustomCursor(point, settings, this.$data)
+      return overlay
     },
     getOverlaySettings (overlay) {
       return getOverlaySettings(overlay)
     },
-    addLegend () {
-      this.$emit('addLegend')
-    },
-    removeLegend (legend) {
-      this.$emit('removeLegend', legend)
-    },
-    switchOverlayWindow (key) {
-      this.activeLegend = null
-      this[key] = !this[key]
-    },
-    selectLegend (legend) {
-      if (this.overlayListVisible) {
-        this.overlayListVisible = false
-      }
-
-      this.activeLegend = legend
-      if (legend.value !== 'scale') {
-        startDrawing(this.$data)
-      }
-    },
-    drawUploadLine (data) {
-      drawUploadLine(data, this.$data)
-    },
-    updateOverlay: debounce(function (key, value, overlay) {
-      overlay = overlay || this.activeOverlay
-      if (overlay.type && overlay.type.includes('specia')) {
-        const specials = this.specialOverlays[overlay.parentId]
-        overlay = specials.find(oly => oly.invented)
-      }
-      try {
-        overlay.update(key, value)
-      } catch (err) {
-        console.log(err)
-      }
-    }, 500),
-    selectOverlay (overlay) {
-      let points = null
-      const type = overlay.type
-      if (type === 'hotspot') {
-        selectOverlay(null, overlay, this.$data)
-        return
-      }
-      try {
-        points = overlay.getPath()
-      } catch {
-        points = [overlay.getPosition()]
-      }
-
-      if (type.includes('special')) {
-        overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
-      }
-      selectOverlay(null, overlay, this.$data)
-
-      const viewPort = this.map.getViewport(points)
-      this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-    },
-    saveOverlays () {
-      const result = getSaveData(this.$data)
-      if (result) {
-        this.$emit('save', result, () => {
-          this.$data.updateOverlays = {}
-          this.$data.removeOverlays = []
-          if (this.activeOverlay) {
-            this.activeOverlay.enableEditing()
+    getDefaultEvents () {
+      return {
+        click: {
+          event: (e) => {
+            if (this.adsorbData) {
+              const { point, polyline } = this.adsorbData
+              e.point = point
+              selectOverlay(e, polyline, this.$data)
+            }
+            if ((this.activeLegend && !this.activeLegend.type) || !this.activeLegend) {
+              if (!e.overlay) {
+                deselectOverlays(this.$data)
+              }
+            }
           }
-          notify('success', '保存成功。')
-        })
-      } else {
-        notify('info', '没有需要修改的信息。')
+        },
+        mousemove: {
+          event: (e) => {
+            const { cursorOverlay } = this.adsorbData
+            if (cursorOverlay.isVisible()) {
+              const { point, polyline } = this.adsorbOverlay(e.point, this.polylineOverlays)
+              cursorOverlay.setPosition(point)
+              Object.assign(
+                this.adsorbData,
+                { point, polyline }
+              )
+            }
+          }
+        },
+        zoomend: {
+          event: () => {
+            showOverlays(this.$data)
+          }
+        }
       }
     }
   }

@@ -1,6 +1,8 @@
 import BMap from 'BMap'
+import { notify } from 'mussel'
 
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
+import { isPointInRect } from '../../calc/geo'
 
 import { addAndSelectOverlay } from './add-overlay'
 import { setOverlaySettings, settingsToStyle } from '../setting'
@@ -176,18 +178,28 @@ function updateHotspot (key, value, overlay) {
   updateOverlay(key, value, overlay)
 }
 
-function onLineupdate (e) {
+function onLineupdate (e, options) {
+  const { areaRestriction } = options
   const overlay = e instanceof BMap.Overlay ? e : e.target
-
   if (!lineUpdate) {
     let points = null
+    let saveable = true
     try {
       points = [overlay.getCenter()]
       updateOverlay('width', overlay.getRadius(), overlay)
     } catch {
       points = overlay.getPath()
     }
-    updateOverlay('points', points, overlay)
+    for (const p of points) {
+      if (!isPointInRect(p, areaRestriction)) {
+        notify('warning', '元件超出绘制区域将不予保存。')
+        saveable = false
+        break
+      }
+    }
+    if (saveable) {
+      updateOverlay('points', points, overlay)
+    }
   }
 }
 

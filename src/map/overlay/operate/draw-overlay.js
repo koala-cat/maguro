@@ -6,7 +6,7 @@ import { defaultSettings, setOverlaySettings } from '../setting'
 import { addOverlay } from './add-overlay'
 
 import Marker from '../overlay-marker'
-import CustomSvg from '../overlay-svg'
+import CustomSvg from '../custom/overlay-svg'
 import Polyline from '../overlay-polyline'
 import Circle from '../overlay-circle'
 import Rectangle from '../overlay-rectangle'
@@ -182,10 +182,11 @@ function drawUploadLine (data, options) {
   addOverlay(overlay, options)
 }
 
-function drawHotspot (overlay, options) {
+function drawHotspot (overlay, settings, options) {
+  console.log(overlay)
   if (!overlay.hotspotMark) return
   const el = document.querySelector(`#${overlay.hotspotMark}`)
-  const hotspot = new Hotspot(el, options)
+  const hotspot = new Hotspot(el, settings, options)
   return setOverlay(hotspot, options)
 }
 

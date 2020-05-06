@@ -1,4 +1,4 @@
-import CustomSpecial from '../overlay-special'
+import CustomSpecial from '../custom/overlay-special'
 
 import { isOverlayInFrame } from '../../calc/geo.js'
 import { getPolylineIncludeSpecials } from '../../calc/overlay'
