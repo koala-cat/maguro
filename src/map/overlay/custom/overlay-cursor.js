@@ -7,7 +7,7 @@ class CustomCursor extends CustomOverlay {
     this.point = point
     this.settings = settings
     this.options = options
-    this.type = this.settings.type
+    this.type = 'cursor'
   }
 
   initialize () {

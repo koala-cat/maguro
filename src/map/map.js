@@ -20,12 +20,13 @@ import { deselectOverlays } from './overlay/operate/deselect-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
 import { getSaveData } from './overlay/operate/save-overlay'
 
+import { adsorbOverlay } from '../map/overlay/operate/adsorb-overlay'
+
 export default {
   methods: {
     init () {
       this.bindMapEvents()
       this.bindDocumentEvents()
-      this.adsorbData.cursorOverlay = this.drawCursor()
 
       initDrawing(this.$data)
     },
@@ -34,7 +35,6 @@ export default {
       const defaultKeys = Object.keys(defaultEvents)
       const mapKeys = Object.keys(this.mapEvents)
       const eventKeys = [...defaultKeys, ...mapKeys]
-
       this.unbindMapEvents()
 
       for (const key of eventKeys) {
@@ -83,6 +83,23 @@ export default {
           notify('warning', '请在有效区域内绘制。')
         }
       })
+      document.addEventListener('mousemove', (e) => {
+        const mapEl = document.querySelector('#map')
+        const { top, left } = mapEl.getBoundingClientRect()
+        const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
+        const { cursorOverlay } = this.adsorbData
+        if (cursorOverlay && cursorOverlay.isVisible()) {
+          const result = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
+          console.log(result)
+          // if (point && polyline) {
+          //   cursorOverlay.setPosition(point)
+          // }
+          // Object.assign(
+          //   this.adsorbData,
+          //   { point, polyline }
+          // )
+        }
+      })
     },
     bindOverlayEvents () {
       const click = (e, overlay) => {
@@ -108,6 +125,7 @@ export default {
         this.drawOverlay(oly, wholePoints)
       }
       this.initSpecialOverlays()
+      this.drawCursor()
       if (this.view && this.mapType !== 'graphic') {
         const zoom = this.map.getZoom()
         const viewPort = this.map.getViewport(wholePoints)
@@ -169,6 +187,12 @@ export default {
       }
 
       this.activeLegend = legend
+      const { cursorOverlay } = this.adsorbData
+      if (legend.type && legend.type === 'special') {
+        cursorOverlay.show()
+      } else {
+        cursorOverlay.hide()
+      }
       if (legend.value !== 'scale') {
         startDrawing(this.$data)
       }
@@ -196,7 +220,7 @@ export default {
     },
     updateOverlay: debounce(function (key, value, overlay) {
       overlay = overlay || this.activeOverlay
-      if (overlay.type && overlay.type.includes('specia')) {
+      if (overlay.type && overlay.type.includes('special')) {
         const specials = this.specialOverlays[overlay.parentId]
         overlay = specials.find(oly => oly.invented)
       }
@@ -273,13 +297,17 @@ export default {
       return overlay
     },
     drawCursor (point) {
+      const center = this.map.getCenter()
+      point = point || center
       const settings = {
         width: 32,
         innerBgColor: 'rgb(69, 123, 216)',
         outerBgColor: 'rgba(68, 123, 216, 0.2)'
       }
       const overlay = new CustomCursor(point, settings, this.$data)
-      return overlay
+      this.map.addOverlay(overlay)
+      overlay.hide()
+      this.adsorbData.cursorOverlay = overlay
     },
     getOverlaySettings (overlay) {
       return getOverlaySettings(overlay)
@@ -288,8 +316,8 @@ export default {
       return {
         click: {
           event: (e) => {
-            if (this.adsorbData) {
-              const { point, polyline } = this.adsorbData
+            const { point, polyline } = this.adsorbData
+            if (point && polyline) {
               e.point = point
               selectOverlay(e, polyline, this.$data)
             }
@@ -297,19 +325,6 @@ export default {
               if (!e.overlay) {
                 deselectOverlays(this.$data)
               }
-            }
-          }
-        },
-        mousemove: {
-          event: (e) => {
-            const { cursorOverlay } = this.adsorbData
-            if (cursorOverlay.isVisible()) {
-              const { point, polyline } = this.adsorbOverlay(e.point, this.polylineOverlays)
-              cursorOverlay.setPosition(point)
-              Object.assign(
-                this.adsorbData,
-                { point, polyline }
-              )
             }
           }
         },

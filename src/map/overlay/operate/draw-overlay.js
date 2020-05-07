@@ -29,7 +29,6 @@ function drawOverlay (overlay, points, settings, options) {
       newOverlay = drawMarker(points[0], settings, options)
     } else if (type === 'polyline') {
       newOverlay = drawPolyline(points, settings, options)
-      console.log(newOverlay)
     } else if (type === 'circle') {
       newOverlay = drawCircle(points[0], overlay.width, settings, options)
     } else if (type === 'rectangle') {
@@ -183,7 +182,6 @@ function drawUploadLine (data, options) {
 }
 
 function drawHotspot (overlay, settings, options) {
-  console.log(overlay)
   if (!overlay.hotspotMark) return
   const el = document.querySelector(`#${overlay.hotspotMark}`)
   const hotspot = new Hotspot(el, settings, options)
