@@ -103,8 +103,8 @@ class CustomSvg extends CustomOverlay {
     const pixelSw = map.pointToOverlayPixel(sw)
     const pixelNe = map.pointToOverlayPixel(ne)
 
-    const width = Math.abs(pixelNe.x - pixelSw.x - this._errorCount / 2)
-    const height = Math.abs(pixelNe.y - pixelSw.y - this._errorCount / 2)
+    const width = Math.abs(pixelNe.x - pixelSw.x) - this._errorCount
+    const height = Math.abs(pixelNe.y - pixelSw.y) - this._errorCount
     Object.assign(
       this.div.querySelector(`.${this.class}`).style,
       {
