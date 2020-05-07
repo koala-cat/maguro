@@ -237,7 +237,7 @@ export default {
           this.$data.updateOverlays = {}
           this.$data.removeOverlays = []
           if (this.activeOverlay) {
-            this.activeOverlay.enableEditing()
+            deselectOverlays(this.$data)
           }
           notify('success', '保存成功。')
         })
