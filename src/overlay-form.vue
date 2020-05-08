@@ -190,7 +190,9 @@
           <mu-form-field
             v-show="displayVisible"
             label="显示">
-            <mu-toggle v-model="isDisplay" />
+            <mu-toggle
+              v-model="isDisplay"
+              :disabled="disabled" />
           </mu-form-field>
           <mu-form-field
             v-if="structures"

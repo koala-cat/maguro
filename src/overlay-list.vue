@@ -89,10 +89,12 @@
               <mu-toggle
                 v-if="item.isCommand === false"
                 v-model="item.isCommandDisplay"
+                :disabled="!editPermission"
                 @change="onChange(item, 'isCommandDisplay')" />
               <mu-toggle
                 v-else
                 v-model="item.isDisplay"
+                :disabled="!editPermission"
                 @change="onChange(item, 'isDisplay')" />
             </mu-flex-item>
           </mu-h-box>
@@ -133,6 +135,9 @@
       }
     },
     computed: {
+      editPermission () {
+        return this.baiduMap.mapEditPermission
+      },
       mapType () {
         return this.baiduMap.mapType
       },

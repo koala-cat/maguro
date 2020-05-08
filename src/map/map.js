@@ -84,27 +84,29 @@ export default {
         }
       })
       document.addEventListener('mousemove', (e) => {
-        const mapEl = document.querySelector('#map')
-        const { top, left } = mapEl.getBoundingClientRect()
-        const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
-        const { cursorOverlay } = this.adsorbData
-        if (cursorOverlay.visible) {
-          cursorOverlay.show()
-        }
-        if (cursorOverlay && cursorOverlay.visible) {
-          const { point, polyline } = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-          console.log(point, polyline)
-          if (point && polyline) {
-            cursorOverlay.setPosition(point)
-            cursorOverlay.show()
-          } else {
-            cursorOverlay.hide()
-          }
-          Object.assign(
-            this.adsorbData,
-            { point, polyline }
-          )
-        }
+        // const { cursorOverlay } = this.adsorbData
+        // if (!cursorOverlay) return
+
+        // const mapEl = document.querySelector('#map')
+        // const { top, left } = mapEl.getBoundingClientRect()
+        // const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
+        // if (cursorOverlay.visible) {
+        //   cursorOverlay.show()
+        // }
+        // if (cursorOverlay.visible) {
+        //   const { point, polyline } = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
+        //   console.log(point, polyline)
+        //   if (point && polyline) {
+        //     cursorOverlay.setPosition(point)
+        //     cursorOverlay.show()
+        //   } else {
+        //     cursorOverlay.hide()
+        //   }
+        //   Object.assign(
+        //     this.adsorbData,
+        //     { point, polyline }
+        //   )
+        // }
       })
     },
     bindOverlayEvents () {
@@ -173,7 +175,7 @@ export default {
       this[key] = !this[key]
     },
     restoreToolkit () {
-      this.switchOverlayWindow('overlayListVisible')
+      this.activeLegend = null
       this.overlayListVisible = false
     },
     setMapType (val) {

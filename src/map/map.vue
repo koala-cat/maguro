@@ -142,8 +142,8 @@
         this.map.setNormalMapDisplay(this.baseMapVisible)
       },
       mapType (val) {
+        this.restoreToolkit()
         if (modes[val]) {
-          this.restoreToolkit()
           this.map.setMapType(modes[val])
         }
       },
@@ -171,5 +171,12 @@
 
   .mu-list-item {
     font-size: 12px;
+  }
+
+  .mu-toggle[disabled] > .mu-toggle-slide-bar {
+    background: rgba(255, 255, 255, 0.8);
+  }
+  .mu-toggle[disabled] > .mu-toggle-slide-bar:after {
+    background: rgba(0,0,0,.12);
   }
 </style>
