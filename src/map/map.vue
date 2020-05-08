@@ -111,7 +111,6 @@
         return this.baseMapVisible && this.mapConfigureVisible
       },
       polylineOverlays () {
-        console.log(this.overlays)
         const polylineOverlays = this.overlays.filter(oly => oly.type === 'polyline')
         return polylineOverlays
       }
@@ -143,6 +142,11 @@
           this.restoreToolkit()
           this.map.setMapType(modes[val])
         }
+      },
+      activeLegend (val) {
+        const { cursorOverlay } = this.adsorbData
+        if (!cursorOverlay) return
+        cursorOverlay.visible = val.type && val.type === 'special'
       }
     },
     mounted () {

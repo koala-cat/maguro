@@ -168,9 +168,9 @@ function adsorbOverlay (map, point, polylineOverlays) {
   }
 
   // 计算点的位置
-  let recentOly = null
+  let recentOly = { point: null, polyline: null, opposite: null }
   const CirclePoint = new BMap.Point(point.lng, point.lat)
-  const circle = new BMap.Circle(CirclePoint, 150)
+  const circle = new BMap.Circle(CirclePoint, 200)
   circle.adsorption = true
   circle.hide()
   map.addOverlay(circle)
@@ -207,22 +207,24 @@ function adsorbOverlay (map, point, polylineOverlays) {
         Bounds: circleBounds,
         overlay: p.oly
       })
-      if (!recentOly || currentPoint.opposite < recentOly.opposite) {
+      if (!recentOly.opposite || currentPoint.opposite < recentOly.opposite) {
         recentOly = {
           point: new BMap.Point(currentPoint.pointX, currentPoint.pointY),
-          polyline: p.oly
+          polyline: p.oly,
+          opposite: currentPoint.opposite
         }
       }
     }
   }
   // 打点范围
   if (recentOly) {
-    const targetPoint = new BMap.Point(recentOly.pointX, recentOly.pointY)
+    const targetPoint = new BMap.Point(recentOly.point.lng, recentOly.point.lat)
     const currentToTargetPixel = pixelDistance(map, point, targetPoint)
     if (currentToTargetPixel > 16) {
-      return null
+      return { point: null, polyline: null }
     }
   }
+  delete recentOly.opposite
   return recentOly
 }
 

@@ -88,16 +88,22 @@ export default {
         const { top, left } = mapEl.getBoundingClientRect()
         const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
         const { cursorOverlay } = this.adsorbData
-        if (cursorOverlay && cursorOverlay.isVisible()) {
-          const result = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-          console.log(result)
-          // if (point && polyline) {
-          //   cursorOverlay.setPosition(point)
-          // }
-          // Object.assign(
-          //   this.adsorbData,
-          //   { point, polyline }
-          // )
+        if (cursorOverlay.visible) {
+          cursorOverlay.show()
+        }
+        if (cursorOverlay && cursorOverlay.visible) {
+          const { point, polyline } = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
+          console.log({ point, polyline })
+          if (point && polyline) {
+            cursorOverlay.setPosition(point)
+            cursorOverlay.show()
+          } else {
+            cursorOverlay.hide()
+          }
+          Object.assign(
+            this.adsorbData,
+            { point, polyline }
+          )
         }
       })
     },
@@ -111,7 +117,10 @@ export default {
       }
     },
     initOverlays () {
-      if (this.overlays.length === 0) return
+      if (this.overlays.length === 0) {
+        this.drawCursor()
+        return
+      }
       const overlays = clonedeep(this.overlays)
       const wholePoints = []
 
@@ -187,12 +196,6 @@ export default {
       }
 
       this.activeLegend = legend
-      const { cursorOverlay } = this.adsorbData
-      if (legend.type && legend.type === 'special') {
-        cursorOverlay.show()
-      } else {
-        cursorOverlay.hide()
-      }
       if (legend.value !== 'scale') {
         startDrawing(this.$data)
       }
