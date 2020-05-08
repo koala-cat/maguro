@@ -100,7 +100,7 @@
         },
         id: -2,
         parentId: -1,
-        view: true
+        isReset: true
       }
     },
     computed: {

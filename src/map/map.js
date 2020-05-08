@@ -126,17 +126,17 @@ export default {
       }
       this.initSpecialOverlays()
       this.drawCursor()
-      if (this.view && this.mapType !== 'graphic') {
+      if (this.isReset && this.mapType !== 'graphic') {
         const zoom = this.map.getZoom()
         const viewPort = this.map.getViewport(wholePoints)
         this.map.centerAndZoom(viewPort.center, viewPort.zoom)
         if (zoom === viewPort.zoom) {
           showOverlays(this.$data)
         }
-        this.view = !this.view
       } else {
         showOverlays(this.$data)
       }
+      this.isReset = true
     },
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
@@ -236,6 +236,7 @@ export default {
         this.$emit('save', result, () => {
           this.$data.updateOverlays = {}
           this.$data.removeOverlays = []
+          this.isReset = false
           if (this.activeOverlay) {
             deselectOverlays(this.$data)
           }
