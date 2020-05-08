@@ -18,6 +18,8 @@ class Rectangle extends BMap.Polygon {
   }
 
   enableEditing () {
+    if (this.disabled) return
+
     const { map, markerOverlays } = this.options
     const mPoints = this.getPath()
     const points = calcRectAllPoints(mPoints[0], mPoints[2], 6)

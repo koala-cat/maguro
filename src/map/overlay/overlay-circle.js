@@ -16,6 +16,7 @@ class Circle extends BMap.Circle {
   }
 
   enableEditing () {
+    if (this.disabled) return
     this.addEventListener('lineupdate', this.lineupdate)
     super.enableEditing()
   }

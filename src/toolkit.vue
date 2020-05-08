@@ -30,6 +30,9 @@
       }
     },
     computed: {
+      editPermission () {
+        return this.baiduMap.mapEditPermission
+      },
       screenIcon () {
         return this.fullScreen ? svg.zoomDown : svg.zoomUp
       }
@@ -49,6 +52,7 @@
     },
     methods: {
       save () {
+        if (!this.editPermission) return
         this.baiduMap.saveOverlays()
       },
       setFullScreen () {

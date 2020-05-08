@@ -276,7 +276,7 @@
         return this.baiduMap.activeOverlay || {}
       },
       disabled () {
-        return this.overlay.disabled
+        return !this.baiduMap.mapEditPermission || this.overlay.disabled
       },
       overlayType () {
         const type = this.overlay.type || ''

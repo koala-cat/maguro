@@ -43,6 +43,7 @@
               style="width: 40px; font-size: 18px; fill: #ffffff;" />
             <mu-combo-box
               v-model="zoomSettings[tool.value]"
+              :disabled="!editPermission"
               :options="scaleSpecs"
               :clearable="false"
               :popup-render-to-body="false"
@@ -71,11 +72,6 @@
             @click.stop="removeLegend(tool)" />
         </a>
       </mu-h-box>
-      <!-- <input
-        ref="fileSelector"
-        type="file"
-        accept=".png,.jpeg,.jpg,.svg"
-        style="display: none;"> -->
     </mu-h-box>
   </mu-v-box>
 </template>
@@ -86,6 +82,9 @@
   export default {
     inject: ['baiduMap'],
     computed: {
+      editPermission () {
+        return this.baiduMap.mapEditPermission
+      },
       mapType () {
         return this.baiduMap.mapType
       },
@@ -242,6 +241,9 @@
         width: 100%;
         height: 100%;
       }
+    }
+    & input[disabled] {
+      color: $fontColorGrey;
     }
   }
 

@@ -15,6 +15,7 @@ class Label extends BMap.Label {
   }
 
   enableEditing () {
+    if (this.disabled) return
     this.setStyle({ borderColor: '#5E87DB' })
   }
 

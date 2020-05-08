@@ -93,7 +93,7 @@ export default {
         }
         if (cursorOverlay && cursorOverlay.visible) {
           const { point, polyline } = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-          console.log({ point, polyline })
+          console.log(point, polyline)
           if (point && polyline) {
             cursorOverlay.setPosition(point)
             cursorOverlay.show()
@@ -194,8 +194,9 @@ export default {
       if (this.overlayListVisible) {
         this.overlayListVisible = false
       }
-
       this.activeLegend = legend
+
+      if (!this.mapEditPermission) return
       if (legend.value !== 'scale') {
         startDrawing(this.$data)
       }

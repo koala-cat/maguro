@@ -72,6 +72,8 @@ class CustomSvg extends CustomOverlay {
   }
 
   enableEditing () {
+    if (this.disabled) return
+
     this.setBorder('#5E87DB')
   }
 

@@ -18,6 +18,8 @@ class Polyline extends BMap.Polyline {
   }
 
   enableEditing () {
+    if (this.disabled) return
+
     const { overlays } = this.options
     if (getPolylineIncludeSpecials(this, overlays).length === 0 &&
       !this.projectGeoKey) {

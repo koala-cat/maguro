@@ -12,6 +12,7 @@ class Hotspot {
   }
 
   enableEditing () {
+    if (this.disabled) return
     this.el.classList.add('active')
   }
 

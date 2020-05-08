@@ -233,6 +233,8 @@ class CustomSpecial {
   }
 
   enableEditing (overlay) {
+    if (this.disabled) return
+
     const {
       map,
       overlays,

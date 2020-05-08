@@ -12,6 +12,8 @@ class Marker extends BMap.Marker {
   }
 
   enableEditing () {
+    if (this.disabled) return
+
     const space = 4
     const markerIcon = this.getIcon()
     const { anchor, imageOffset: offset, size } = markerIcon

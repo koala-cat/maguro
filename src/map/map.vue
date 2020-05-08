@@ -31,6 +31,10 @@
     },
     mixins: [MapMixin],
     props: {
+      mapEditPermission: {
+        type: Boolean,
+        default: true
+      },
       mapCurrentOrg: {
         type: Object,
         default: () => ({})
@@ -146,7 +150,7 @@
       activeLegend (val) {
         const { cursorOverlay } = this.adsorbData
         if (!cursorOverlay) return
-        cursorOverlay.visible = val.type && val.type === 'special'
+        cursorOverlay.visible = val && val.type === 'special'
       }
     },
     mounted () {

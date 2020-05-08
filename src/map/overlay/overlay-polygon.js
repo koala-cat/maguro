@@ -16,6 +16,7 @@ class Polygon extends BMap.Polygon {
   }
 
   enableEditing () {
+    if (this.disabled) return
     this.addEventListener('lineupdate', this.lineupdate)
     super.enableEditing()
   }
