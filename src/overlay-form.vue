@@ -225,7 +225,8 @@
     <structure-tree
       v-if="structures"
       :structures="structures"
-      :overlay="overlay" />
+      :overlay="overlay"
+      :disabled="disabled" />
     <slot />
   </mu-v-box>
 </template>

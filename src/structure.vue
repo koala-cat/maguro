@@ -36,6 +36,7 @@
           :key="item.id">
           <tree-node
             :node="item"
+            :disabled="disabled"
             :level="0"
             :check-value="overlay.projectStructureId"
             @check="onChecked"
@@ -65,6 +66,10 @@
       overlay: {
         type: Object,
         default: () => ({})
+      },
+      disabled: {
+        type: Boolean,
+        default: false
       }
     },
     data () {

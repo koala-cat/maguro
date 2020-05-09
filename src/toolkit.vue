@@ -3,6 +3,7 @@
     <slot />
     <mu-button
       button-style="text"
+      :disabled="!editPermission"
       @click="save">
       <mu-icon icon-class="ipm-icon-save" />
       保存

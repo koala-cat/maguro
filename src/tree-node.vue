@@ -20,6 +20,7 @@
       <input
         v-show="isLeaf"
         v-model="check"
+        :disabled="disabled"
         type="checkbox">
     </mu-h-box>
     <mu-v-box
@@ -43,6 +44,10 @@
       node: {
         type: Object,
         default: () => ({})
+      },
+      disabled: {
+        type: Boolean,
+        default: false
       },
       level: {
         type: Number,
