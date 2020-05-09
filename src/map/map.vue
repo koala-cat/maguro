@@ -39,6 +39,10 @@
         type: Object,
         default: () => ({})
       },
+      mapDefaultType: {
+        type: String,
+        default: 'normal'
+      },
       mapType: {
         type: String,
         default: 'normal'
@@ -159,6 +163,7 @@
       this.map.setCurrentCity('北京')
       this.map.enableScrollWheelZoom(true)
       this.map.setNormalMapDisplay(this.baseMapVisible)
+
       this.init()
     }
   }

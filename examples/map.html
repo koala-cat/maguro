@@ -27,7 +27,7 @@
       :map-overlays="overlays"
       :map-structures="structures"
       :map-configure-visible="true"
-      @set="setMapType"
+      @set="switchMapType"
       @save="saveOverlays">
       <maguro-toolkit>
         <mu-button
@@ -305,7 +305,7 @@
           // 要提供drawuploadline
           console.log('upload')
         },
-        setMapType (val) {
+        switchMapType (val) {
           this.mapType = val
         },
         saveOverlays (result) {

@@ -178,8 +178,11 @@ export default {
       this.activeLegend = null
       this.overlayListVisible = false
     },
-    setMapType (val) {
-      this.$emit('setMapMode', val)
+    switchMapType (val) {
+      this.$emit('switchMapType', val)
+    },
+    setMapDefaultType (val) {
+      this.$emit('setMapDefaultType', val)
     },
     setMapZoomSettings (key, value) {
       this.$emit('setMapZoomSettings', key, value, () => {
@@ -329,6 +332,7 @@ export default {
               selectOverlay(e, polyline, this.$data)
             }
             if ((this.activeLegend && !this.activeLegend.type) || !this.activeLegend) {
+              this.activeLegend = null
               if (!e.overlay) {
                 deselectOverlays(this.$data)
               }
