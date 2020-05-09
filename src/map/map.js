@@ -175,6 +175,7 @@ export default {
       this[key] = !this[key]
     },
     restoreToolkit () {
+      this.activeOverlay = null
       this.activeLegend = null
       this.overlayListVisible = false
     },

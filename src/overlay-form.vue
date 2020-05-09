@@ -365,8 +365,9 @@
           return fixedNumber(this.overlay.fillOpacity * 100, 2)
         },
         set (val) {
-          if (val === 0) val = 0.00001
-          this.baiduMap.updateOverlay('fillOpacity', fixedNumber(val / 100, 4))
+          val = parseFloat(val)
+          if (val === 0 || val < 0) val = 0.0001
+          this.baiduMap.updateOverlay('fillOpacity', fixedNumber(val / 100, 6))
         }
       },
       strokeColor: {
@@ -379,10 +380,12 @@
       },
       strokeWeight: {
         get () {
-          return this.overlay.strokeWeight
+          return fixedNumber(this.overlay.strokeWeight, 2)
         },
         set (val) {
-          this.baiduMap.updateOverlay('strokeWeight', val)
+          val = parseFloat(val)
+          if (val === 0 || val < 0) val = 0.0001
+          this.baiduMap.updateOverlay('strokeWeight', fixedNumber(val, 6))
         }
       },
       strokeStyle () {

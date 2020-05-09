@@ -1,5 +1,4 @@
 import BMap from 'BMap'
-import { notify } from 'mussel'
 
 import { getSpecialAttachPolyline, getPolylineIncludeSpecials } from '../../calc/overlay'
 import { isPointInRect } from '../../calc/geo'
