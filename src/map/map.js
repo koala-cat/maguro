@@ -64,7 +64,6 @@ export default {
     bindDocumentEvents () {
       const overlays = this.selectedOverlays
       const mapEl = document.querySelector('#map')
-      const { top, left } = mapEl.getBoundingClientRect()
 
       document.addEventListener('keydown', (e) => {
         e = e || window.event
@@ -89,6 +88,8 @@ export default {
       document.addEventListener('mousemove', (e) => {
         const { cursorOverlay } = this.adsorbData
         if (this.mapType === 'graphic' || !cursorOverlay) return
+
+        const { top, left } = mapEl.getBoundingClientRect()
         const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
         if (cursorOverlay.visible) {
           const { point, polyline } = this.adsorbOverlay(this.map, mPoint, this.polylineOverlays)
