@@ -252,7 +252,7 @@ export default {
           notify('success', '保存成功。')
         })
       } else {
-        notify('info', '没有需要修改的信息。')
+        notify('info', '无需保存（超出绘制区域元件将不予保存）。')
       }
     },
     clearOverlays () {

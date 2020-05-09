@@ -192,7 +192,6 @@ function onLineupdate (e, options) {
     }
     for (const p of points) {
       if (!isPointInRect(p, areaRestriction)) {
-        notify('warning', '元件超出绘制区域将不予保存。')
         saveable = false
         break
       }

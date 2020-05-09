@@ -32,7 +32,7 @@ function getSaveData (options) {
 }
 
 function getCreates (options) {
-  const { overlays, polylineCenters } = options
+  const { areaRestriction, overlays, polylineCenters } = options
   const result = []
 
   for (let oly of overlays) {
@@ -47,6 +47,10 @@ function getCreates (options) {
       return arr
     }, [])
     if (oly.id < 0) {
+      const bounds = oly.getBounds ? oly.getBounds() : null
+      if (bounds && !areaRestriction.containsBounds(bounds)) {
+        continue
+      }
       if (oly.invented) {
         oly = {
           id: oly.id,
