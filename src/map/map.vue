@@ -154,7 +154,12 @@
       activeLegend (val) {
         const { cursorOverlay } = this.adsorbData
         if (!cursorOverlay) return
-        cursorOverlay.visible = val && val.type === 'special'
+        if (val && val.type === 'special') {
+          cursorOverlay.visible = true
+        } else {
+          cursorOverlay.visible = false
+          cursorOverlay.hide()
+        }
       }
     },
     mounted () {

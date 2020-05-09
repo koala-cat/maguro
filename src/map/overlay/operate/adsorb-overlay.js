@@ -56,7 +56,9 @@ function adsorbOverlay (map, point, polylineOverlays) {
   /**
    *  设置多种情况的X及Y的坐标
    */
-  const setMoreHap = (YSTATUS, XSTATUS, pointX, pointY, bigAbj, bigOps, A, B) => {
+  const setMoreHap = (YSTATUS, XSTATUS, bigAbj, bigOps, A, B) => {
+    let pointX = B.lng - bigAbj
+    let pointY = B.lat + bigOps
     if (YSTATUS && !XSTATUS) {
       pointX = B.lng + bigAbj
     } else if (!YSTATUS && !XSTATUS) {
@@ -66,6 +68,7 @@ function adsorbOverlay (map, point, polylineOverlays) {
       pointX = A.lng + bigAbj
       pointY = A.lat + bigOps
     }
+    return { pointX, pointY }
   }
 
   /**
@@ -124,11 +127,11 @@ function adsorbOverlay (map, point, polylineOverlays) {
       const raC = Math.cos(radian) * cL
       const bigAbj = Math.cos(bigRadian) * raC
       const bigOps = Math.sin(bigRadian) * raC
-      pointX = B.lng - bigAbj
-      pointY = B.lat + bigOps
 
       //  多边形形成夹角的情况
-      setMoreHap(YSTATUS, XSTATUS, pointX, pointY, bigAbj, bigOps, A, B)
+      const moreHap = setMoreHap(YSTATUS, XSTATUS, bigAbj, bigOps, A, B)
+      pointX = moreHap.pointX
+      pointY = moreHap.pointY
 
       // 处理边界值 有一个点在交集区域切最小距离点不在线上
       const pointTemp = new BMap.Point(pointX, pointY)
@@ -168,57 +171,51 @@ function adsorbOverlay (map, point, polylineOverlays) {
   }
 
   // 计算点的位置
-  let recentOly = { point: null, polyline: null, opposite: null }
+  const recentOly = { point: null, polyline: null, opposite: null }
   const CirclePoint = new BMap.Point(point.lng, point.lat)
-  const circle = new BMap.Circle(CirclePoint, 200)
+  const circle = new BMap.Circle(CirclePoint, 150)
   circle.adsorption = true
   circle.hide()
   map.addOverlay(circle)
   const circleBounds = circle.getBounds()
-  const paths = []
   const mapBounds = map.getBounds()
-  polylineOverlays.map(oly => {
+  polylineOverlays.forEach(oly => {
     const path = oly.getPath()
-    path.map((p, i) => {
-      const findP = mapBounds.containsPoint(p)
-      if (findP) {
-        paths.push(Object.assign(p, {
-          oly
-        }))
+    path.forEach((p, i) => {
+      if (i < path.length - 2) {
+        const findP = mapBounds.containsPoint(p)
+        if (findP) {
+          const point1 = new BMap.Point(p.lng, p.lat)
+          const point2 = new BMap.Point(Object(path[i + 1]).lng, Object(path[i + 1]).lat)
+          const tempLine = new BMap.Polyline([point1, point2])
+          tempLine.adsorption = true
+          map.addOverlay(tempLine)
+          tempLine.hide()
+          const lineBounds = tempLine.getBounds()
+          const intersects = lineBounds.intersects(circleBounds)
+          if (intersects) {
+            const currentPoint = calcSmallOpsBigAndHyp({
+              A: p,
+              B: Object(path[i + 1]),
+              C: point,
+              Bounds: circleBounds,
+              overlay: oly
+            })
+            if (!recentOly.opposite || currentPoint.opposite < recentOly.opposite) {
+              Object.assign(recentOly, {
+                point: new BMap.Point(currentPoint.pointX, currentPoint.pointY),
+                polyline: oly,
+                opposite: currentPoint.opposite
+              })
+            }
+          }
+        }
       }
     })
   })
-
-  for (let i = 0; i < paths.length - 1; i++) {
-    const p = paths[i]
-    const point1 = new BMap.Point(p.lng, p.lat)
-    const point2 = new BMap.Point(Object(paths[i + 1]).lng, Object(paths[i + 1]).lat)
-    const tempLine = new BMap.Polyline([point1, point2])
-    tempLine.adsorption = true
-    map.addOverlay(tempLine)
-    tempLine.hide()
-    const lineBounds = tempLine.getBounds()
-    const intersects = lineBounds.intersects(circleBounds)
-    if (intersects) {
-      const currentPoint = calcSmallOpsBigAndHyp({
-        A: p,
-        B: Object(paths[i + 1]),
-        C: point,
-        Bounds: circleBounds,
-        overlay: p.oly
-      })
-      if (!recentOly.opposite || currentPoint.opposite < recentOly.opposite) {
-        recentOly = {
-          point: new BMap.Point(currentPoint.pointX, currentPoint.pointY),
-          polyline: p.oly,
-          opposite: currentPoint.opposite
-        }
-      }
-    }
-  }
   // 打点范围
-  if (recentOly) {
-    const targetPoint = new BMap.Point(recentOly.point.lng, recentOly.point.lat)
+  if (recentOly.point) {
+    const targetPoint = recentOly.point
     const currentToTargetPixel = pixelDistance(map, point, targetPoint)
     if (currentToTargetPixel > 16) {
       return { point: null, polyline: null }

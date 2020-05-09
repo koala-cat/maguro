@@ -20,7 +20,7 @@ import { deselectOverlays } from './overlay/operate/deselect-overlay'
 import { selectOverlay } from './overlay/operate/select-overlay'
 import { getSaveData } from './overlay/operate/save-overlay'
 
-import { adsorbOverlay } from '../map/overlay/operate/adsorb-overlay'
+// import { adsorbOverlay } from '../map/overlay/operate/adsorb-overlay'
 
 export default {
   methods: {
@@ -63,6 +63,9 @@ export default {
     },
     bindDocumentEvents () {
       const overlays = this.selectedOverlays
+      const mapEl = document.querySelector('#map')
+      const { top, left } = mapEl.getBoundingClientRect()
+
       document.addEventListener('keydown', (e) => {
         e = e || window.event
         const keyCode = e.keyCode || e.which || e.charCode
@@ -84,29 +87,25 @@ export default {
         }
       })
       document.addEventListener('mousemove', (e) => {
-        // const { cursorOverlay } = this.adsorbData
-        // if (!cursorOverlay) return
-
-        // const mapEl = document.querySelector('#map')
-        // const { top, left } = mapEl.getBoundingClientRect()
-        // const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
-        // if (cursorOverlay.visible) {
-        //   cursorOverlay.show()
-        // }
-        // if (cursorOverlay.visible) {
-        //   const { point, polyline } = adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-        //   console.log(point, polyline)
-        //   if (point && polyline) {
-        //     cursorOverlay.setPosition(point)
-        //     cursorOverlay.show()
-        //   } else {
-        //     cursorOverlay.hide()
-        //   }
-        //   Object.assign(
-        //     this.adsorbData,
-        //     { point, polyline }
-        //   )
-        // }
+        const { cursorOverlay } = this.adsorbData
+        if (this.mapType === 'graphic' || !cursorOverlay) return
+        const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
+        if (cursorOverlay.visible) {
+          const { point, polyline } = this.adsorbOverlay(this.map, mPoint, this.polylineOverlays)
+          console.log(point, polyline)
+          if (point && polyline) {
+            this.map.setDefaultCursor('crosshair')
+            cursorOverlay.setPosition(point)
+            cursorOverlay.show()
+          } else {
+            this.map.setDefaultCursor('pointer')
+            cursorOverlay.hide()
+          }
+          Object.assign(
+            this.adsorbData,
+            { point, polyline }
+          )
+        }
       })
     },
     bindOverlayEvents () {
@@ -329,6 +328,7 @@ export default {
             const { point, polyline } = this.adsorbData
             if (point && polyline) {
               e.point = point
+              this.map.setDefaultCursor('pointer')
               selectOverlay(e, polyline, this.$data)
             }
             if ((this.activeLegend && !this.activeLegend.type) || !this.activeLegend) {

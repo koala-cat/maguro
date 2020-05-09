@@ -33,7 +33,6 @@
         return this.baiduMap.configureVisible
       },
       defaultMode () {
-        console.log(this.baiduMap.mapDefaultType)
         return this.baiduMap.mapDefaultType
       },
       mode () {

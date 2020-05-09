@@ -182,7 +182,7 @@ function dragRectAnchorOverlay (overlay, options) {
 function dragSpecialAnchorOverlay (overlay, options, callback) {
   let endPoint = null
   let movePointIdx = null
-  const { map, overlays, markerOverlays, markerPoints, markerPositions } = options
+  const { map, overlays, markerOverlays, markerPoints, markerPositions, adsorbData } = options
   const polyline = getSpecialAttachPolyline(overlay, overlays)
   const markers = markerOverlays.filter(item => item.parentId === overlay.id)
 
@@ -193,17 +193,26 @@ function dragSpecialAnchorOverlay (overlay, options, callback) {
       const distanceA = map.getDistance(endPoint, markerPoints[0])
       const distanceB = map.getDistance(endPoint, markerPoints[1])
       movePointIdx = distanceA < distanceB ? 0 : 1
+      adsorbData.cursorOverlay.visible = true
     })
     marker.addEventListener('dragend', (e) => {
-      const dragIdx = calcMarkerOnLinePosition(e.point, polyline, true)
-      if (dragIdx > -1) {
-        markerPoints.splice(movePointIdx, 1, e.point)
-        markerPositions.splice(movePointIdx, 1, dragIdx)
-        if (callback) callback(polyline)
-      } else {
+      const { point, polyline: mPolyline } = options.adsorbData
+      let dragIdx = -1
+      if (point && mPolyline.id === polyline.id) {
+        dragIdx = calcMarkerOnLinePosition(point, polyline, true)
+        if (dragIdx > -1) {
+          markerPoints.splice(movePointIdx, 1, point)
+          markerPositions.splice(movePointIdx, 1, dragIdx)
+          if (callback) callback(polyline)
+        }
+      }
+      if (dragIdx === -1) {
         marker.setPosition(markerPoints[movePointIdx])
         notify('info', '拖动后点的不在线上，请放大地图重新拖动。')
       }
+      adsorbData.cursorOverlay.visible = false
+      adsorbData.cursorOverlay.hide()
+      map.setDefaultCursor('pointer')
     })
   }
 }
