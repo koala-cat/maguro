@@ -88,12 +88,16 @@ export default {
       document.addEventListener('mousemove', (e) => {
         const { cursorOverlay } = this.adsorbData
         if (this.mapType === 'graphic' || !cursorOverlay) return
+        if (this.clientX === e.clientX && this.clientY === e.clientY) {
+          return
+        }
 
         const { top, left } = mapEl.getBoundingClientRect()
         const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
+        this.clientX = e.clientX
+        this.clientY = e.clientY
         if (cursorOverlay.visible) {
           const { point, polyline } = this.adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-          console.log(point, polyline)
           if (point && polyline) {
             this.map.setDefaultCursor('crosshair')
             cursorOverlay.setPosition(point)
