@@ -215,9 +215,11 @@
           :cellpadding="false">
           <mu-form-field
             label="备注">
-            <mu-editor
+            <textarea
               v-model.trim="remark"
-              :disabled="disabled" />
+              class="mu-input"
+              :disabled="disabled"
+              style="height: 224px;" />
           </mu-form-field>
         </mu-form>
       </mu-tab-panel>

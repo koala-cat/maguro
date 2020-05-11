@@ -58,7 +58,9 @@ function getOverlaySettings (oly) {
       oly.fillOpacity = oly.opacity
       key = 'fillOpacity'
     }
-    if (settings.includes(key) || key === 'opacity') {
+    if (key === 'strokeWeight' && !oly[key]) {
+      map[key] = 5
+    } else if (settings.includes(key) || key === 'opacity') {
       map[key] = oly[key]
     }
   }

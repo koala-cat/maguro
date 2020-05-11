@@ -68,15 +68,7 @@ function frameSelectOverlays (overlay, options) {
     if (parentIds.includes(oly.parentId) || !oly.visible) continue
     const { result, parentId } = isOverlayInFrame(oly, overlay)
     if (result) {
-      if (type.includes('special')) {
-        const specials = overlays.reduce((arr, item) => {
-          if (item.parentId === oly.parentId) {
-            arr.push(item)
-          }
-          return arr
-        }, [])
-        selectedOverlays.push(...specials)
-      } else {
+      if (!type.includes('special')) {
         selectedOverlays.push(oly)
         if (getPolylineIncludeSpecials(oly, overlays).length === 0) {
           oly.enableEditing()

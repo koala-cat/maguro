@@ -9,14 +9,14 @@
       保存
     </mu-button>
     <mu-flex-item size="auto" />
-    <mu-icon-button
+    <!-- <mu-icon-button
       button-style="text"
       style="font-size: 18px;"
       @click="switchScreen">
       <mu-icon
         :svg="screenIcon"
         style="fill: #fff;" />
-    </mu-icon-button>
+    </mu-icon-button> -->
   </mu-h-box>
 </template>
 <script>

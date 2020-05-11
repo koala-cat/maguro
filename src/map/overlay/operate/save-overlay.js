@@ -98,7 +98,7 @@ function getPoints (oly) {
 
 function isOlyInAreaRestriction (oly, areaRestriction) {
   const bounds = oly.getBounds ? oly.getBounds() : null
-  return bounds && areaRestriction && areaRestriction.containsBounds(bounds)
+  return (bounds && areaRestriction && areaRestriction.containsBounds(bounds)) || !areaRestriction
 }
 
 export {
