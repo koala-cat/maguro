@@ -48,7 +48,7 @@ function getCreates (options) {
     }, [])
     if (oly.id < 0) {
       const bounds = oly.getBounds ? oly.getBounds() : null
-      if (bounds && !areaRestriction.containsBounds(bounds)) {
+      if (bounds && areaRestriction && !areaRestriction.containsBounds(bounds)) {
         continue
       }
       if (oly.invented) {
