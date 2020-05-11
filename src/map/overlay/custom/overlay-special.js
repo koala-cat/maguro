@@ -49,9 +49,7 @@ class CustomSpecial {
         deleteAnchorOverlays(this.options)
       }
     }
-
     const idx = calcMarkerOnLinePosition(this.point, this.polyline)
-
     if (idx > -1) {
       const icon = drawSymbol({ ...this.settings, fillOpacity: 1 })
       const marker = new BMap.Marker(this.point, {

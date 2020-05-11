@@ -1,7 +1,7 @@
 import { getOverlaySettings } from '../setting'
 
 function getSaveData (options) {
-  const { updateOverlays, removeOverlays } = options
+  const { areaRestriction, overlays, updateOverlays, removeOverlays } = options
   const data = {
     creates: [],
     updates: [],
@@ -19,14 +19,20 @@ function getSaveData (options) {
     if (item > 0) arr.push(item)
     return arr
   }, [])
-
   for (const key in updateOverlays) {
+    const oly = updateOverlays[key]
     if (data.removes.includes(parseInt(key))) continue
-    if (updateOverlays[key].fillOpacity) {
-      updateOverlays[key].opacity = updateOverlays[key].fillOpacity
-      delete updateOverlays[key].fillOpacity
+    if (oly.fillOpacity) {
+      oly.opacity = oly.fillOpacity
+      delete oly.fillOpacity
     }
-    data.updates.push(updateOverlays[key])
+    if (oly.points) {
+      const _oly = overlays.find(item => item.id === oly.id)
+      if (!isOlyInAreaRestriction(_oly, areaRestriction)) {
+        continue
+      }
+    }
+    data.updates.push(oly)
   }
   return data
 }
@@ -47,8 +53,7 @@ function getCreates (options) {
       return arr
     }, [])
     if (oly.id < 0) {
-      const bounds = oly.getBounds ? oly.getBounds() : null
-      if (bounds && areaRestriction && !areaRestriction.containsBounds(bounds)) {
+      if (!isOlyInAreaRestriction(oly, areaRestriction)) {
         continue
       }
       if (oly.invented) {
@@ -89,6 +94,11 @@ function getPoints (oly) {
     }
   }
   return points
+}
+
+function isOlyInAreaRestriction (oly, areaRestriction) {
+  const bounds = oly.getBounds ? oly.getBounds() : null
+  return bounds && areaRestriction && areaRestriction.containsBounds(bounds)
 }
 
 export {

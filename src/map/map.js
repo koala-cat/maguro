@@ -248,8 +248,9 @@ export default {
       return getSaveData(this.$data)
     },
     saveOverlays () {
-      const result = this.getSaveData()
-      if (result) {
+      const result = this.getSaveData() || {}
+      const { creates = [], updates = [], removes = [] } = result
+      if (creates.length > 0 || updates.length > 0 || removes.length > 0) {
         this.$emit('save', result, () => {
           this.$data.updateOverlays = {}
           this.$data.removeOverlays = []
@@ -260,7 +261,7 @@ export default {
           notify('success', '保存成功。')
         })
       } else {
-        notify('info', '无需保存（超出绘制区域元件将不予保存）。')
+        notify('info', '无需保存(超出绘制区域不予保存)')
       }
     },
     clearOverlays () {
