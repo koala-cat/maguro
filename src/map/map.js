@@ -240,8 +240,11 @@ export default {
         console.log(err)
       }
     }, 500),
+    getSaveData () {
+      return getSaveData(this.$data)
+    },
     saveOverlays () {
-      const result = getSaveData(this.$data)
+      const result = this.getSaveData()
       if (result) {
         this.$emit('save', result, () => {
           this.$data.updateOverlays = {}

@@ -29,6 +29,7 @@
         v-for="subNode in subNodes"
         :key="subNode.id"
         :node="subNode"
+        :disabled="disabled"
         :check-value="checkValue"
         :level="level+1"
         v-on="$listeners" />
@@ -41,13 +42,10 @@
   export default {
     name: 'TreeNode',
     props: {
+      disabled: Boolean,
       node: {
         type: Object,
         default: () => ({})
-      },
-      disabled: {
-        type: Boolean,
-        default: false
       },
       level: {
         type: Number,
