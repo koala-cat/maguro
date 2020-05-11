@@ -62,16 +62,16 @@ export default {
       }
     },
     bindDocumentEvents () {
-      const overlays = this.selectedOverlays
       const mapEl = document.querySelector('#map')
 
       document.addEventListener('keydown', (e) => {
         e = e || window.event
         const keyCode = e.keyCode || e.which || e.charCode
         if (keyCode === 46) { // Delete 46
-          overlays.map(oly => {
+          this.selectedOverlays.map(oly => {
             oly.delete()
           })
+          this.selectedOverlays.splice(0)
         }
 
         if (keyCode === 27) { // Escape
