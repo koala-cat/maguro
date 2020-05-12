@@ -190,7 +190,7 @@ function onLineupdate (e, options) {
       points = overlay.getPath()
     }
     for (const p of points) {
-      if (!isPointInRect(p, areaRestriction)) {
+      if (areaRestriction && !isPointInRect(p, areaRestriction)) {
         saveable = false
         break
       }

@@ -28,7 +28,7 @@ function getSaveData (options) {
     }
     if (oly.points) {
       const _oly = overlays.find(item => item.id === oly.id)
-      if (!isOlyInAreaRestriction(_oly, areaRestriction)) {
+      if (_oly && !isOlyInAreaRestriction(_oly, areaRestriction)) {
         continue
       }
     }
@@ -98,7 +98,11 @@ function getPoints (oly) {
 
 function isOlyInAreaRestriction (oly, areaRestriction) {
   const bounds = oly.getBounds ? oly.getBounds() : null
-  return (bounds && areaRestriction && areaRestriction.containsBounds(bounds)) || !areaRestriction
+  let result = true
+  if (bounds && areaRestriction) {
+    result = areaRestriction.containsBounds(bounds)
+  }
+  return result
 }
 
 export {

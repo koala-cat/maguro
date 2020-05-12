@@ -14,7 +14,7 @@ function calcMarkerOnLinePosition (point, polyline, isDrag) {
       point.lat >= Math.min(curPt.lat, nextPt.lat) && point.lat <= Math.max(curPt.lat, nextPt.lat)) {
       const precision = (curPt.lng - point.lng) * (nextPt.lat - point.lat) -
         (nextPt.lng - point.lng) * (curPt.lat - point.lat)
-      if (precision < 2e-2 && precision > -2e-2) { // 实质判断是否接近0
+      if (precision < 2e-8 && precision > -2e-8) { // 实质判断是否接近0
         return i
       }
     }
