@@ -157,6 +157,13 @@
         if (val && val.type === 'special') {
           cursorOverlay.visible = true
         } else {
+          Object.assign(
+            this.adsorbData,
+            {
+              point: null,
+              polyline: null
+            }
+          )
           cursorOverlay.visible = false
           cursorOverlay.hide()
         }
