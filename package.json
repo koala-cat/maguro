@@ -1,6 +1,6 @@
 {
   "name": "maguro",
-  "version": "0.1.59",
+  "version": "0.1.60",
   "description": "draw on map",
   "main": "dist/maguro.esm.js",
   "files": [

@@ -62,56 +62,29 @@ export default {
       }
     },
     bindDocumentEvents () {
-      const mapEl = document.querySelector('#map')
+      const onKeydown = (e) => {
+        this.docKeydown(e)
+      }
+      const onMousedown = (e) => {
+        this.docMousedown(e)
+      }
 
-      document.addEventListener('keydown', (e) => {
-        e = e || window.event
-        const keyCode = e.keyCode || e.which || e.charCode
-        if (keyCode === 46) { // Delete 46
-          this.selectedOverlays.map(oly => {
-            oly.delete()
-          })
-          this.selectedOverlays.splice(0)
-        }
-
-        if (keyCode === 27) { // Escape
-          breakDrawing(this.$data)
-        }
-      })
-      document.addEventListener('mousedown', (e) => {
-        if (!e.point || !(this.areaRestriction instanceof BMap.Bounds)) return
-        if (!isPointInRect(e.point, this.areaRestriction)) {
-          breakDrawing(this.$data)
-          notify('warning', '请在有效区域内绘制。')
-        }
-      })
-      document.addEventListener('mousemove', (e) => {
-        const { cursorOverlay } = this.adsorbData
-        if (this.mapType === 'graphic' || !cursorOverlay) return
-        if (this.clientX === e.clientX && this.clientY === e.clientY) {
+      let timer = null
+      const onMousemove = (e) => {
+        if (timer) {
           return
         }
+        timer = setTimeout(() => {
+          this.docMouseMove(e)
 
-        const { top, left } = mapEl.getBoundingClientRect()
-        const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
-        this.clientX = e.clientX
-        this.clientY = e.clientY
-        if (cursorOverlay.visible) {
-          const { point, polyline } = this.adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-          if (point && polyline) {
-            this.map.setDefaultCursor('crosshair')
-            cursorOverlay.setPosition(point)
-            cursorOverlay.show()
-          } else {
-            this.map.setDefaultCursor('pointer')
-            cursorOverlay.hide()
-          }
-          Object.assign(
-            this.adsorbData,
-            { point, polyline }
-          )
-        }
-      })
+          clearTimeout(timer)
+          timer = null
+        }, 20)
+      }
+
+      document.addEventListener('keydown', onKeydown)
+      document.addEventListener('mousedown', onMousedown)
+      document.addEventListener('mousemove', onMousemove)
     },
     bindOverlayEvents () {
       const click = (e, overlay) => {
@@ -354,6 +327,56 @@ export default {
             showOverlays(this.$data)
           }
         }
+      }
+    },
+    docKeydown (e) {
+      e = e || window.event
+      const keyCode = e.keyCode || e.which || e.charCode
+      if (keyCode === 46) { // Delete 46
+        this.selectedOverlays.map(oly => {
+          oly.delete()
+        })
+        this.selectedOverlays.splice(0)
+      }
+
+      if (keyCode === 27) { // Escape
+        breakDrawing(this.$data)
+      }
+    },
+    docMousedown (e) {
+      if (!e.point || !(this.areaRestriction instanceof BMap.Bounds)) return
+      if (!isPointInRect(e.point, this.areaRestriction)) {
+        breakDrawing(this.$data)
+        notify('warning', '请在有效区域内绘制。')
+      }
+    },
+    docMouseMove (e) {
+      const { cursorOverlay } = this.adsorbData
+      if (this.mapType === 'graphic' || !cursorOverlay) return
+      if (this.clientX === e.clientX && this.clientY === e.clientY) {
+        return
+      }
+
+      const mapEl = document.querySelector('#map')
+      const { top, left } = mapEl.getBoundingClientRect()
+      const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
+      this.clientX = e.clientX
+      this.clientY = e.clientY
+      if (cursorOverlay.visible) {
+        const { point, polyline } = this.adsorbOverlay(this.map, mPoint, this.polylineOverlays)
+        // console.log(point, polyline)
+        if (point && polyline) {
+          this.map.setDefaultCursor('crosshair')
+          cursorOverlay.setPosition(point)
+          cursorOverlay.show()
+        } else {
+          this.map.setDefaultCursor('pointer')
+          cursorOverlay.hide()
+        }
+        Object.assign(
+          this.adsorbData,
+          { point, polyline }
+        )
       }
     }
   }
