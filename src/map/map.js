@@ -129,11 +129,11 @@ export default {
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
         const specials = this.specialOverlays[key]
+        specials.sort((a, b) => b.parentId * 1 - a.parentId * 1)
         const settings = {
           ...getOverlaySettings(specials[0]),
           type: specials[0].type
         }
-        specials.sort((a, b) => a.invented * 1 - b.invented * 1)
 
         const overlay = specials[specials.length - 1]
         const polyline = getSpecialAttachPolyline(overlay, this.overlays)
