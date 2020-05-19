@@ -15,7 +15,7 @@ function selectOverlay (e, overlay, options) {
     activeOverlay === overlay) {
     return
   }
-  if (activeLegendType === 'special' && type === 'polyline' && e) {
+  if (activeLegendType === 'special' && type === 'polyline' && !overlay.disabled && e) {
     const settings = defaultSettings(activeLegendType)
     const special = new CustomSpecial(e.point, overlay, settings, options)
     special.draw((overlays) => {

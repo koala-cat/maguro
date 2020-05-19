@@ -220,13 +220,16 @@ export default {
     getSaveData () {
       return getSaveData(this.$data)
     },
+    clearSaveData () {
+      this.$data.updateOverlays = {}
+      this.$data.removeOverlays = []
+    },
     saveOverlays () {
       const result = this.getSaveData() || {}
       const { creates = [], updates = [], removes = [] } = result
       if (creates.length > 0 || updates.length > 0 || removes.length > 0) {
         this.$emit('save', result, () => {
-          this.$data.updateOverlays = {}
-          this.$data.removeOverlays = []
+          this.clearSaveData()
           this.isReset = false
           if (this.activeOverlay) {
             deselectOverlays(this.$data)

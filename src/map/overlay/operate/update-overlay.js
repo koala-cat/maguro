@@ -59,7 +59,7 @@ function updateOverlay (key, value, overlay) {
   if (key === 'projectStructureId') {
     const structureId = overlay.projectStructureId
     const structure = structures.find(item => item.id === structureId)
-    overlay.structureName = structureId ? structure.name : '未关联'
+    overlay.structureName = structure?.name || '未关联'
   }
 
   if (id < 0) return
