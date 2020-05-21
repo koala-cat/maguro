@@ -1,7 +1,7 @@
 import { scaleSpecs, zoomSpecs } from '../../constants'
 import { calcOnePixelToPoint } from './point'
 import { calcPixelDistance, distanceToPointAndPixel } from './distance'
-import { getSpecialAttachPolyline } from './overlay'
+import { getSpecialAttachPolyline, getOverlayParent } from './overlay'
 
 function calcOverlayPixel (map, overlay) {
   const bounds = overlay.getBounds()
@@ -147,6 +147,7 @@ function showOverlays (options) {
   const { map, overlays, zoomSettings } = options
   const zoom = map.getZoom()
   const zoomMap = {}
+  overlays.sort((a, b) => a.parentId - b.parentId)
   for (const overlayType in zoomSettings) {
     const scale = zoomSettings[overlayType]
     const idx = scaleSpecs.indexOf(scale)
@@ -154,7 +155,7 @@ function showOverlays (options) {
   }
 
   for (const oly of overlays) {
-    let { type, projectGeoKey, isCommand, isDisplay, isCommandDisplay } = oly
+    let { type, isCommand, isDisplay, isCommandDisplay } = oly
     const display = isCommand === false ? isCommandDisplay : isDisplay
 
     if (!display) {
@@ -162,21 +163,30 @@ function showOverlays (options) {
       continue
     }
 
-    if (type.includes('special')) {
-      type = 'special'
-    } else if (type === 'polyline') {
-      type = projectGeoKey ? 'uploadPolyline' : type
-    } else if (['circle', 'rectangle', 'polygon'].includes(type)) {
-      type = 'polygon'
-    }
-
-    if (zoom >= zoomMap[type]) {
+    type = getZoomType(oly)
+    const parent = getOverlayParent(oly, overlays)
+    const disaplay = parent ? parent.visible : zoom >= zoomMap[type]
+    if (disaplay) {
       oly.show()
     } else {
       oly.hide()
     }
+    oly.visible = disaplay
+
     zoomSpecialOverlayPixel(map, oly)
   }
+}
+
+function getZoomType (oly) {
+  let { type, projectGeoKey } = oly
+  if (type.includes('special')) {
+    type = 'special'
+  } else if (type === 'polyline') {
+    type = projectGeoKey ? 'uploadPolyline' : type
+  } else if (['circle', 'rectangle', 'polygon'].includes(type)) {
+    type = 'polygon'
+  }
+  return type
 }
 
 export {

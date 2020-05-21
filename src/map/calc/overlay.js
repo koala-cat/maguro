@@ -82,9 +82,26 @@ function getPolylineIncludeSpecials (polyline, overlays) {
   return specials
 }
 
+function getOverlayParent (overlay, overlays) {
+  const parent = overlays.find(item => item.id === overlay.parentId)
+  return parent
+}
+
+function getOverlayChildren (overlay, overlays) {
+  const children = overlays.reduce((arr, item) => {
+    if (item.parentId === overlay.id) {
+      arr.push(item)
+    }
+    return arr
+  }, [])
+  return children
+}
+
 export {
   getCreateOverlays,
   getUpdateOverlays,
   getSpecialAttachPolyline,
-  getPolylineIncludeSpecials
+  getPolylineIncludeSpecials,
+  getOverlayParent,
+  getOverlayChildren
 }

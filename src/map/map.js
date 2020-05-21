@@ -1,6 +1,6 @@
 import BMap from 'BMap'
 import { notify } from 'mussel'
-import clonedeep from 'lodash.clonedeep'
+import cloneDeep from 'lodash.clonedeep'
 import debounce from 'lodash.debounce'
 
 import CustomSvg from './overlay/custom/overlay-svg'
@@ -100,16 +100,15 @@ export default {
         this.drawCursor()
         return
       }
-      const overlays = clonedeep(this.overlays)
+      const overlays = cloneDeep(this.overlays)
       const wholePoints = []
 
       this.clearOverlays()
       this.overlays.splice(0)
       this.specialOverlays = {}
-
       for (const oly of overlays) {
         const legend = getLegend(this.legends, oly)
-        oly.type = getLegendType(legend)
+        oly.type = oly.type || getLegendType(legend)
         this.drawOverlay(oly, wholePoints)
       }
       this.initSpecialOverlays()

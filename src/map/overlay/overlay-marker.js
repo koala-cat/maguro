@@ -7,6 +7,16 @@ import { dragOverlay } from './operate/drag-overlay'
 class Marker extends BMap.Marker {
   constructor (point, settings, options) {
     super(point, { icon: options.icon })
+    const { label: opts, offsetX, offsetY } = settings
+    if (opts) {
+      const { name, offsetX: x = 0, offsetY: y = 0 } = opts
+      const label = new BMap.Label(name)
+      label.setStyle(opts)
+      label.setOffset(new BMap.Size(x, y))
+      this.setLabel(label)
+    }
+    this.setOffset(new BMap.Size(offsetX, offsetY))
+
     this.settings = settings
     this.options = options
   }
