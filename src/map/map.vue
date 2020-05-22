@@ -15,7 +15,7 @@
   import cloneDeep from 'lodash.clonedeep'
   import { modes } from '../constants'
 
-  import MapMixin from './map'
+  import MapMixin from './mixins'
   import Mode from './configure/mode.vue'
   import Scale from './configure/scale.vue'
 
@@ -146,7 +146,7 @@
         this.map.setNormalMapDisplay(this.baseMapVisible)
       },
       mapType (val) {
-        this.restoreToolkit()
+        this.switchToolkit()
         if (modes[val]) {
           this.map.setMapType(modes[val])
         }
