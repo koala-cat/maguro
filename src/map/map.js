@@ -9,6 +9,7 @@ import CustomCursor from './overlay/custom/overlay-cursor'
 
 import { showOverlays } from './calc/clusterer'
 import { isPointInRect } from './calc/geo'
+import { lazyTrigger } from './calc/trigger'
 import { getSpecialAttachPolyline } from './calc/overlay'
 import { getOverlaySettings } from './overlay/setting'
 import { getLegend, getLegendType } from './overlay/legend'
@@ -69,17 +70,12 @@ export default {
         this.docMousedown(e)
       }
 
-      let timer = null
+      const timer = lazyTrigger(20)
       const onMousemove = (e) => {
-        if (timer) {
-          return
-        }
-        timer = setTimeout(() => {
+        const callback = () => {
           this.docMouseMove(e)
-
-          clearTimeout(timer)
-          timer = null
-        }, 20)
+        }
+        timer(callback)
       }
 
       document.addEventListener('keydown', onKeydown)
@@ -354,19 +350,21 @@ export default {
     },
     docMouseMove (e) {
       const { cursorOverlay } = this.adsorbData
-      if (this.mapType === 'graphic' || !cursorOverlay) return
-      if (this.clientX === e.clientX && this.clientY === e.clientY) {
-        return
-      }
 
-      const mapEl = document.querySelector('#map')
-      const { top, left } = mapEl.getBoundingClientRect()
-      const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
-      this.clientX = e.clientX
-      this.clientY = e.clientY
       if (cursorOverlay.visible) {
+        console.log(e)
+        if (this.mapType === 'graphic' || !cursorOverlay) return
+        if (this.clientX === e.clientX && this.clientY === e.clientY) {
+          return
+        }
+
+        const mapEl = document.querySelector('#map')
+        const { top, left } = mapEl.getBoundingClientRect()
+        const mPoint = this.map.pixelToPoint(new BMap.Pixel(e.clientX - left, e.clientY - top))
+        this.clientX = e.clientX
+        this.clientY = e.clientY
+
         const { point, polyline } = this.adsorbOverlay(this.map, mPoint, this.polylineOverlays)
-        // console.log(point, polyline)
         if (point && polyline) {
           this.map.setDefaultCursor('crosshair')
           cursorOverlay.setPosition(point)
