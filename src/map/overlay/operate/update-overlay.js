@@ -31,7 +31,7 @@ function showOverlay (key, value, overlay) {
         data.push(oly)
       }
     })
-    polylineVisible = getSpecialAttachPolyline(overlay).isVisible()
+    polylineVisible = getSpecialAttachPolyline(overlay, overlays).isVisible()
   } else {
     data.push(overlay)
   }
