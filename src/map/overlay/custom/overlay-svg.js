@@ -51,6 +51,8 @@ class CustomSvg extends CustomOverlay {
     if (this.class && this.class.includes('vtk')) {
       this.getBounds()
     }
+
+    this.setLabel()
     return this.div
   }
 
@@ -124,12 +126,53 @@ class CustomSvg extends CustomOverlay {
     this.setTransform()
   }
 
-  setStyle (key, value) {
-    this.div.querySelector('svg').style[key] = value
+  setLabel () {
+    const { label: opts } = this.settings
+    if (!opts) {
+      return
+    }
+    const { name, offsetX: x = 0, offsetY: y = 0 } = opts
+    const label = new BMap.Label(name, {
+      offset: new BMap.Size(x, y),
+      position: this.point
+    })
+    label.hide()
+    label.setStyle(opts)
+    this.options.map.addOverlay(label)
+    setTimeout(() => {
+      let el = label.ba
+      const style = el.getAttribute('style')
+      const innerHTML = el.innerHTML
+      el = document.createElement('label')
+      el.setAttribute('style', style)
+      Object.assign(
+        el.style,
+        {
+          display: 'block',
+          left: `${x}px`,
+          top: `${y}px`
+        }
+      )
+      el.innerHTML = innerHTML
+      this.div.appendChild(el)
+      this.options.map.removeOverlay(label)
+    })
   }
 
-  setBorder (color) {
-    this.div.style.border = '1px solid ' + color
+  setBorder (color, radius) {
+    const style = {}
+    style.border = '1px solid ' + color
+    if (radius) {
+      style.borderRadius = radius
+    }
+    Object.assign(
+      this.div.style,
+      style
+    )
+  }
+
+  setStyle (key, value) {
+    this.div.querySelector('svg').style[key] = value
   }
 }
 

@@ -157,13 +157,15 @@
           if (oly.isCommand === false && !oly.isDisplay) continue
 
           const { conditionDisplay, conditionStructure } = this.getDisplay(oly)
-          const conditionParentId = (oly.parentId < 0 && !oly.invented) ||
-            (oly.parentId > 0 && !groupIds.includes(oly.parentId))
           if (conditionDisplay &&
             conditionStructure &&
-            conditionParentId) {
-            groupIds.push(oly.parentId)
+            !groupIds.includes(oly.parentId)) {
             result.push(oly)
+          }
+          if (oly.parentId &&
+            oly.parentId !== -1 &&
+            !groupIds.includes(oly.parentId)) {
+            groupIds.push(oly.parentId)
           }
         }
         return result

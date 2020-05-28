@@ -7,7 +7,7 @@ import { defaultSettings } from '../setting'
 import { deselectOverlays } from './deselect-overlay'
 
 function selectOverlay (e, overlay, options) {
-  const { selectedOverlays, specialOverlays, activeOverlay, activeLegend } = options
+  const { currentOrg, selectedOverlays, specialOverlays, activeOverlay, activeLegend } = options
   const type = overlay.type
   const activeLegendType = activeLegend?.type || ''
 
@@ -16,7 +16,11 @@ function selectOverlay (e, overlay, options) {
     return
   }
   if (activeLegendType === 'special' && type === 'polyline' && !overlay.disabled && e) {
-    const settings = defaultSettings(activeLegendType)
+    const settings = {
+      ...defaultSettings(activeLegendType),
+      orgId: currentOrg.id,
+      orgName: currentOrg.shortName
+    }
     const special = new CustomSpecial(e.point, overlay, settings, options)
     special.draw((overlays) => {
       const parentOverlay = overlays.find(oly => oly.invented)

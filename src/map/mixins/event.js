@@ -5,7 +5,7 @@ import { showOverlays } from '../calc/clusterer'
 import { isPointInRect } from '../calc/geo'
 import { lazyTrigger } from '../calc/trigger'
 
-// import { adsorbOverlay } from '../overlay/operate/adsorb-overlay'
+import { adsorbOverlay } from '../overlay/operate/adsorb-overlay'
 import { breakDrawing } from '../overlay/operate/drawing-overlay'
 import { deselectOverlays } from '../overlay/operate/deselect-overlay'
 import { selectOverlay } from '../overlay/operate/select-overlay'
@@ -127,13 +127,12 @@ export default {
     docMouseMove (e) {
       const { cursorOverlay } = this.adsorbData
 
-      if (cursorOverlay.visible) {
-        console.log(e)
-        if (this.mapType === 'graphic' || !cursorOverlay) return
-        if (this.clientX === e.clientX && this.clientY === e.clientY) {
-          return
-        }
+      if (this.mapType === 'graphic' || !cursorOverlay) return
+      if (this.clientX === e.clientX && this.clientY === e.clientY) {
+        return
+      }
 
+      if (cursorOverlay.visible) {
         const mapEl = document.querySelector('#map')
         const { top, left } = mapEl.getBoundingClientRect()
         const mPoint = this.map.pixelToPoint(
@@ -142,7 +141,7 @@ export default {
         this.clientX = e.clientX
         this.clientY = e.clientY
 
-        const { point, polyline } = this.adsorbOverlay(
+        const { point, polyline } = adsorbOverlay(
           this.map,
           mPoint,
           this.polylineOverlays

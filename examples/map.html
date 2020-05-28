@@ -125,6 +125,14 @@
             value: 'label',
             disabled: true,
             isRemoved: false
+          },
+          {
+            id: 1022,
+            type: 'tag',
+            value: 'marker',
+            disabled: true,
+            iconUrl: "./assets/images/s3.svg",
+            format: 'svg'
           }
         ],
         overlays: [],
@@ -225,7 +233,7 @@
           {
             id: 111,
             parentId: 102,
-            projectMapLegendId: 1009,
+            projectMapLegendId: 1022,
             width: 32,
             points: [
               {
@@ -249,12 +257,14 @@
               borderStyle: 'solid',
               borderColor: 'rgba(0, 0, 0, 0)',
               offsetX: 30,
-              offsetY: 3
+              offsetY: 0
             },
             offsetX: 10,
             offsetY: 20,
+            fillColor: '#000',
+            fillOpacity: 1,
             visible: true,
-            disabled: true
+            disabled: false
           },
           {
             id: 103,

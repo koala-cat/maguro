@@ -36,22 +36,33 @@ export default {
       }
       this.initSpecialOverlays()
       this.drawCursor()
-      if (this.isReset && this.mapType !== 'graphic') {
-        const zoom = this.map.getZoom()
-        const viewPort = this.map.getViewport(wholePoints)
-        this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-        if (zoom === viewPort.zoom) {
+      if (this.mapType !== 'graphic') {
+        if (this.isReset) {
+          const zoom = this.map.getZoom()
+          const viewPort = this.map.getViewport(wholePoints)
+          this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+          if (zoom === viewPort.zoom) {
+            showOverlays(this.$data)
+          }
+        } else {
           showOverlays(this.$data)
         }
-      } else {
-        showOverlays(this.$data)
       }
       this.isReset = true
     },
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
         const specials = this.specialOverlays[key]
-        specials.sort((a, b) => b.parentId * 1 - a.parentId * 1)
+        specials.sort(
+          (a, b) => {
+            const value1 = a.parentId * 1
+            const value2 = b.parentId * 1
+            if (value1 === value2) {
+              return a.id - b.id
+            }
+            return value2 - value1
+          }
+        )
         const settings = {
           ...getOverlaySettings(specials[0]),
           type: specials[0].type
