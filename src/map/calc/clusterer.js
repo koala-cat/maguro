@@ -165,7 +165,7 @@ function showOverlays (options) {
 
     type = getZoomType(oly)
     const parent = getOverlayParent(oly, overlays)
-    const disaplay = parent ? parent.visible : zoom >= zoomMap[type]
+    const disaplay = zoomMap[type] ? zoom >= zoomMap[type] : !!parent && parent.visible
     if (disaplay) {
       oly.show()
     } else {

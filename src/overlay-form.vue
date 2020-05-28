@@ -192,7 +192,7 @@
             label="显示">
             <mu-toggle
               v-model="isDisplay"
-              :disabled="disabled" />
+              :disabled="!editPermission" />
           </mu-form-field>
           <mu-form-field
             v-if="structures"
@@ -280,8 +280,11 @@
       overlay () {
         return this.baiduMap.activeOverlay || {}
       },
+      editPermission () {
+        return this.baiduMap.mapEditPermission
+      },
       disabled () {
-        return !this.baiduMap.mapEditPermission || this.overlay.disabled
+        return !this.editPermission || this.overlay.disabled
       },
       overlayType () {
         const type = this.overlay.type || ''

@@ -168,6 +168,7 @@
             groupIds.push(oly.parentId)
           }
         }
+        result.sort((a, b) => b.id - a.id)
         return result
       },
       headers () {

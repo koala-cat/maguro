@@ -314,9 +314,6 @@ class CustomSpecial {
       const parentOverlay = olys[olys.length - 1]
       if (key !== 'projectMapLegendId') {
         specials.sort((a, b) => a.invented * 1 - b.invented * 1)
-        selectedOverlays.map(o1 => {
-
-        })
         for (let i = 0; i < olys.length; i++) {
           const oly = olys[i]
           oly.id = specials[i].id
