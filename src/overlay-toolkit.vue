@@ -35,7 +35,6 @@
             :key="tool.type"
             :label="isUploadPolylineField(tool) ? tool.label : ''"
             align-items="center"
-            size="33%"
             style="font-size: 12px; color: #ffffff;">
             <mu-icon
               v-show="!isUploadPolylineField(tool)"
@@ -55,22 +54,14 @@
       <mu-h-box
         v-else
         flex-wrap>
-        <a
+        <toolkit
           v-for="tool in subTools"
           :key="tool.id"
+          :tool="tool"
           :style="getLegendStyle(tool)"
-          @click="uploadLegend(tool)">
-          <span v-if="tool.value === 'create'">+</span>
-          <img
-            v-else
-            :src="tool.iconUrl"
-            @click="onSelect(tool)">
-          <span
-            v-if="!tool.disabled"
-            class="icon ipm-icon-error-circle"
-            style="position: absolute; top: 0; right: -6px; color: #f5222d; line-height: 0;"
-            @click.stop="removeLegend(tool)" />
-        </a>
+          @select="onSelect"
+          @remove="removeLegend"
+          @upload="uploadLegend" />
       </mu-h-box>
     </mu-h-box>
   </mu-v-box>
@@ -79,8 +70,13 @@
   import { tools, scaleSpecs } from './constants'
   import svg from './assets/svg-icons'
 
+  import Toolkit from './overlay-toolkit.jsx'
+
   export default {
     inject: ['baiduMap'],
+    components: {
+      Toolkit
+    },
     computed: {
       editPermission () {
         return this.baiduMap.mapEditPermission
@@ -145,9 +141,11 @@
         return !this.graphicMode || (this.graphicMode && !this.hiddenToolkits.includes(tool.value))
       },
       getLegendStyle (tool) {
-        return this.activeTool === tool && tool.value !== 'create'
-          ? 'border: 1px solid #1890ff'
-          : ''
+        return tool.value === 'create'
+          ? 'font-size: 16px; line-height: 14px; background: transparent; border: 1px solid rgba(255, 255, 255, 0.6);'
+          : this.activeTool === tool
+            ? 'background: rgba(255, 255, 255, 0.3)'
+            : ''
       },
       getPath (icon) {
         return svg[icon]
@@ -189,8 +187,7 @@
       removeLegend (legend) {
         this.baiduMap.removeLegend(legend)
       },
-      uploadLegend (tool) {
-        if (tool.value !== 'create') return
+      uploadLegend () {
         this.baiduMap.addLegend()
       }
     }
@@ -226,20 +223,23 @@
     width: 152px;
     max-height: 120px;
     height: auto;
-    padding: 8px 0 0;
+    padding: 7px 0 0;
     left: 40px;
     overflow: auto;
     box-shadow: 0 3px 12px rgba(0,0,0,.23),0 3px 12px rgba(0,0,0,.16);
     & a {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       padding: 4px;
-      margin: 0 0 8px 8px;
-      background: $fontColorWhite;
+      margin: 0 0 7px 8px;
+      color: $fontColorWhite;
       cursor: pointer;
       & img {
         width: 100%;
         height: 100%;
+      }
+      &:hover {
+        background:rgba(255, 255, 255, 0.3)
       }
     }
     & input[disabled] {

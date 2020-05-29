@@ -1,5 +1,6 @@
 import collapseCircle from './collapse-circle'
 import dashed from './dashed'
+import errorCircle from './error-circle'
 import expandCircle from './expand-circle'
 import label from './label'
 import list from './list'
@@ -18,6 +19,7 @@ import zoomUp from './zoom-up'
 export default {
   collapseCircle,
   dashed,
+  errorCircle,
   expandCircle,
   label,
   list,
