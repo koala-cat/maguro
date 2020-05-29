@@ -35,6 +35,7 @@
             :key="tool.type"
             :label="isUploadPolylineField(tool) ? tool.label : ''"
             align-items="center"
+            size="33%"
             style="font-size: 12px; color: #ffffff;">
             <mu-icon
               v-show="!isUploadPolylineField(tool)"

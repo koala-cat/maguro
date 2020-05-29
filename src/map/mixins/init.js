@@ -53,16 +53,9 @@ export default {
     initSpecialOverlays () {
       for (const key in this.specialOverlays) {
         const specials = this.specialOverlays[key]
-        specials.sort(
-          (a, b) => {
-            const value1 = a.parentId * 1
-            const value2 = b.parentId * 1
-            if (value1 === value2) {
-              return a.id - b.id
-            }
-            return value2 - value1
-          }
-        )
+        specials.sort((a, b) => {
+          return b.parentId - a.parentId ? b.parentId - a.parentId : a.id - b.id
+        })
         const settings = {
           ...getOverlaySettings(specials[0]),
           type: specials[0].type

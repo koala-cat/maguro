@@ -147,7 +147,9 @@ function showOverlays (options) {
   const { map, overlays, zoomSettings } = options
   const zoom = map.getZoom()
   const zoomMap = {}
-  overlays.sort((a, b) => a.parentId - b.parentId)
+  overlays.sort((a, b) => {
+    return a.parentId - b.parentId ? a.parentId - b.parentId : a.id - b.id
+  })
   for (const overlayType in zoomSettings) {
     const scale = zoomSettings[overlayType]
     const idx = scaleSpecs.indexOf(scale)
