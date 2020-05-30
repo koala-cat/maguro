@@ -5,7 +5,7 @@ import { showOverlays } from '../calc/clusterer'
 import { isPointInRect } from '../calc/geo'
 import { lazyTrigger } from '../calc/trigger'
 
-import { adsorbOverlay } from '../overlay/operate/adsorb-overlay'
+// import { adsorbOverlay } from '../overlay/operate/adsorb-overlay'
 import { breakDrawing } from '../overlay/operate/drawing-overlay'
 import { deselectOverlays } from '../overlay/operate/deselect-overlay'
 import { selectOverlay } from '../overlay/operate/select-overlay'
@@ -96,7 +96,9 @@ export default {
         },
         zoomend: {
           event: () => {
-            showOverlays(this.$data)
+            if (this.mapType !== 'graphic') {
+              showOverlays(this.$data)
+            }
           }
         }
       }
@@ -141,7 +143,7 @@ export default {
         this.clientX = e.clientX
         this.clientY = e.clientY
 
-        const { point, polyline } = adsorbOverlay(
+        const { point, polyline } = this.adsorbOverlay(
           this.map,
           mPoint,
           this.polylineOverlays

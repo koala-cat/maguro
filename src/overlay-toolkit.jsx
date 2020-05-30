@@ -16,6 +16,8 @@ export default {
       this.$emit('select', this.tool)
     },
     onMouse (e, val) {
+      if (this.tool.disabled) return
+
       const el = e?.target || null
       const delEl = el ? el.querySelector('span') : null
       if (delEl) {
@@ -46,7 +48,7 @@ export default {
           onMouseenter={ this.onMouseover }
           onMouseleave={ this.onMouseleave }>
           {
-            this.tool.disabled
+            !this.tool.disabled
               ? <span
                 style="display:none;"
                 onClick={ this.onRemove }>

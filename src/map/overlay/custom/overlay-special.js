@@ -289,7 +289,7 @@ class CustomSpecial {
       updatePolyline(key, value, this.overlay)
       return
     }
-
+    // overlay
     const { selectedOverlays, specialOverlays, removeOverlays } = this.options
     const specials = cloneDeep(selectedOverlays)
     const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1].getPath()
