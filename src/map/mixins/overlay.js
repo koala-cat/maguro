@@ -122,7 +122,7 @@ export default {
       const result = this.getSaveData() || {}
       const { creates = [], updates = [], removes = [] } = result
       if (creates.length > 0 || updates.length > 0 || removes.length > 0) {
-        this.$emit('save', result, () => {
+        this.$emit('save', result, true, () => {
           this.clearSaveData()
           this.isReset = false
           if (this.activeOverlay) {
