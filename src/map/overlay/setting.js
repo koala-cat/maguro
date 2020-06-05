@@ -90,13 +90,16 @@ function settingsToStyle (options, type) {
       case 'fillOpacity':
         style.opacity = value
         break
-      default:
+      case 'width':
         if (type === 'label') {
           style.fontSize = `${value}px`
         } else {
           style.width = `${value}px`
           style.height = `${value}px`
         }
+        break
+      default:
+        break
     }
   }
   return style

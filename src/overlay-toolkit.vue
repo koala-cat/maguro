@@ -16,7 +16,7 @@
           @click.native="onSelectTool($event, tool)">
           <mu-icon
             :svg="getPath(tool.value)"
-            style="fill: #ffffff;" />
+            style="font-size: 20px; fill: #ffffff;" />
         </mu-list-item>
       </mu-v-box>
     </mu-v-box>
@@ -33,14 +33,17 @@
           <mu-form-field
             v-for="tool in subTools"
             :key="tool.type"
-            :label="isUploadPolylineField(tool) ? tool.label : ''"
             align-items="center"
             size="33%"
-            style="font-size: 12px; color: #ffffff;">
-            <mu-icon
-              v-show="!isUploadPolylineField(tool)"
-              :svg="getPath(tool.value)"
-              style="width: 40px; font-size: 18px; fill: #ffffff;" />
+            style="font-size: 12px;">
+            <label
+              style="width: 40px; color: #fff;">
+              {{ isUploadPolylineField(tool) ? tool.label : '' }}
+              <mu-icon
+                v-show="!isUploadPolylineField(tool)"
+                :svg="getPath(tool.value)"
+                style="font-size: 18px; fill: #ffffff;" />
+            </label>
             <mu-combo-box
               v-model="zoomSettings[tool.value]"
               :disabled="!editPermission"

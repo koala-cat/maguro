@@ -207,7 +207,7 @@
     },
     methods: {
       getDisplay (oly) {
-        const display = oly.isCommand ? oly.isDisplay : oly.isCommandDisplay
+        const display = oly.isCommand === false ? oly.isCommandDisplay : oly.isDisplay
         const conditionDisplay = this.showHiddenOverlay ? !display : true
         const conditionStructure =
           this.showUnlinkOverlay
