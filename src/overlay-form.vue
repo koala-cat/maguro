@@ -257,7 +257,7 @@
       },
       maxWidth: {
         type: String,
-        default: '60px'
+        default: '76px'
       }
     },
     data () {
@@ -487,7 +487,7 @@
   }
 
   .overlay-form {
-    width: 280px;
+    width: 328px;
     top: 56px;
     right: 16px;
     bottom: 108px;
