@@ -12,6 +12,7 @@ const ignoreFields = [
   'isDisplay',
   'isCommandDisplay',
   'projectStructureId',
+  'projectMapTagId',
   'remark'
 ]
 let lineUpdate = null

@@ -43,6 +43,26 @@
               :disabled="disabled" />
           </mu-form-field>
           <mu-form-field
+            label="标签">
+            <mu-h-box
+              :style="{maxWidth: maxWidth}">
+              <img v-show="tagFile" :src="tagFile" width="16" height="16">
+              <mu-combo-box
+                :clearable="false"
+                :disabled="disabled"
+                popup-height="154px">
+                <mu-option
+                  v-for="legend in tagLegends"
+                  :key="legend.id"
+                  style="padding: 5px 0; text-align: center;"
+                  @click="onComboBoxSelect('projectMapTagId', legend.id)">
+                  <img v-show="legend.iconUrl" :src="legend.iconUrl" width="16" height="16">
+                  <span v-show="!legend.iconUrl">无</span>
+                </mu-option>
+              </mu-combo-box>
+            </mu-h-box>
+          </mu-form-field>
+          <mu-form-field
             v-show="overlayType==='special'"
             label="路宽"
             align-items="center">
@@ -328,6 +348,13 @@
           item => item.type === this.overlayType && item.value !== 'create'
         )
       },
+      tagLegends () {
+        const legends = this.legends.filter(
+          item => item.type === 'tag'
+        )
+        legends.unshift({ id: null })
+        return legends
+      },
       name: {
         get () {
           return this.overlay.name
@@ -336,8 +363,13 @@
           this.baiduMap.updateOverlay('name', val)
         }
       },
+      tagFile () {
+        const tag = this.tagLegends.find(item => item.id === this.overlay.projectMapTagId)
+        console.log(tag)
+        return tag?.iconUrl || null
+      },
       specialFile () {
-        return this.overlay.iconUrl
+        return this.overlay.legendUrl
       },
       width: {
         get () {
@@ -507,7 +539,7 @@
       & img, & [combo-icon] {
         position: absolute;
         top: 8px;
-        left: 16px;
+        left: 24px;
         z-index: 10;
       }
     }

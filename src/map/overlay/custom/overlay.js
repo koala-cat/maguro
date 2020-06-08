@@ -20,7 +20,7 @@ class CustomOverlay extends BMap.Overlay {
     const point = this.getPosition()
     const settings = {
       ...getOverlaySettings(this),
-      iconUrl: legend?.iconUrl || this.iconUrl,
+      legendUrl: legend?.iconUrl || this.legendUrl,
       svg: legend?.svg || this.svg
     }
     const newOverlay = this.draw(point, false, settings, events)

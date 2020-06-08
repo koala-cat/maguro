@@ -38,7 +38,7 @@ class CustomSpecial {
       this.settings,
       {
         type: legend.value,
-        iconUrl: legend.iconUrl,
+        legendUrl: legend.iconUrl,
         projectMapLegendId: legend.id
       }
     )
@@ -109,7 +109,7 @@ class CustomSpecial {
         wPixel,
         parentId,
         parentLineId: this.polyline.id,
-        iconUrl: legend?.iconUrl || ''
+        legendUrl: legend?.iconUrl || ''
       }
     )
     if (type.includes('Line')) {

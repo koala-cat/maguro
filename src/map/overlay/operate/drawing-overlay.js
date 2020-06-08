@@ -53,7 +53,7 @@ function startDrawing (options) {
     ...defaultSettings(legend.type),
     orgId: currentOrg.id,
     orgName: currentOrg.shortName,
-    iconUrl: legend.iconUrl,
+    legendUrl: legend.iconUrl,
     svg: legend.svg,
     projectMapLegendId: legend.id
   }

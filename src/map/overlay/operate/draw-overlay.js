@@ -25,7 +25,7 @@ function drawOverlay (overlay, points, settings, options) {
     newOverlay = drawHotspot(overlay, settings, options)
   } else {
     if (type === 'marker') {
-      Object.assign(settings, { iconUrl: legend.iconUrl })
+      Object.assign(settings, { legendUrl: legend.iconUrl })
       newOverlay = drawMarker(points[0], settings, options)
     } else if (type === 'polyline') {
       newOverlay = drawPolyline(points, settings, options)
@@ -49,7 +49,7 @@ function drawMarker (point, settings, options) {
   const legend = legendId ? getLegend(legends, legendId) : activeLegend
   const { svg } = legend
   let marker = null
-  Object.assign(settings, { svg, iconUrl: legend.iconUrl })
+  Object.assign(settings, { svg, legendUrl: legend.iconUrl })
   if (svg) {
     marker = drawSvg(point, settings, options)
   } else {
@@ -73,7 +73,7 @@ function drawIcon (settings) {
     anchor = [sizeWidth / 2, sizeHeight / 2]
   } = settings
 
-  return new BMap.Icon(settings.iconUrl,
+  return new BMap.Icon(settings.legendUrl,
     new BMap.Size(sizeWidth, sizeHeight), {
       anchor: new BMap.Size(anchor[0], anchor[1]),
       imageSize: new BMap.Size(sizeWidth, sizeHeight),
