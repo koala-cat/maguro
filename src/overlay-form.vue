@@ -43,21 +43,29 @@
               :disabled="disabled" />
           </mu-form-field>
           <mu-form-field
+            v-show="tagFileVisible"
             label="标签">
             <mu-h-box
               :style="{maxWidth: maxWidth}">
               <img v-show="tagFile" :src="tagFile" width="16" height="16">
               <mu-combo-box
+                unlettered
                 :clearable="false"
                 :disabled="disabled"
                 popup-height="154px">
                 <mu-option
                   v-for="legend in tagLegends"
                   :key="legend.id"
+                  :value="legend.id"
+                  :title="legend.name"
                   style="padding: 5px 0; text-align: center;"
                   @click="onComboBoxSelect('projectMapTagId', legend.id)">
-                  <img v-show="legend.iconUrl" :src="legend.iconUrl" width="16" height="16">
-                  <span v-show="!legend.iconUrl">无</span>
+                  <img
+                    v-show="legend.id"
+                    :src="legend.iconUrl"
+                    width="16"
+                    height="16">
+                  <span v-show="!legend.id">{{ legend.value }}</span>
                 </mu-option>
               </mu-combo-box>
             </mu-h-box>
@@ -238,7 +246,6 @@
             <textarea
               v-model.trim="remark"
               class="mu-input"
-              :disabled="disabled"
               style="height: 224px;" />
           </mu-form-field>
         </mu-form>
@@ -314,6 +321,9 @@
         else if (this.overlay instanceof BMap.Polyline) return 'polyline'
         else return type
       },
+      tagFileVisible () {
+        return this.overlayType !== 'label'
+      },
       legendFieldVisible () {
         return ['marker', 'special'].includes(this.overlayType)
       },
@@ -349,10 +359,14 @@
         )
       },
       tagLegends () {
-        const legends = this.legends.filter(
-          item => item.type === 'tag'
-        )
-        legends.unshift({ id: null })
+        const legends = this.legends.reduce((arr, item) => {
+          if (item.type === 'tag') {
+            item.name = item.fileName ? item.fileName.substring(0, item.fileName.lastIndexOf('.')) : ''
+            arr.push(item)
+          }
+          return arr
+        }, [])
+        legends.unshift({ id: null, value: '不选择' })
         return legends
       },
       name: {
@@ -363,9 +377,11 @@
           this.baiduMap.updateOverlay('name', val)
         }
       },
+      projectMapTagId () {
+        return this.overlay.projectMapTagId
+      },
       tagFile () {
-        const tag = this.tagLegends.find(item => item.id === this.overlay.projectMapTagId)
-        console.log(tag)
+        const tag = this.tagLegends.find(item => item.id === this.projectMapTagId)
         return tag?.iconUrl || null
       },
       specialFile () {
@@ -525,9 +541,12 @@
     bottom: 108px;
     overflow: auto;
     z-index: 10;
-    & *:not(.mu-tab-item):not(.mu-tab-label){
+    & *:not(.mu-tab-item):not(.mu-tab-label) {
       color: $fontColorGrey;
-      font-size: $fontSize !important;
+      font-size: $fontSize;
+    }
+    & *[unlettered] input {
+      font-size: 0 !important;
     }
     & > * {
       background: $bgColorLight;
