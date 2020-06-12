@@ -7,14 +7,14 @@ import { defaultSettings } from '../setting'
 import { deselectOverlays } from './deselect-overlay'
 
 function selectOverlay (e, overlay, options) {
-  const { currentOrg, selectedOverlays, specialOverlays, activeOverlay, activeLegend } = options
+  const { currentOrg, selectedOverlays, specialOverlays, activeLegend } = options
   const type = overlay.type
   const activeLegendType = activeLegend?.type || ''
 
-  if ((!overlay.isLocked && selectedOverlays.includes(overlay)) ||
-    activeOverlay === overlay) {
-    return
-  }
+  // if ((!overlay.isLocked && selectedOverlays.includes(overlay)) ||
+  //   activeOverlay === overlay) {
+  //   return
+  // }
   if (activeLegendType === 'special' && type === 'polyline' && !overlay.disabled && e) {
     const settings = {
       ...defaultSettings(activeLegendType),
@@ -39,7 +39,7 @@ function selectOverlay (e, overlay, options) {
 }
 
 function multipleOverlays (e, overlay, options) {
-  const { selectedOverlays, specialOverlays, activeOverlay } = options
+  const { selectedOverlays, specialOverlays } = options
   // removeMarkers(this._map, this._options)
 
   // const mac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
@@ -48,19 +48,27 @@ function multipleOverlays (e, overlay, options) {
   if (!modKey) {
     deselectOverlays(options)
   }
+  // 判断当前是否选中
+  const isSelected = !!selectedOverlays.find(item => item.id === overlay.id)
+  const overlays = type.includes('special') ? specialOverlays[overlay.parentId] : [overlay]
 
-  if (type.includes('special')) {
-    selectedOverlays.push(...specialOverlays[overlay.parentId])
+  if (isSelected) {
+    overlays.map(oly => {
+      const idx = selectedOverlays.findIndex(item => item.id === oly.id)
+      if (idx > -1) {
+        selectedOverlays.splice(idx, 1)
+        oly.disableEditing()
+      }
+    })
   } else {
-    selectedOverlays.push(overlay)
+    selectedOverlays.push(...overlays)
+    if (!overlay.disabled && overlay.isVisible()) {
+      overlay.enableEditing()
+      overlay.drag()
+    }
   }
 
-  options.activeOverlay = modKey ? activeOverlay || selectedOverlays[0] : selectedOverlays[0]
-
-  if (!overlay.disabled && overlay.isVisible()) {
-    overlay.enableEditing()
-    overlay.drag()
-  }
+  options.activeOverlay = modKey ? null : selectedOverlays[0]
 }
 
 function frameSelectOverlays (overlay, options) {
