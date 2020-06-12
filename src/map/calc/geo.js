@@ -22,6 +22,9 @@ function isOverlayInFrame (overlay, rectOverlay) {
       result = isPolygonInRect(overlay.getBounds(), bounds)
     }
   }
+  const { isCommand, isDisplay, isCommandDisplay } = overlay
+  const display = isCommand === false ? isCommandDisplay : isDisplay
+  result = result && display
   return { result, parentId }
 }
 

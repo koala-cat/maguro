@@ -116,6 +116,7 @@ export default {
 
       if (keyCode === 27) {
         // Escape
+        deselectOverlays(this.$data)
         breakDrawing(this.$data)
       }
     },
