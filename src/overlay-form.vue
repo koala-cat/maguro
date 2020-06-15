@@ -355,7 +355,7 @@
       },
       specialLegends () {
         return this.legends.filter(
-          item => item.type === this.overlayType && item.value !== 'create'
+          item => item.type === this.overlayType && item.value !== 'create' && !item.isRemoved && item.isCommand !== false
         )
       },
       tagLegends () {
@@ -385,7 +385,8 @@
         return tag?.iconUrl || null
       },
       specialFile () {
-        return this.overlay.legendUrl
+        const legend = this.specialLegends.find(item => item.id === this.overlay.projectMapLegendId)
+        return legend ? this.overlay.legendUrl : null
       },
       width: {
         get () {
