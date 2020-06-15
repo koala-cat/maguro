@@ -96,9 +96,7 @@ export default {
         },
         zoomend: {
           event: () => {
-            if (this.mapType !== 'graphic') {
-              showOverlays(this.$data)
-            }
+            showOverlays(this.mapType, this.$data)
           }
         }
       }

@@ -141,6 +141,9 @@
       mapType () {
         return this.baiduMap.mapType
       },
+      structures () {
+        return this.baiduMap.structures
+      },
       overlays () {
         return this.baiduMap.overlays
       },
@@ -208,10 +211,12 @@
     methods: {
       getDisplay (oly) {
         const display = oly.isCommand === false ? oly.isCommandDisplay : oly.isDisplay
+        const structure = this.structures.find(item => item.id === oly.projectStructureId)
+
         const conditionDisplay = this.showHiddenOverlay ? !display : true
         const conditionStructure =
           this.showUnlinkOverlay
-            ? !oly.projectStructureId
+            ? !oly.projectStructureId || !structure
             : true
         return { conditionDisplay, conditionStructure }
       },

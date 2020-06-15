@@ -36,17 +36,15 @@ export default {
       }
       this.initSpecialOverlays()
       this.drawCursor()
-      if (this.mapType !== 'graphic') {
-        if (this.isReset) {
-          const zoom = this.map.getZoom()
-          const viewPort = this.map.getViewport(wholePoints)
-          this.map.centerAndZoom(viewPort.center, viewPort.zoom)
-          if (zoom === viewPort.zoom) {
-            showOverlays(this.$data)
-          }
-        } else {
-          showOverlays(this.$data)
+      if (this.mapType !== 'graphic' && this.isReset) {
+        const zoom = this.map.getZoom()
+        const viewPort = this.map.getViewport(wholePoints)
+        this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+        if (zoom === viewPort.zoom) {
+          showOverlays(this.mapType, this.$data)
         }
+      } else {
+        showOverlays(this.mapType, this.$data)
       }
       this.isReset = true
     },
@@ -90,7 +88,7 @@ export default {
     },
     setMapZoomSettings (key, value) {
       this.$emit('setMapZoomSettings', key, value, () => {
-        showOverlays(this.$data)
+        showOverlays(this.mapType, this.$data)
       })
     }
   }

@@ -143,7 +143,7 @@ function zoomSpecialOverlayPixel (map, overlay) {
   }
 }
 
-function showOverlays (options) {
+function showOverlays (mapType, options) {
   const { map, overlays, zoomSettings } = options
   const zoom = map.getZoom()
   const zoomMap = {}
@@ -158,7 +158,7 @@ function showOverlays (options) {
 
   for (const oly of overlays) {
     let { type, isCommand, isDisplay, isCommandDisplay } = oly
-    const display = isCommand === false ? isCommandDisplay : isDisplay
+    let display = isCommand === false ? isCommandDisplay : isDisplay
 
     if (!display) {
       oly.hide()
@@ -167,13 +167,16 @@ function showOverlays (options) {
 
     type = getZoomType(oly)
     const parent = getOverlayParent(oly, overlays)
-    const disaplay = zoomMap[type] ? zoom >= zoomMap[type] : !!parent && parent.visible
-    if (disaplay) {
+    if (mapType !== 'graphic') {
+      display = zoomMap[type] ? zoom >= zoomMap[type] : !!parent && parent.visible
+    }
+
+    if (display) {
       oly.show()
     } else {
       oly.hide()
     }
-    oly.visible = disaplay
+    oly.visible = display
 
     zoomSpecialOverlayPixel(map, oly)
   }
