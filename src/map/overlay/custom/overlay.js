@@ -29,8 +29,9 @@ class CustomOverlay extends BMap.Overlay {
   }
 
   delete () {
-    this.div.remove()
-    deleteOverlays(this)
+    deleteOverlays(this, () => {
+      this.div.remove()
+    })
   }
 
   addEventListener (type, fn, capture = false) {

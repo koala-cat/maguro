@@ -1,7 +1,7 @@
 import { notify } from 'mussel'
 import { getPolylineIncludeSpecials } from '../../calc/overlay'
 
-function deleteOverlays (overlay) {
+function deleteOverlays (overlay, callback) {
   const {
     map,
     overlays,
@@ -27,6 +27,7 @@ function deleteOverlays (overlay) {
       removeOverlays.push(parseInt(overlay.id))
     }
     deleteAnchorOverlays(overlay.options)
+    if (callback) callback()
   }
 }
 
