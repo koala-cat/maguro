@@ -82,7 +82,6 @@ export default {
       } catch {
         points = [overlay.getPosition()]
       }
-
       if (type.includes('special')) {
         overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
       }

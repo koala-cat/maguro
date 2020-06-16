@@ -158,7 +158,7 @@ function showOverlays (mapType, options) {
 
   for (const oly of overlays) {
     let { type, isCommand, isDisplay, isCommandDisplay } = oly
-    let display = isCommand === false ? isCommandDisplay : isDisplay
+    let display = isCommand === false ? isDisplay && isCommandDisplay : isDisplay
 
     if (!display) {
       oly.hide()

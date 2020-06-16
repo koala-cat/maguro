@@ -52,7 +52,7 @@ function multipleOverlays (e, overlay, options) {
   const isSelected = !!selectedOverlays.find(item => item.id === overlay.id)
   const overlays = type.includes('special') ? specialOverlays[overlay.parentId] : [overlay]
 
-  if (isSelected) {
+  if (isSelected && modKey) {
     overlays.map(oly => {
       const idx = selectedOverlays.findIndex(item => item.id === oly.id)
       if (idx > -1) {
@@ -68,7 +68,16 @@ function multipleOverlays (e, overlay, options) {
     }
   }
 
-  options.activeOverlay = modKey ? null : selectedOverlays[0]
+  if (modKey) {
+    options.activeOverlay = null
+  } else {
+    if (selectedOverlays.length > 1) {
+      const id = Math.min.apply(Math, selectedOverlays.map(item => { return item.id }))
+      options.activeOverlay = selectedOverlays.find(item => item.id === id)
+    } else {
+      options.activeOverlay = selectedOverlays[0]
+    }
+  }
 }
 
 function frameSelectOverlays (overlay, options) {

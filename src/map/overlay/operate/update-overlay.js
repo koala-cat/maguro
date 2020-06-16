@@ -23,7 +23,6 @@ function showOverlay (key, value, overlay) {
 
   let polylineVisible = true
   const data = []
-
   if (!['isDisplay', 'isCommandDisplay'].includes(key)) return
 
   if (type.includes('special')) {
@@ -55,7 +54,6 @@ function showOverlay (key, value, overlay) {
 function updateOverlay (key, value, overlay) {
   const { structures, updateOverlays, polylinePointIds } = overlay.options
   const { id, name, projectGeoKey } = overlay
-  lineUpdate = key
   overlay[key] = value
   if (key === 'projectStructureId') {
     const structureId = overlay.projectStructureId
@@ -65,6 +63,7 @@ function updateOverlay (key, value, overlay) {
 
   if (id < 0) return
 
+  lineUpdate = key
   if (!updateOverlays[id]) updateOverlays[id] = {}
 
   if (key === 'points') {
@@ -136,9 +135,8 @@ function updatePolyline (key, value, overlay) {
     showOverlay(key, value, overlay)
   } else if (key !== 'points') {
     overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
+    updateOverlay(key, value, overlay)
   }
-
-  updateOverlay(key, value, overlay)
 }
 
 function updateCircle (key, value, overlay) {

@@ -99,7 +99,6 @@
           if (!item.name.includes(this.searchKey)) {
             continue
           }
-
           const categoryId = item.projectStructureCategoryId
           if (!map[categoryId]) {
             const category = {
@@ -113,6 +112,7 @@
             this.filterStructures.push(category)
           }
           map[categoryId].subNodes.push(item)
+          map[categoryId].expanded = !!this.searchKey
         }
       },
       onSearch: debounce(function (val) {

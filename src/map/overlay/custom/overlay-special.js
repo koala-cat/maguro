@@ -291,20 +291,21 @@ class CustomSpecial {
     }
     // overlay
     const { selectedOverlays, specialOverlays, removeOverlays } = this.options
-    const specials = cloneDeep(selectedOverlays)
-    const polyline = key === 'points' ? value : selectedOverlays[selectedOverlays.length - 1].getPath()
+    const specials = specialOverlays[overlay.parentId]
+    const cloneSpecials = cloneDeep(specials)
+    const polyline = key === 'points' ? value : specials.find(item => item.invented)?.getPath() || null
     const width = key === 'width' ? parseFloat(value) < 10 ? 10 : parseFloat(value) : overlay.width
     Object.assign(
       this.settings,
       {
-        ...getOverlaySettings(selectedOverlays[0]),
+        ...getOverlaySettings(overlay),
         [key]: value,
         width
       }
     )
 
     if (!['projectMapLegendId', 'points', 'width'].includes(key)) {
-      selectedOverlays.map(oly => {
+      specials.map(oly => {
         updatePolyline(key, value, oly, this.options)
       })
       return
@@ -313,10 +314,10 @@ class CustomSpecial {
     this.drawSpecial(polyline, (olys) => {
       const parentOverlay = olys[olys.length - 1]
       if (key !== 'projectMapLegendId') {
-        specials.sort((a, b) => a.invented * 1 - b.invented * 1)
+        cloneSpecials.sort((a, b) => a.invented * 1 - b.invented * 1)
         for (let i = 0; i < olys.length; i++) {
           const oly = olys[i]
-          oly.id = specials[i].id
+          oly.id = cloneSpecials[i].id
           if (key === 'width') {
             updateSpecial(key, width, oly)
             continue
