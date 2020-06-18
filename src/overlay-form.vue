@@ -78,7 +78,8 @@
               v-model.trim="width"
               type="number"
               :disabled="disabled"
-              size="auto" />
+              size="auto"
+              @blur="onBlur($event, 'width')" />
             <mu-flex-item size="8px" />
             <mu-flex-item>m</mu-flex-item>
           </mu-form-field>
@@ -137,7 +138,8 @@
                 type="number"
                 :clearable="false"
                 :disabled="disabled"
-                :style="{maxWidth: maxWidth}" />
+                :style="{maxWidth: maxWidth}"
+                @blur="onBlur($event, 'fillOpacity')" />
               <mu-flex-item size="8px" />
               <mu-flex-item>%</mu-flex-item>
             </mu-h-box>
@@ -160,7 +162,8 @@
               type="number"
               :clearable="false"
               :disabled="disabled"
-              :style="{maxWidth: maxWidth}" />
+              :style="{maxWidth: maxWidth}"
+              @blur="onBlur($event, 'strokeWeight')" />
             <mu-flex-item size="8px" />
             <mu-h-box
               v-show="overlay.type !== 'special'"
@@ -262,6 +265,7 @@
 <script>
   import BMap from 'BMap'
   import isEmpty from 'lodash.isempty'
+  import { notify } from 'mussel'
   import { legendSpecs, fontSpecs, strokeSpecs } from './constants'
   import { fixedNumber } from './map/calc/data'
 
@@ -393,7 +397,10 @@
           return this.overlay.width
         },
         set (val) {
-          this.baiduMap.updateOverlay('width', parseFloat(val))
+          val = parseFloat(val)
+          if (val > 0) {
+            this.baiduMap.updateOverlay('width', val)
+          }
         }
       },
       height: {
@@ -420,8 +427,10 @@
         },
         set (val) {
           val = parseFloat(val)
-          if (val === 0 || val < 0) val = 0.0001
-          this.baiduMap.updateOverlay('fillOpacity', fixedNumber(val / 100, 6))
+          if (val >= 0) {
+            val = val === 0 ? 0.0001 : val
+            this.baiduMap.updateOverlay('fillOpacity', fixedNumber(val / 100, 6))
+          }
         }
       },
       strokeColor: {
@@ -438,8 +447,10 @@
         },
         set (val) {
           val = parseFloat(val)
-          if (val === 0 || val < 0) val = 0.0001
-          this.baiduMap.updateOverlay('strokeWeight', fixedNumber(val, 6))
+          if (val >= 0) {
+            val = val === 0 ? 0.0001 : val
+            this.baiduMap.updateOverlay('strokeWeight', fixedNumber(val, 6))
+          }
         }
       },
       strokeStyle () {
@@ -501,6 +512,21 @@
       },
       onClose () {
         this.visible = false
+      },
+      onBlur (e, key) {
+        let val = e?.$el.querySelector('input').value || -1
+        const prevVal = key === 'fillOpacity' ? fixedNumber(e.value / 100, 6) : e.value
+        const msg = key === 'width' ? '路宽' : key === 'strokeWeight' ? '边框宽度' : '透明度'
+        const symbol = key === 'width' ? '>' : '>='
+        val = parseFloat(val) === 0 && key === 'width' ? -1 : val
+
+        if (val < 0) {
+          this.overlay[key] = val
+          setTimeout(() => {
+            this.overlay[key] = prevVal
+          })
+          notify('warning', `${msg}必须${symbol}0，请重新输入！`)
+        }
       },
       onComboBoxSelect (key, val) {
         this.baiduMap.updateOverlay(key, val)

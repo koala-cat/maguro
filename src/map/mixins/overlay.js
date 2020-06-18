@@ -101,7 +101,7 @@ export default {
       } catch (err) {
         console.log(err)
       }
-    }, 500),
+    }, 100),
     clearOverlays () {
       const overlays = this.map.getOverlays()
       overlays.map(oly => {

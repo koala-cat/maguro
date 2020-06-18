@@ -133,10 +133,11 @@ function updatePolyline (key, value, overlay) {
   if (overlay.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay)
-  } else if (key !== 'points') {
+  } else if (overlay[`set${key.replace(key[0], key[0].toUpperCase())}`]) {
     overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
-    updateOverlay(key, value, overlay)
   }
+
+  updateOverlay(key, value, overlay)
 }
 
 function updateCircle (key, value, overlay) {

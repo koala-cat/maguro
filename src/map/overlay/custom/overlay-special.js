@@ -285,20 +285,22 @@ class CustomSpecial {
   }
 
   update (key, value, overlay) {
+    if (value === overlay[key]) return
+
     if (key === 'points' && !overlay) {
       updatePolyline(key, value, this.overlay)
       return
     }
     // overlay
     const { selectedOverlays, specialOverlays, removeOverlays } = this.options
-    const specials = specialOverlays[overlay.parentId]
+    const specials = selectedOverlays.length > 0 ? selectedOverlays : specialOverlays[overlay.parentId]
     const cloneSpecials = cloneDeep(specials)
     const polyline = key === 'points' ? value : specials.find(item => item.invented)?.getPath() || null
-    const width = key === 'width' ? parseFloat(value) < 10 ? 10 : parseFloat(value) : overlay.width
+    const width = key === 'width' ? parseFloat(value) : overlay.width
     Object.assign(
       this.settings,
       {
-        ...getOverlaySettings(overlay),
+        ...getOverlaySettings(overlay.invented ? selectedOverlays[0] : overlay),
         [key]: value,
         width
       }

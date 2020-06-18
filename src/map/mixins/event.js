@@ -68,8 +68,24 @@ export default {
         selectOverlay(e, overlay, this.$data)
       }
 
+      const mouseover = () => {
+        this.map.setDefaultCursor('pointer')
+      }
+
+      const mouseout = () => {
+        this.map.setDefaultCursor('grab')
+      }
+
       if (!this.overlayEvents.click) {
         this.overlayEvents.click = click
+      }
+
+      if (!this.overlayEvents.mouseover) {
+        this.overlayEvents.mouseover = mouseover
+      }
+
+      if (!this.overlayEvents.mouseout) {
+        this.overlayEvents.mouseout = mouseout
       }
     },
 
