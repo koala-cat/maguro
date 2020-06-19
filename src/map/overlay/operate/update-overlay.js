@@ -130,13 +130,13 @@ function updateMarker (key, value, overlay) {
 function updatePolyline (key, value, overlay) {
   const { settings } = overlay
   settings[key] = value
-  if (overlay.invented && !['width', 'points', 'isDisplay', 'isCommandDisplay'].includes(key)) return
+  if (overlay.invented && !['width', 'points', 'isLocked', 'isDisplay', 'isCommandDisplay'].includes(key)) return
+
   if (ignoreFields.includes(key)) {
     showOverlay(key, value, overlay)
   } else if (overlay[`set${key.replace(key[0], key[0].toUpperCase())}`]) {
     overlay[`set${key.replace(key[0], key[0].toUpperCase())}`](value)
   }
-
   updateOverlay(key, value, overlay)
 }
 

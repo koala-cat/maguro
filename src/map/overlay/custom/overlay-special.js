@@ -214,7 +214,7 @@ class CustomSpecial {
         updatePolyline(key, value, overlay, this.options)
       }
     }
-    overlay.delete = (isRemove) => {
+    overlay.delete = (callback, isRemove) => {
       const { map, overlays } = this.options
       if (isRemove === false) {
         const idx = overlays.findIndex(item => item.id === overlay.id)
@@ -226,7 +226,7 @@ class CustomSpecial {
         }
         return
       }
-      this.delete(overlay)
+      this.delete(overlay, callback)
     }
   }
 
@@ -354,8 +354,8 @@ class CustomSpecial {
     })
   }
 
-  delete (overlay) {
-    deleteOverlays(overlay)
+  delete (overlay, callback) {
+    deleteOverlays(overlay, callback)
   }
 }
 export default CustomSpecial

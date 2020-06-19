@@ -156,6 +156,7 @@
       filterOverlays () {
         const groupIds = []
         const result = []
+
         for (const oly of this.overlays) {
           if (oly.isCommand === false && !oly.isDisplay) continue
 
@@ -171,7 +172,7 @@
             groupIds.push(oly.parentId)
           }
         }
-        result.sort((a, b) => b.id - a.id)
+        result.sort((a, b) => b.id > 0 && a.id > 0 ? a.id - b.id : b.id - a.id)
         return result
       },
       headers () {

@@ -29,6 +29,7 @@ function deleteOverlays (overlay, callback) {
     deleteAnchorOverlays(overlay.options)
     if (callback) callback()
   }
+  console.log(overlays)
 }
 
 function deleteSelectedOverlays (options, isRemove = true) {

@@ -34,8 +34,8 @@ class Circle extends BMap.Circle {
     updateCircle(key, value, this)
   }
 
-  delete () {
-    deleteOverlays(this)
+  delete (callback) {
+    deleteOverlays(this, callback)
   }
 }
 

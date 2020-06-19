@@ -31,8 +31,8 @@ class Label extends BMap.Label {
     updateLabel(key, value, this)
   }
 
-  delete () {
-    deleteOverlays(this)
+  delete (callback) {
+    deleteOverlays(this, callback)
   }
 }
 

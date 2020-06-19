@@ -64,8 +64,8 @@ class Rectangle extends BMap.Polygon {
     updateRectangle(key, value, this)
   }
 
-  delete () {
-    deleteOverlays(this)
+  delete (callback) {
+    deleteOverlays(this, callback)
   }
 }
 

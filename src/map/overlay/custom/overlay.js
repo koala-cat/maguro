@@ -28,8 +28,9 @@ class CustomOverlay extends BMap.Overlay {
     updateMarker(key, value, this)
   }
 
-  delete () {
+  delete (callback) {
     deleteOverlays(this, () => {
+      if (callback) callback()
       this.div.remove()
     })
   }

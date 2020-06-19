@@ -41,8 +41,8 @@ class Polyline extends BMap.Polyline {
     updatePolyline(key, value, this)
   }
 
-  delete () {
-    deleteOverlays(this)
+  delete (callback) {
+    deleteOverlays(this, callback)
   }
 }
 

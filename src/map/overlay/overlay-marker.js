@@ -49,8 +49,8 @@ class Marker extends BMap.Marker {
     updateMarker(key, value, this)
   }
 
-  delete () {
-    deleteOverlays(this)
+  delete (callback) {
+    deleteOverlays(this, callback)
   }
 }
 

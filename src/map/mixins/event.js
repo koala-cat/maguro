@@ -122,10 +122,15 @@ export default {
       const keyCode = e.keyCode || e.which || e.charCode
       if (keyCode === 46) {
         // Delete 46
-        this.selectedOverlays.map(oly => {
-          oly.delete()
+        const idxs = []
+        this.selectedOverlays.map((oly, idx) => {
+          oly.delete(() => {
+            idxs.push(idx)
+          })
         })
-        this.selectedOverlays.splice(0)
+        idxs.map(idx => {
+          this.selectedOverlays.splice(idx, 1)
+        })
       }
 
       if (keyCode === 27) {

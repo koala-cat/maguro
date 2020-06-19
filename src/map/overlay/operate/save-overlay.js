@@ -78,7 +78,7 @@ function getCreates (options) {
       delete oly.fillOpacity
     }
   }
-  return result
+  return result.sort((a, b) => b.id - a.id)
 }
 
 function getPoints (oly) {

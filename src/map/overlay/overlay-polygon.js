@@ -34,8 +34,8 @@ class Polygon extends BMap.Polygon {
     updatePolygon(key, value, this)
   }
 
-  delete () {
-    deleteOverlays(this)
+  delete (callback) {
+    deleteOverlays(this, callback)
   }
 }
 

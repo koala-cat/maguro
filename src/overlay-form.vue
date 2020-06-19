@@ -45,11 +45,11 @@
           <mu-form-field
             v-show="tagFileVisible"
             label="标签">
-            <mu-h-box
-              :style="{maxWidth: maxWidth}">
+            <mu-h-box size="auto">
               <img v-show="tagFile" :src="tagFile" width="16" height="16">
               <mu-combo-box
                 unlettered
+                size="auto"
                 :clearable="false"
                 :disabled="disabled"
                 popup-height="154px">
@@ -58,13 +58,19 @@
                   :key="legend.id"
                   :value="legend.id"
                   :title="legend.name"
-                  style="padding: 5px 0; text-align: center;"
+                  style="padding: 5px 8px;"
                   @click="onComboBoxSelect('projectMapTagId', legend.id)">
                   <img
                     v-show="legend.id"
                     :src="legend.iconUrl"
                     width="16"
-                    height="16">
+                    height="16"
+                    style="vertical-align: middle;">
+                  <span
+                    v-show="legend.id"
+                    class="mu-text-ellipsis">
+                    {{ legend.name }}
+                  </span>
                   <span v-show="!legend.id">{{ legend.value }}</span>
                 </mu-option>
               </mu-combo-box>
@@ -427,7 +433,7 @@
         },
         set (val) {
           val = parseFloat(val)
-          if (val >= 0) {
+          if (val >= 0 && val <= 100) {
             val = val === 0 ? 0.0001 : val
             this.baiduMap.updateOverlay('fillOpacity', fixedNumber(val / 100, 6))
           }
@@ -514,18 +520,32 @@
         this.visible = false
       },
       onBlur (e, key) {
-        let val = e?.$el.querySelector('input').value || -1
-        const prevVal = key === 'fillOpacity' ? fixedNumber(e.value / 100, 6) : e.value
-        const msg = key === 'width' ? '路宽' : key === 'strokeWeight' ? '边框宽度' : '透明度'
-        const symbol = key === 'width' ? '>' : '>='
-        val = parseFloat(val) === 0 && key === 'width' ? -1 : val
-
+        let val = e.$el.querySelector('input').value
+        let prevVal = e.value
+        let msg = ''
+        let symbol = ''
+        val = parseFloat(val)
+        if (key === 'width') {
+          val = val === 0 ? -1 : val
+          msg = '路宽'
+          symbol = '>0'
+        }
+        if (key === 'strokeWeight') {
+          msg = '边框宽度'
+          symbol = '>=0'
+        }
+        if (key === 'fillOpacity') {
+          val = val > 100 ? -1 : val
+          msg = '透明度'
+          prevVal = fixedNumber(e.value / 100, 6)
+          symbol = '>=0且<=100'
+        }
         if (val < 0) {
           this.overlay[key] = val
           setTimeout(() => {
             this.overlay[key] = prevVal
           })
-          notify('warning', `${msg}必须${symbol}0，请重新输入！`)
+          notify('warning', `${msg}必须${symbol}，请重新输入！`)
         }
       },
       onComboBoxSelect (key, val) {
