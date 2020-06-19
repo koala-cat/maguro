@@ -285,8 +285,6 @@ class CustomSpecial {
   }
 
   update (key, value, overlay) {
-    if (value === overlay[key]) return
-
     if (key === 'points' && !overlay) {
       updatePolyline(key, value, this.overlay)
       return

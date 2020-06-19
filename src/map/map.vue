@@ -108,7 +108,8 @@
         },
         id: -2,
         parentId: -1,
-        isReset: true
+        isReset: true,
+        dragging: false
       }
     },
     computed: {

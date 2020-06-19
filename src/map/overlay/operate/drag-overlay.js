@@ -34,6 +34,7 @@ function dragOverlay (overlay, options, callback) {
   }
 
   const move = (e) => {
+    if (!options.selectedOverlays.find(item => item.id === overlay.id)) return
     dragMove(e, options)
   }
 
@@ -80,6 +81,8 @@ function dragMove (e, options) {
 
   if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return
 
+  options.dragging = true
+
   for (let i = 0; i < selectedOverlays.length; i++) {
     const oly = selectedOverlays[i]
     const type = oly.type
@@ -112,6 +115,10 @@ function dragEnd (e, options) {
   e.stopPropagation()
 
   const { overlays, selectedOverlays } = options
+
+  setTimeout(() => {
+    options.dragging = false
+  }, 10)
 
   selectedOverlays.map(oly => {
     const specials = getPolylineIncludeSpecials(oly, overlays)

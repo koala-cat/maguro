@@ -29,7 +29,6 @@ function deleteOverlays (overlay, callback) {
     deleteAnchorOverlays(overlay.options)
     if (callback) callback()
   }
-  console.log(overlays)
 }
 
 function deleteSelectedOverlays (options, isRemove = true) {
@@ -39,7 +38,7 @@ function deleteSelectedOverlays (options, isRemove = true) {
 
     const idx = overlays.findIndex(item => item.id === oly.id)
     if (idx > -1) {
-      oly.delete(isRemove)
+      oly.delete(null, isRemove)
     }
   }
   selectedOverlays.splice(0)

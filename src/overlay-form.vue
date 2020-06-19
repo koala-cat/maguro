@@ -570,7 +570,7 @@
 
   .mu-color-picker {
     position:absolute;
-    max-width: 60px;
+    max-width: 76px;
     opacity: 0;
     z-index: 10;
     & > input {

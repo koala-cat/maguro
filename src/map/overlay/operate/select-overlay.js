@@ -11,10 +11,8 @@ function selectOverlay (e, overlay, options) {
   const type = overlay.type
   const activeLegendType = activeLegend?.type || ''
 
-  // if ((!overlay.isLocked && selectedOverlays.includes(overlay)) ||
-  //   activeOverlay === overlay) {
-  //   return
-  // }
+  if (options.dragging) return
+
   if (activeLegendType === 'special' && type === 'polyline' && !overlay.disabled && e) {
     const settings = {
       ...defaultSettings(activeLegendType),
@@ -34,16 +32,16 @@ function selectOverlay (e, overlay, options) {
       selectedOverlays.push(...overlays)
     })
   } else {
-    multipleOverlays(e, overlay, options)
+    const isApple = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
+    const modKey = e ? isApple ? e.metaKey || e.ctrlKey : e.ctrlKey : false
+
+    multipleOverlays(modKey, overlay, options)
   }
 }
 
-function multipleOverlays (e, overlay, options) {
+function multipleOverlays (modKey, overlay, options) {
   const { selectedOverlays, specialOverlays } = options
   // removeMarkers(this._map, this._options)
-
-  // const mac = /Mac|iPod|iPhone|iPad/.test(window.navigator.platform)
-  const modKey = e?.ctrlKey || false
   const type = overlay.type
   if (!modKey) {
     deselectOverlays(options)
@@ -51,7 +49,7 @@ function multipleOverlays (e, overlay, options) {
   // 判断当前是否选中
   const isSelected = !!selectedOverlays.find(item => item.id === overlay.id)
   const overlays = type.includes('special') ? specialOverlays[overlay.parentId] : [overlay]
-
+  console.log('selected')
   if (isSelected && modKey) {
     overlays.map(oly => {
       const idx = selectedOverlays.findIndex(item => item.id === oly.id)
@@ -67,7 +65,6 @@ function multipleOverlays (e, overlay, options) {
       overlay.drag()
     }
   }
-
   if (modKey) {
     options.activeOverlay = null
   } else {
