@@ -85,10 +85,9 @@ export default {
       if (type.includes('special')) {
         overlay = this.specialOverlays[overlay.parentId].find(item => item.invented)
       }
-      selectOverlay(null, overlay, this.$data)
-
       const viewPort = this.map.getViewport(points)
       this.map.centerAndZoom(viewPort.center, viewPort.zoom)
+      selectOverlay(null, overlay, this.$data)
     },
     updateOverlay: debounce(function (key, value, overlay) {
       overlay = overlay || this.activeOverlay

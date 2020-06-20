@@ -50,6 +50,7 @@
               <mu-combo-box
                 unlettered
                 size="auto"
+                :value="projectMapTagId"
                 :clearable="false"
                 :disabled="disabled"
                 popup-height="154px">
@@ -61,17 +62,15 @@
                   style="padding: 5px 8px;"
                   @click="onComboBoxSelect('projectMapTagId', legend.id)">
                   <img
-                    v-show="legend.id"
-                    :src="legend.iconUrl"
+                    v-show="legend.name !== '不选择'"
+                    :src="legend.tagIconUrl"
                     width="16"
                     height="16"
                     style="vertical-align: middle;">
                   <span
-                    v-show="legend.id"
                     class="mu-text-ellipsis">
                     {{ legend.name }}
                   </span>
-                  <span v-show="!legend.id">{{ legend.value }}</span>
                 </mu-option>
               </mu-combo-box>
             </mu-h-box>
@@ -371,12 +370,16 @@
       tagLegends () {
         const legends = this.legends.reduce((arr, item) => {
           if (item.type === 'tag') {
-            item.name = item.fileName ? item.fileName.substring(0, item.fileName.lastIndexOf('.')) : ''
-            arr.push(item)
+            const name = item.fileName ? item.fileName.substring(0, item.fileName.lastIndexOf('.')) : ''
+            item.name = name
+            if (name === '不选择') {
+              arr.unshift(item)
+            } else {
+              arr.push(item)
+            }
           }
           return arr
         }, [])
-        legends.unshift({ id: null, value: '不选择' })
         return legends
       },
       name: {
@@ -388,11 +391,17 @@
         }
       },
       projectMapTagId () {
-        return this.overlay.projectMapTagId
+        let tagId = this.overlay.projectMapTagId
+        if (!tagId) {
+          const tag = this.tagLegends.find(item => item.name === '不选择')
+          tagId = tag?.id || null
+        }
+        return tagId
       },
       tagFile () {
         const tag = this.tagLegends.find(item => item.id === this.projectMapTagId)
-        return tag?.iconUrl || null
+        const iconUrl = tag && tag.name !== '不选择' ? tag?.tagIconUrl || null : null
+        return iconUrl
       },
       specialFile () {
         const legend = this.specialLegends.find(item => item.id === this.overlay.projectMapLegendId)

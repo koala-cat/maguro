@@ -144,12 +144,15 @@ function zoomSpecialOverlayPixel (map, overlay) {
 }
 
 function showOverlays (mapType, options) {
-  const { map, overlays, activeOverlay, zoomSettings } = options
+  const { map, overlays, selectedOverlays, activeOverlay, zoomSettings } = options
   const zoom = map.getZoom()
   const zoomMap = {}
-  const setActiveOverlay = (oly) => {
+  const deselectOverlay = (oly) => {
     if (activeOverlay && oly.id === activeOverlay.id) {
       options.activeOverlay = null
+    }
+    if (selectedOverlays.find(item => item.id === oly.id)) {
+      oly.disableEditing()
     }
   }
   overlays.sort((a, b) => {
@@ -166,9 +169,8 @@ function showOverlays (mapType, options) {
     let display = isCommand === false ? isDisplay && isCommandDisplay : isDisplay
 
     if (!display) {
+      deselectOverlay(oly)
       oly.hide()
-      oly.disableEditing()
-      setActiveOverlay(oly)
       continue
     }
 
@@ -181,9 +183,9 @@ function showOverlays (mapType, options) {
     if (display) {
       oly.show()
     } else {
+      console.log(oly.name)
+      deselectOverlay(oly)
       oly.hide()
-      oly.disableEditing()
-      setActiveOverlay(oly)
     }
     oly.visible = display
 

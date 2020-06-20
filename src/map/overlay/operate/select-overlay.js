@@ -49,7 +49,7 @@ function multipleOverlays (modKey, overlay, options) {
   // 判断当前是否选中
   const isSelected = !!selectedOverlays.find(item => item.id === overlay.id)
   const overlays = type.includes('special') ? specialOverlays[overlay.parentId] : [overlay]
-  console.log('selected')
+
   if (isSelected && modKey) {
     overlays.map(oly => {
       const idx = selectedOverlays.findIndex(item => item.id === oly.id)
